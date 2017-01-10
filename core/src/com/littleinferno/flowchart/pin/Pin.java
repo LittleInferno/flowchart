@@ -2,51 +2,35 @@ package com.littleinferno.flowchart.pin;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.Batch;
-import com.badlogic.gdx.graphics.g2d.Sprite;
-import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.scenes.scene2d.Actor;
-import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
+import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
+import com.littleinferno.flowchart.node.ConverterNode;
+import com.littleinferno.flowchart.node.Node;
+import com.littleinferno.flowchart.value.Value;
 import com.littleinferno.flowchart.wire.Wire;
 import com.littleinferno.flowchart.wire.WireConnector;
 
 import java.util.ArrayList;
 import java.util.Iterator;
 
+
 public class Pin extends Image {
-
-    public Data getData() {
-        return data;
-    }
-
-    public Connection getConnection() {
-        return connection;
-    }
 
     public enum Connection {
         INPUT,
         OUTPUT
     }
 
-    public enum Data {
-        EXECUTION,
-        BOOL,
-        INT,
-        FLOAT,
-        STRING,
-    }
-
-    public Pin(Connection connection, Data data) {
+    public Pin(Connection connection, Value.Type data) {
         super(getTexture(data));
 
         this.pins = new ArrayList<Pin>();
-
         this.connection = connection;
+
         this.data = data;
         addListener(new InputListener() {
 
@@ -60,13 +44,51 @@ public class Pin extends Image {
         });
     }
 
+    public Value.Type getData() {
+        return data;
+    }
+
+    public void setData(Value.Type data) {
+        this.data = data;
+        setDrawable(new TextureRegionDrawable(getTexture(data)));
+    }
+
+
+    public Connection getConnection() {
+        return connection;
+    }
+
     public boolean connect(Pin pin) {
 
-        if (pin.getConnection().equals(getConnection()) || pin.getParent() == getParent())
+        if (pin.getConnection() == getConnection() || pin.getParent() == getParent())
             return false;
+        if (getData() != pin.getData()) {
+            if (getData() == Value.Type.EXECUTION || pin.getData() == Value.Type.EXECUTION)
+                return false;
 
-        if ((getData() == Data.EXECUTION && getConnection() == Connection.OUTPUT)
-                || (getData() != Data.EXECUTION && getConnection() == Connection.INPUT)) {
+            Vector2 pos = new Vector2();
+
+            pos = getLocation().add(pin.getLocation());
+            pos.x /= 2;
+            pos.y /= 2;
+
+            ConverterNode converter;
+            if (getConnection() == Connection.INPUT) {
+                converter = new ConverterNode(pos, pin.getData(), this.getData());
+                converter.get("from").connect(pin);
+                converter.get("to").connect(this);
+            } else {
+                converter = new ConverterNode(pos, this.getData(), pin.getData());
+                converter.get("from").connect(this);
+                converter.get("to").connect(pin);
+            }
+
+            getStage().addActor(converter);
+            return true;
+        }
+
+        if ((getData() == Value.Type.EXECUTION && getConnection() == Connection.OUTPUT)
+                || (getData() != Value.Type.EXECUTION && getConnection() == Connection.INPUT)) {
 
             if (this.pin != null) pin.disconnect(this);
 
@@ -84,8 +106,8 @@ public class Pin extends Image {
 
     public void disconnect(Pin pin) {
 
-        if ((getData() == Data.EXECUTION && getConnection() == Connection.OUTPUT)
-                || (getData() != Data.EXECUTION && getConnection() == Connection.INPUT)) {
+        if ((getData() == Value.Type.EXECUTION && getConnection() == Connection.OUTPUT)
+                || (getData() != Value.Type.EXECUTION && getConnection() == Connection.INPUT)) {
 
             this.pin = null;
         } else {
@@ -101,13 +123,7 @@ public class Pin extends Image {
         }
     }
 
-    @Override
-    public void act(float delta) {
-        super.act(delta);
-    }
-
-
-    static private TextureRegion getTexture(Data data) {
+    static private TextureRegion getTexture(Value.Type data) {
 
         switch (data) {
             case EXECUTION:
@@ -125,10 +141,22 @@ public class Pin extends Image {
         return null;
     }
 
+    public Vector2 getLocation() {
+        return localToStageCoordinates(new Vector2(0, 0));
+    }
+
+    public Node getConnectionNode() {
+
+        if (pin != null)
+            return (Node) pin.getParent().getParent().getParent();
+
+        return null;
+    }
+
     private Pin pin;
     private ArrayList<Pin> pins;
-    private Connection connection;
-    private Data data;
+    private final Connection connection;
+    private Value.Type data;
 
     private static Texture texture = new Texture(Gdx.files.internal("pin.png"));
 }
