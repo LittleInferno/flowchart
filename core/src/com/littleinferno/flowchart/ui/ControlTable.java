@@ -1,7 +1,10 @@
 package com.littleinferno.flowchart.ui;
 
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Actor;
+import com.badlogic.gdx.scenes.scene2d.InputEvent;
+import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Button;
 import com.badlogic.gdx.scenes.scene2d.ui.ButtonGroup;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
@@ -15,6 +18,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.ui.TextField;
 import com.badlogic.gdx.scenes.scene2d.ui.VerticalGroup;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
+import com.badlogic.gdx.scenes.scene2d.utils.DragAndDrop;
 import com.littleinferno.flowchart.Variable;
 import com.littleinferno.flowchart.node.VariableGetNode;
 import com.littleinferno.flowchart.node.VariableSetNode;
@@ -23,8 +27,8 @@ import com.littleinferno.flowchart.value.Value;
 
 public class ControlTable extends Table {
 
-    private static class VariableItem extends Table {
-        VariableItem(String varName, Skin skin) {
+    private class VariableItem extends Table {
+        VariableItem(String varName, final Skin skin) {
 
             variable = new Variable(varName);
             variable.setValueType(Value.Type.BOOL);
@@ -37,10 +41,10 @@ public class ControlTable extends Table {
             name.setEllipsis(true);
             title.addActor(name);
 
-            Button set = new TextButton("set", skin);
+            final Button set = new TextButton("set", skin);
             title.add(set).size(30).right();
 
-            Button get = new TextButton("get", skin);
+            final Button get = new TextButton("get", skin);
             title.add(get).size(30).right();
 
             Table property = new Table();
@@ -72,17 +76,18 @@ public class ControlTable extends Table {
             add(tree).fillX().expandX();
 
 
-            get.addListener(new ChangeListener() {
-                public void changed(ChangeEvent event, Actor actor) {
-                    getStage().addActor(new VariableGetNode(new Vector2(200, 200), variable));
-                }
-            });
-
-            set.addListener(new ChangeListener() {
-                public void changed(ChangeEvent event, Actor actor) {
-                    getStage().addActor(new VariableSetNode(new Vector2(200, 300), variable));
-                }
-            });
+//            get.addListener(new ChangeListener() {
+//                public void changed(ChangeEvent event, Actor actor) {
+//
+//
+//                }
+//            });
+//
+//            set.addListener(new ChangeListener() {
+//                public void changed(ChangeEvent event, Actor actor) {
+//
+//                }
+//            });
 
             nameField.setTextFieldListener(new TextField.TextFieldListener() {
                 @Override
@@ -98,6 +103,31 @@ public class ControlTable extends Table {
                     variable.setValueType(type.getSelected());
                 }
             });
+
+            dragAndDrop.addSource(new DragAndDrop.Source(get) {
+                @Override
+                public DragAndDrop.Payload dragStart(InputEvent event, float x, float y, int pointer) {
+                    DragAndDrop.Payload payload = new DragAndDrop.Payload();
+                    payload.setObject(new VariableGetNode(new Vector2(200, 200), variable));
+
+                    payload.setDragActor(new Label(String.format("Get %s", variable.getName()), skin));
+
+                    return payload;
+                }
+            });
+
+            dragAndDrop.addSource(new DragAndDrop.Source(set) {
+                @Override
+                public DragAndDrop.Payload dragStart(InputEvent event, float x, float y, int pointer) {
+                    DragAndDrop.Payload payload = new DragAndDrop.Payload();
+                    payload.setObject(new VariableSetNode(new Vector2(200, 300), variable));
+
+                    payload.setDragActor(new Label(String.format("Set %s", variable.getName()), skin));
+
+                    return payload;
+                }
+            });
+
         }
 
         Variable variable;
@@ -155,7 +185,7 @@ public class ControlTable extends Table {
 
     }
 
-    private static class VariableTable extends Table {
+    private class VariableTable extends Table {
         VariableTable(Skin skin) {
             this.skin = skin;
 
@@ -178,7 +208,7 @@ public class ControlTable extends Table {
         private Table items;
         private ScrollPane scroll;
         private Skin skin;
-        private static int counter = 1;
+        private int counter = 1;
     }
 
     private static class FunTable extends Table {
@@ -204,8 +234,10 @@ public class ControlTable extends Table {
     }
 
 
-    public ControlTable(Skin skin) {
+    public ControlTable(Stage st, Skin skin) {
         setWidth(300);
+        setHeight(st.getHeight());
+        st.addActor(this);
 
         top();
         Table tabTable = new Table();
@@ -280,6 +312,25 @@ public class ControlTable extends Table {
         variables.setChecked(true);
         funTable.setVisible(false);
 
+
+        final NodeWindow main = new NodeWindow(skin);
+        st.addActor(main);
+
+        dragAndDrop.addTarget(new DragAndDrop.Target(main) {
+            @Override
+            public boolean drag(DragAndDrop.Source source, DragAndDrop.Payload payload, float x, float y, int pointer) {
+                return true;
+            }
+
+            @Override
+            public void drop(DragAndDrop.Source source, DragAndDrop.Payload payload, float x, float y, int pointer) {
+
+                Actor node = (Actor) payload.getObject();
+                node.setPosition(x, y);
+                main.addActor(node);
+            }
+        });
     }
 
+    DragAndDrop dragAndDrop = new DragAndDrop();
 }

@@ -3,6 +3,7 @@ package com.littleinferno.flowchart;
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.GL20;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
@@ -15,6 +16,8 @@ import com.littleinferno.flowchart.node.LogNode;
 import com.littleinferno.flowchart.node.StringNode;
 import com.littleinferno.flowchart.ui.ControlTable;
 import com.littleinferno.flowchart.ui.FunctionItem;
+import com.littleinferno.flowchart.ui.FunctionWindow;
+import com.littleinferno.flowchart.ui.NodeWindow;
 import com.littleinferno.flowchart.wire.WireConnector;
 
 public class Flowchart extends ApplicationAdapter {
@@ -75,13 +78,12 @@ public class Flowchart extends ApplicationAdapter {
         stage.addActor(new LogNode(new Vector2(350, 250)));
         stage.addActor(new LogNode(new Vector2(350, 300)));
 
-        stage.addActor(new StringNode(new Vector2(400, 150)));
+        stage.addActor(new StringNode   (new Vector2(400, 150)));
         stage.addActor(new IntegerNode(new Vector2(400, 250)));
 
 
-        ControlTable controlTable = new ControlTable(skin);
+        ControlTable controlTable = new ControlTable(stage, skin);
 
-        controlTable.setHeight(stage.getHeight());
         stage.addActor(controlTable);
 //        VariableTable var = new VariableTable(skin);
 //        var.setPosition(400, 200);
@@ -112,11 +114,13 @@ public class Flowchart extends ApplicationAdapter {
         Gdx.input.setInputProcessor(stage);
 
         TextButton b = new TextButton("qwe", skin);
-        stage.setDebugAll(true);
+        //  stage.setDebugAll(true);
 
         // stage.addActor(node);
         // stage.addActor(node2);
 
+        //  d.setFillParent(true);
+      //  stage.addActor(d);
     }
 
     @Override
