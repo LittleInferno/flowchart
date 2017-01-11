@@ -1,10 +1,13 @@
 package com.littleinferno.flowchart.ui;
 
 import com.badlogic.gdx.scenes.scene2d.Actor;
+import com.badlogic.gdx.scenes.scene2d.InputEvent;
+import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.ui.Window;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
+import com.badlogic.gdx.utils.Align;
 
 public class NodeWindow extends Window {
 
@@ -22,9 +25,12 @@ public class NodeWindow extends Window {
 
     public NodeWindow(String title, Skin skin) {
         super(title, skin);
+
+        setSize(300, 300);
         setResizable(true);
 
         final TextButton button = new TextButton("\u25F1", skin);
+        getTitleTable().add(button).size(getPadTop());
         button.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
@@ -44,8 +50,6 @@ public class NodeWindow extends Window {
                 NodeWindow.this.setFillParent(fill = !fill);
             }
         });
-        getTitleTable().add(button).size(getPadTop());
 
-        setSize(400, 400);
     }
 }

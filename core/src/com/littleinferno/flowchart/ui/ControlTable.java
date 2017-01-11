@@ -1,6 +1,9 @@
 package com.littleinferno.flowchart.ui;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.NinePatch;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
@@ -19,6 +22,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.TextField;
 import com.badlogic.gdx.scenes.scene2d.ui.VerticalGroup;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.DragAndDrop;
+import com.badlogic.gdx.scenes.scene2d.utils.NinePatchDrawable;
 import com.littleinferno.flowchart.Variable;
 import com.littleinferno.flowchart.node.VariableGetNode;
 import com.littleinferno.flowchart.node.VariableSetNode;
@@ -35,11 +39,11 @@ public class ControlTable extends Table {
 
 
             Table title = new Table();
-            title.setSize(221, 30);
 
             final Label name = new Label(varName, skin);
             name.setEllipsis(true);
-            title.addActor(name);
+            title.add(name).expand().fill()
+                    .width(151);// TODO WTF? Fix it
 
             final Button set = new TextButton("set", skin);
             title.add(set).size(30).right();
@@ -67,27 +71,15 @@ public class ControlTable extends Table {
 
             Tree.Node titleNode = new Tree.Node(title);
             titleNode.setSelectable(false);
-
             Tree.Node propertyNode = new Tree.Node(property);
             propertyNode.setSelectable(false);
             titleNode.add(propertyNode);
 
             tree.add(titleNode);
             add(tree).fillX().expandX();
-
-
-//            get.addListener(new ChangeListener() {
-//                public void changed(ChangeEvent event, Actor actor) {
-//
-//
-//                }
-//            });
-//
-//            set.addListener(new ChangeListener() {
-//                public void changed(ChangeEvent event, Actor actor) {
-//
-//                }
-//            });
+            tree.layout();
+            property.pack();
+            Gdx.app.log(tree.getWidth()+"",property.getWidth()+"");
 
             nameField.setTextFieldListener(new TextField.TextFieldListener() {
                 @Override
@@ -104,7 +96,7 @@ public class ControlTable extends Table {
                 }
             });
 
-            dragAndDrop.addSource(new DragAndDrop.Source(get) {
+            Main.getDND().addSource(new DragAndDrop.Source(get) {
                 @Override
                 public DragAndDrop.Payload dragStart(InputEvent event, float x, float y, int pointer) {
                     DragAndDrop.Payload payload = new DragAndDrop.Payload();
@@ -116,7 +108,7 @@ public class ControlTable extends Table {
                 }
             });
 
-            dragAndDrop.addSource(new DragAndDrop.Source(set) {
+            Main.getDND().addSource(new DragAndDrop.Source(set) {
                 @Override
                 public DragAndDrop.Payload dragStart(InputEvent event, float x, float y, int pointer) {
                     DragAndDrop.Payload payload = new DragAndDrop.Payload();
@@ -233,11 +225,11 @@ public class ControlTable extends Table {
         private static int counter = 1;
     }
 
+    public ControlTable(Skin skin) {
 
-    public ControlTable(Stage st, Skin skin) {
-        setWidth(300);
-        setHeight(st.getHeight());
-        st.addActor(this);
+        setWidth(200);
+        NinePatch patch = new NinePatch(new Texture(Gdx.files.internal("VarTable.png")), 1, 1, 1, 1);
+        setBackground(new NinePatchDrawable(patch));
 
         top();
         Table tabTable = new Table();
@@ -312,25 +304,5 @@ public class ControlTable extends Table {
         variables.setChecked(true);
         funTable.setVisible(false);
 
-
-        final NodeWindow main = new NodeWindow(skin);
-        st.addActor(main);
-
-        dragAndDrop.addTarget(new DragAndDrop.Target(main) {
-            @Override
-            public boolean drag(DragAndDrop.Source source, DragAndDrop.Payload payload, float x, float y, int pointer) {
-                return true;
-            }
-
-            @Override
-            public void drop(DragAndDrop.Source source, DragAndDrop.Payload payload, float x, float y, int pointer) {
-
-                Actor node = (Actor) payload.getObject();
-                node.setPosition(x, y);
-                main.addActor(node);
-            }
-        });
     }
-
-    DragAndDrop dragAndDrop = new DragAndDrop();
 }
