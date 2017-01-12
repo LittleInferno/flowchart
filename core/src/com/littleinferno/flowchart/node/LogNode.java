@@ -20,7 +20,7 @@ public class LogNode extends Node {
     @Override
     void execute() {
 
-        Node string = get("string").getConnectionNode();
+        Node string = getItem("string").getPin().getConnectionNode();
         if (string != null) {
             try {
                 Gdx.app.log("", string.evaluate().asString());
@@ -29,7 +29,7 @@ public class LogNode extends Node {
             }
         }
 
-        Node next = get("exec out").getConnectionNode();
+        Node next = getItem("exec out").getPin().getConnectionNode();
 
         if (next != null) {
             try {

@@ -28,7 +28,7 @@ public class NodeWindow extends Window {
 
         setSize(300, 300);
         setResizable(true);
-
+        setKeepWithinStage(false);
         final TextButton button = new TextButton("\u25F1", skin);
         getTitleTable().add(button).size(getPadTop());
         button.addListener(new ChangeListener() {
@@ -41,10 +41,13 @@ public class NodeWindow extends Window {
                     oldW = getWidth();
                     oldH = getHeight();
                     button.setText("\u25F1");
+                    setPosition(0, 0);
+                    setMovable(false);
                 } else {
                     setSize(oldW, oldH);
                     setPosition(oldX, oldY);
                     button.setText("\u25F3");
+                    setMovable(true);
                 }
 
                 NodeWindow.this.setFillParent(fill = !fill);

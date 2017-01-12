@@ -17,6 +17,39 @@ import com.littleinferno.flowchart.value.Value;
 
 public class Node extends Table {
 
+    public static class Item extends Table {
+        Label label;
+        Pin pin;
+
+
+        Item(String name, Pin.Connection connection, Value.Type value, Skin skin) {
+            super.setName(name);
+
+            this.label = new Label(name, skin);
+            this.label.setEllipsis(true);
+            this.label.setName("name");
+            this.pin = new Pin(connection, value);
+
+            if (connection == Pin.Connection.INPUT) {
+                add(pin).padLeft(10).width(16);
+                add(label).fill();
+            } else {
+                add(label).fill();
+                add(pin).padRight(10).width(16);
+            }
+        }
+
+        public Pin getPin() {
+            return pin;
+        }
+
+        @Override
+        public void setName(String name) {
+            super.setName(name);
+            label.setText(name);
+        }
+    }
+
     public Node(Vector2 position, CharSequence header) {
 
         setWidth(200);
@@ -76,38 +109,27 @@ public class Node extends Table {
         });
     }
 
-    void addDataInputPin(final Value.Type type, final String name) {
-        Pin pin = new Pin(Pin.Connection.INPUT, type);
-        pin.setName(name);
-        left.add(pin).padLeft(10).width(16);
-        left.add(new Label(name, skin)).expandX();
+    public void addDataInputPin(final Value.Type type, final String name) {
+        left.add(new Item(name, Pin.Connection.INPUT, type, skin)).expandX().fillX().height(16);
+
         left.row();
         updateSize();
     }
 
-    void addDataOutputPin(final Value.Type type, final String name) {
-        Pin pin = new Pin(Pin.Connection.OUTPUT, type);
-        pin.setName(name);
-        right.add(new Label(name, skin)).expandX();
-        right.add(pin).padRight(10).width(16);
+    public void addDataOutputPin(final Value.Type type, final String name) {
+        right.add(new Item(name, Pin.Connection.OUTPUT, type, skin)).expandX().fillX().height(16);
         right.row();
         updateSize();
     }
 
     void addExecutionInputPin(final String name) {
-        Pin pin = new Pin(Pin.Connection.INPUT, Value.Type.EXECUTION);
-        pin.setName(name);
-        left.add(pin).padLeft(10).width(16);
-        left.add(new Label(name, skin)).expandX();
+        left.add(new Item(name, Pin.Connection.INPUT, Value.Type.EXECUTION, skin)).expandX().fillX().height(16);
         left.row();
         updateSize();
     }
 
     void addExecutionOutputPin(final String name) {
-        Pin pin = new Pin(Pin.Connection.OUTPUT, Value.Type.EXECUTION);
-        pin.setName(name);
-        right.add(new Label(name, skin)).expandX();
-        right.add(pin).padRight(20).width(16);
+        right.add(new Item(name, Pin.Connection.OUTPUT, Value.Type.EXECUTION, skin)).expandX().fillX().height(16);
         right.row();
         updateSize();
     }
@@ -117,8 +139,8 @@ public class Node extends Table {
         right.removeActor(right.findActor(name));
     }
 
-    public Pin get(String name) {
-        return (Pin) findActor(name);
+    public Item getItem(String name) {
+        return (Item) findActor(name);
     }
 
     public void setTitle(String title) {

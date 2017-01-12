@@ -1,13 +1,11 @@
 package com.littleinferno.flowchart.ui;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.NinePatch;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
-import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Button;
 import com.badlogic.gdx.scenes.scene2d.ui.ButtonGroup;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
@@ -23,13 +21,14 @@ import com.badlogic.gdx.scenes.scene2d.ui.VerticalGroup;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.DragAndDrop;
 import com.badlogic.gdx.scenes.scene2d.utils.NinePatchDrawable;
+import com.littleinferno.flowchart.Function;
 import com.littleinferno.flowchart.Variable;
 import com.littleinferno.flowchart.node.VariableGetNode;
 import com.littleinferno.flowchart.node.VariableSetNode;
 import com.littleinferno.flowchart.value.Value;
 
 
-public class ControlTable extends Table {
+class ControlTable extends Table {
 
     private class VariableItem extends Table {
         VariableItem(String varName, final Skin skin) {
@@ -77,9 +76,6 @@ public class ControlTable extends Table {
 
             tree.add(titleNode);
             add(tree).fillX().expandX();
-            tree.layout();
-            property.pack();
-            Gdx.app.log(tree.getWidth()+"",property.getWidth()+"");
 
             nameField.setTextFieldListener(new TextField.TextFieldListener() {
                 @Override
@@ -125,44 +121,134 @@ public class ControlTable extends Table {
         Variable variable;
     }
 
-//    private static class FunctionItem extends Table {
-//
-//        FunctionItem(String funName, Skin skin) {
-//
-//            Table title = new Table();
-//
-//            final Label name = new Label(funName, skin);
-//            title.add(name).width(100).height(30);
-//
-//            Button set = new TextButton("ed", skin);
-//            title.add(set).size(30).left();
-//
-//            Button get = new TextButton("use", skin);
-//            title.add(get).size(30).left();
-//
-//
-//            Table property = new Table();
-//            property.setSize(160, 200);
-//
-//            Tree inputTree = new Tree(skin);
-//
-//            Tree.Node inputNode = new Tree.Node(new Label("input", skin));
-//            inputNode.setSelectable(false);
-//
-//            VerticalGroup inputList = new VerticalGroup();
-//            ScrollPane inputScroll = new ScrollPane(inputList);
-//            Table container = new Table();
-//            container.add(inputScroll).expandX().fillX().height(100);
-//            container.setHeight(100);
-//
-//            Tree.Node inputContainerNode = new Tree.Node(container);
-//            inputContainerNode.setSelectable(false);
-//
-//            inputNode.add(inputContainerNode);
-//
-//            inputTree.add(inputNode);
-//        }
-//    }
+    private class FunctionItem extends Table {
+
+        class Parameter extends Table {
+
+            public Parameter(String varName, Function.ParameterType parameterType, Skin skin) {
+                final Function.Parameter parameter = function.new Parameter(parameterType, Value.Type.BOOL, varName);
+                function.addParameter(parameter);
+
+                add(new Label("name", skin)).expandX().fillX().height(30);
+                final TextField nameField = new TextField("", skin);
+                add(nameField).expandX().fillX().height(30).row();
+
+                add(new Label("Data type", skin)).expandX().fillX().height(30);
+
+                final SelectBox<Value.Type> type = new SelectBox<Value.Type>(skin);
+                type.setItems(Value.Type.BOOL,
+                        Value.Type.FLOAT,
+                        Value.Type.INT,
+                        Value.Type.STRING);
+
+                add(type).expandX().fillX().height(30);
+
+                nameField.setTextFieldListener(new TextField.TextFieldListener() {
+                    @Override
+                    public void keyTyped(TextField textField, char c) {
+                        parameter.setName(nameField.getText());
+                    }
+                });
+
+                type.addListener(new ChangeListener() {
+                    @Override
+                    public void changed(ChangeEvent event, Actor actor) {
+                        parameter.setValueType(type.getSelected());
+                    }
+                });
+            }
+        }
+
+        FunctionItem(String funName, final Skin skin) {
+
+            function = new Function(funName);
+
+            FunctionWindow functionWindow = new FunctionWindow(funName, skin);
+            functionWindow.setPosition(100,100);
+            function.setWindow(functionWindow);
+            Main.getActivity().addActor(functionWindow);
+
+            Table title = new Table();
+
+            final Label name = new Label(funName, skin);
+            name.setEllipsis(true);
+            title.add(name).expand().fill()
+                    .width(151);// TODO WTF? Fix it
+
+            final Button edit = new TextButton("ed", skin);
+            title.add(edit).size(30).right();
+
+            final Button add = new TextButton("add", skin);
+            title.add(add).size(30).right();
+
+
+            Tree tree = new Tree(skin);
+
+            Tree.Node titleNode = new Tree.Node(title);
+            titleNode.setSelectable(false);
+
+
+            Table inputTitle = new Table();
+
+            inputTitle.add(new Label("input", skin)).expand().fill()
+                    .width(181);// TODO WTF? Fix it
+
+            final Button addInput = new TextButton("add", skin);
+            inputTitle.add(addInput).size(30).right();
+
+            Tree.Node inputTitleNode = new Tree.Node(inputTitle);
+            inputTitleNode.setSelectable(false);
+
+            final VerticalGroup inputList = new VerticalGroup();
+            Tree.Node inputNode = new Tree.Node(inputList);
+            inputNode.setSelectable(false);
+
+            inputTitleNode.add(inputNode);
+
+
+            Table outputTitle = new Table();
+
+            outputTitle.add(new Label("output", skin)).expand().fill()
+                    .width(181);// TODO WTF? Fix it
+
+            final Button addOutput = new TextButton("add", skin);
+            outputTitle.add(addOutput).size(30).right();
+
+            Tree.Node outputTitleNode = new Tree.Node(outputTitle);
+            outputTitleNode.setSelectable(false);
+
+            final VerticalGroup outputList = new VerticalGroup();
+            Tree.Node outputNode = new Tree.Node(outputList);
+            outputNode.setSelectable(false);
+
+            outputTitleNode.add(outputNode);
+
+
+            addInput.addListener(new ChangeListener() {
+                @Override
+                public void changed(ChangeEvent event, Actor actor) {
+                    inputList.addActor(new Parameter(Integer.toString(counter++), Function.ParameterType.INPUT, skin));
+                }
+            });
+
+            addOutput.addListener(new ChangeListener() {
+                @Override
+                public void changed(ChangeEvent event, Actor actor) {
+                    outputList.addActor(new Parameter(Integer.toString(counter++), Function.ParameterType.OUTPUT, skin));
+                }
+            });
+
+            titleNode.add(inputTitleNode);
+            titleNode.add(outputTitleNode);
+            tree.add(titleNode);
+            add(tree).fillX().expandX();
+
+
+        }
+
+        private int counter = 1;
+        Function function;
+    }
 
     private static class ComponentsTable extends Table {
         ComponentsTable(Skin skin) {
@@ -203,29 +289,33 @@ public class ControlTable extends Table {
         private int counter = 1;
     }
 
-    private static class FunTable extends Table {
-        FunTable(Skin skin) {
+    private class FunctionTable extends Table {
+        FunctionTable(Skin skin) {
             this.skin = skin;
 
-            items = new VerticalGroup();
-
+            items = new Table();
             scroll = new ScrollPane(items);
             Table container = new Table();
-
-            container.add(scroll).expand();
+            container.add(scroll).expand().fillX().top();
             add(container).fill().expand();
         }
 
-        void addFun() {
+        void addFunction() {
+            FunctionItem var = new FunctionItem(Integer.toString(counter++), skin);
+            items.add(var).fillX().expandX();
+            items.row();
+
+            scroll.layout();
+            scroll.scrollTo(0, 0, 0, 0);
         }
 
-        private VerticalGroup items;
+        private Table items;
         private ScrollPane scroll;
         private Skin skin;
-        private static int counter = 1;
+        private int counter = 1;
     }
 
-    public ControlTable(Skin skin) {
+    ControlTable(Skin skin) {
 
         setWidth(200);
         NinePatch patch = new NinePatch(new Texture(Gdx.files.internal("VarTable.png")), 1, 1, 1, 1);
@@ -265,11 +355,11 @@ public class ControlTable extends Table {
         mainContainer.add(container);
 
         final VariableTable variableTable = new VariableTable(skin);
-        final FunTable funTable = new FunTable(skin);
+        final FunctionTable functionTable = new FunctionTable(skin);
 
         Stack contents = new Stack();
         contents.add(variableTable);
-        contents.add(funTable);
+        contents.add(functionTable);
 
         container.add(contents).fill().expand();
         mainContainer.add(container);
@@ -283,7 +373,7 @@ public class ControlTable extends Table {
                 container.setVisible(!components.isChecked());
 
                 variableTable.setVisible(variables.isChecked());
-                funTable.setVisible(functions.isChecked());
+                functionTable.setVisible(functions.isChecked());
             }
         };
         components.addListener(tabListener);
@@ -296,13 +386,13 @@ public class ControlTable extends Table {
                 if (variables.isChecked()) {
                     variableTable.addVariable();
                 } else if (functions.isChecked()) {
-                    funTable.addFun();
+                    functionTable.addFunction();
                 }
             }
         });
 
         variables.setChecked(true);
-        funTable.setVisible(false);
+        functionTable.setVisible(false);
 
     }
 }

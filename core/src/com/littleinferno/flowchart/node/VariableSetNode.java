@@ -1,10 +1,7 @@
 package com.littleinferno.flowchart.node;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.math.Vector2;
 import com.littleinferno.flowchart.Variable;
-import com.littleinferno.flowchart.pin.Pin;
-import com.littleinferno.flowchart.value.Value;
 
 
 public class VariableSetNode extends Node {
@@ -24,14 +21,14 @@ public class VariableSetNode extends Node {
     @Override
     void execute() {
 
-        Node node = get("set").getConnectionNode();
+        Node node = getItem("set").getPin().getConnectionNode();
         try {
             variable.setValue(node.evaluate());
         } catch (Exception e) {
             e.printStackTrace();
         }
 
-        Node next = get("exec out").getConnectionNode();
+        Node next = getItem("exec out").getPin().getConnectionNode();
 
         if (next != null) {
             try {

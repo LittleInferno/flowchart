@@ -47,13 +47,9 @@ public class Flowchart extends ApplicationAdapter {
         //  stage.addActor(new IntegerNode(new Vector2(400, 250)));
 
 
-        //     ControlTable controlTable = new ControlTable(stage, skin);
-
-        //    stage.addActor(controlTable);
-
         Gdx.input.setInputProcessor(main);
 
-        main.setDebugAll(true);
+   //     main.setDebugAll(true);
 
     }
 
