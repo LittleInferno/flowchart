@@ -19,7 +19,7 @@ public class ConverterNode extends Node {
 
     @Override
     Value evaluate() {
-        Node node = get("from").getConnectionNode();
+        Node node = getItem("from").getPin().getConnectionNode();
 
         if (node != null) {
 

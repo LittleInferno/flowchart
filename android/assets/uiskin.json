@@ -1,7 +1,7 @@
 {
   "com.badlogic.gdx.graphics.g2d.BitmapFont": {
     "default-font": {
-      "file": "default.fnt"
+      "file": "D.fnt"
     }
   },
   "com.badlogic.gdx.graphics.Color": {
@@ -133,7 +133,7 @@
   "com.badlogic.gdx.scenes.scene2d.ui.Label$LabelStyle": {
     "default": {
       "font": "default-font",
-      "fontColor": "white"
+      "fontColor": "black"
     }
   },
   "com.badlogic.gdx.scenes.scene2d.ui.TextField$TextFieldStyle": {

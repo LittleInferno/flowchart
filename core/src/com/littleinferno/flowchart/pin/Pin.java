@@ -75,12 +75,12 @@ public class Pin extends Image {
             ConverterNode converter;
             if (getConnection() == Connection.INPUT) {
                 converter = new ConverterNode(pos, pin.getData(), this.getData());
-                converter.get("from").connect(pin);
-                converter.get("to").connect(this);
+                converter.getItem("from").getPin().connect(pin);
+                converter.getItem("to").getPin().connect(this);
             } else {
                 converter = new ConverterNode(pos, this.getData(), pin.getData());
-                converter.get("from").connect(this);
-                converter.get("to").connect(pin);
+                converter.getItem("from").getPin().connect(this);
+                converter.getItem("to").getPin().connect(pin);
             }
 
             getStage().addActor(converter);

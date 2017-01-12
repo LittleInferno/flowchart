@@ -4,8 +4,6 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.ui.Button;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
-import com.littleinferno.flowchart.pin.Pin;
-import com.littleinferno.flowchart.value.Value;
 
 public class BeginNode extends Node {
     public BeginNode(Vector2 position) {
@@ -26,7 +24,7 @@ public class BeginNode extends Node {
 
     @Override
     void execute() {
-        Node next = get("start").getConnectionNode();
+        Node next = getItem("start").getPin().getConnectionNode();
 
         if (next != null)
             try {

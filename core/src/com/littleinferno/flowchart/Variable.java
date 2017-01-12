@@ -2,7 +2,6 @@ package com.littleinferno.flowchart;
 
 import com.littleinferno.flowchart.node.Node;
 import com.littleinferno.flowchart.node.VariableGetNode;
-import com.littleinferno.flowchart.pin.Pin;
 import com.littleinferno.flowchart.value.Value;
 
 import java.util.ArrayList;
@@ -24,9 +23,9 @@ public class Variable {
         for (Node i : nodes) {
 
             if (i instanceof VariableGetNode)
-                ((Pin) i.findActor("get")).setData(valueType);
+                i.getItem("get").getPin().setData(valueType);
             else
-                ((Pin) i.findActor("set")).setData(valueType);
+                i.getItem("set").getPin().setData(valueType);
         }
     }
 
