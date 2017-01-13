@@ -6,7 +6,7 @@ import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 
 public class BeginNode extends Node {
     public BeginNode() {
-        super("Begin");
+        super("Begin", false);
 
         addExecutionOutputPin("start");
 

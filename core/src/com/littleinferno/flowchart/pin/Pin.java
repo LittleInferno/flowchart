@@ -4,7 +4,6 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
@@ -149,15 +148,23 @@ public class Pin extends Image {
     public Node getConnectionNode() {
 
         if (pin != null)
-            return (Node) pin.getParent().getParent().getParent().getParent();
+            return (Node) pin.getParent().getParent().getParent();
 
         return null;
+    }
+
+    public Value getValue() {
+        return value;
+    }
+
+    public void setValue(Value value) {
+        this.value = value;
     }
 
     private Pin pin;
     private ArrayList<Pin> pins;
     private final Connection connection;
     private Value.Type data;
-
+    private Value value;
     private static Texture texture = new Texture(Gdx.files.internal("pin.png"));
 }

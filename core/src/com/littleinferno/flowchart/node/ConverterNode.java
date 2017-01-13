@@ -4,7 +4,7 @@ import com.littleinferno.flowchart.value.Value;
 
 public class ConverterNode extends Node {
     public ConverterNode(Value.Type from, Value.Type to) {
-        super("Converter");
+        super("Converter", true);
         this.to = to;
 
         addDataInputPin(from, "from");

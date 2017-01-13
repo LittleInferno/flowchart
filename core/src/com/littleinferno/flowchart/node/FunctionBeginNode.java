@@ -5,7 +5,7 @@ import com.littleinferno.flowchart.Function;
 
 public class FunctionBeginNode extends Node {
     public FunctionBeginNode(Function function) {
-        super(function.getName());
+        super(function.getName(), false);
 
         addExecutionOutputPin("exec out");
     }

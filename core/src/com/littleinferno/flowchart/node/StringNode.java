@@ -7,12 +7,13 @@ import com.littleinferno.flowchart.value.Value;
 public class StringNode extends Node {
 
     public StringNode() {
-        super("String");
+        super("String", true);
 
         addDataOutputPin(Value.Type.STRING, "data");
 
         field = new TextField("", skin);
-        left.add(field).expandX().fillX().minWidth(0);;
+        left.add(field).expandX().fillX().minWidth(0);
+        ;
     }
 
     @Override

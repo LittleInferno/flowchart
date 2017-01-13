@@ -1,13 +1,14 @@
 package com.littleinferno.flowchart.node;
 
 import com.badlogic.gdx.Gdx;
+import com.littleinferno.flowchart.ui.Main;
 import com.littleinferno.flowchart.value.Value;
 
 public class LogNode extends Node {
 
 
     public LogNode() {
-        super("Log");
+        super("Log", true);
 
 
         addExecutionInputPin("exec in");
@@ -22,7 +23,9 @@ public class LogNode extends Node {
         Node string = getItem("string").getPin().getConnectionNode();
         if (string != null) {
             try {
-                Gdx.app.log("", string.evaluate().asString());
+                Main.console.appendText(string.evaluate().asString());
+                Main.console.newLineAtEnd();
+            //    Gdx.app.log("", );
             } catch (Exception e) {
                 e.printStackTrace();
             }

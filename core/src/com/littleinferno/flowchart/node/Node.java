@@ -3,13 +3,16 @@ package com.littleinferno.flowchart.node;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.NinePatch;
+import com.badlogic.gdx.graphics.g3d.particles.batches.BufferedParticleBatch;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.Touchable;
+import com.badlogic.gdx.scenes.scene2d.ui.Button;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
+import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.NinePatchDrawable;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Array;
@@ -52,7 +55,7 @@ public class Node extends Table {
         }
     }
 
-    public Node(String name) {
+    public Node(final String name, final boolean closable) {
 
         setWidth(200);
         NinePatch patch = new NinePatch(new Texture(Gdx.files.internal("VarTable.png")), 1, 1, 1, 1);
@@ -64,9 +67,27 @@ public class Node extends Table {
         title = new Label(name, skin);
         title.setName("title");
         title.setAlignment(Align.center);
-        add(title).expandX().fillX().top().colspan(2);
-        row();
 
+        if (closable) {
+            Table container = new Table();
+
+            container.add(title).expandX().fillX();
+
+            Button close = new Button(skin);
+            container.add(close).width(30);
+
+            add(container).expandX().fillX().top().colspan(2).row();
+
+            close.addListener(new ChangeListener() {
+                @Override
+                public void changed(ChangeEvent event, Actor actor) {
+                    Node.this.getParent().removeActor(Node.this);
+                }
+            });
+
+        } else {
+            add(title).expandX().fillX().top().colspan(2).row();
+        }
 
         title.pack();
         headerHeight = title.getHeight();
@@ -143,12 +164,24 @@ public class Node extends Table {
         return (Item) findActor(name);
     }
 
-    public SnapshotArray<Actor> getInputItems() {
-        return left.getChildren();
+    public Array<Item> getInputItems() {
+        Array<Actor> children = left.getChildren();
+
+        Array<Item> result = new Array<Item>(children.size);
+
+        for (Actor i : children) result.add((Item) i);
+
+        return result;
     }
 
-    public SnapshotArray<Actor> getOutputItems() {
-        return right.getChildren();
+    public Array<Item> getOutputItems() {
+        Array<Actor> children = right.getChildren();
+
+        Array<Item> result = new Array<Item>(children.size);
+
+        for (Actor i : children) result.add((Item) i);
+
+        return result;
     }
 
     public void setTitle(String text) {

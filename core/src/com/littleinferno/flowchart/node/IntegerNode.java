@@ -9,7 +9,7 @@ import com.littleinferno.flowchart.value.Value;
 public class IntegerNode extends Node {
 
     public IntegerNode() {
-        super("Integer");
+        super("Integer", true);
 
         addDataOutputPin(Value.Type.INT, "data");
 
