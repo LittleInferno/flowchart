@@ -1,14 +1,13 @@
 package com.littleinferno.flowchart.node;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.math.Vector2;
 import com.littleinferno.flowchart.value.Value;
 
 public class LogNode extends Node {
 
 
-    public LogNode(Vector2 position) {
-        super(position, "Log");
+    public LogNode() {
+        super("Log");
 
 
         addExecutionInputPin("exec in");

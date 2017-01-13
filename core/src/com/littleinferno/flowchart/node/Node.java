@@ -3,7 +3,7 @@ package com.littleinferno.flowchart.node;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.NinePatch;
-import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.Touchable;
@@ -12,30 +12,32 @@ import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.NinePatchDrawable;
 import com.badlogic.gdx.utils.Align;
+import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.SnapshotArray;
 import com.littleinferno.flowchart.pin.Pin;
 import com.littleinferno.flowchart.value.Value;
 
 public class Node extends Table {
 
+    private final Label title;
+
     public static class Item extends Table {
         Label label;
         Pin pin;
-
 
         Item(String name, Pin.Connection connection, Value.Type value, Skin skin) {
             super.setName(name);
 
             this.label = new Label(name, skin);
             this.label.setEllipsis(true);
-            this.label.setName("name");
             this.pin = new Pin(connection, value);
 
             if (connection == Pin.Connection.INPUT) {
-                add(pin).padLeft(10).width(16);
-                add(label).fill();
+                add(pin).padLeft(10).size(16);
+                add(label).expandX().fillX().minWidth(0);
             } else {
-                add(label).fill();
-                add(pin).padRight(10).width(16);
+                add(label).expandX().fillX().minWidth(0);
+                add(pin).padRight(10).size(16);
             }
         }
 
@@ -50,49 +52,47 @@ public class Node extends Table {
         }
     }
 
-    public Node(Vector2 position, CharSequence header) {
+    public Node(String name) {
 
         setWidth(200);
         NinePatch patch = new NinePatch(new Texture(Gdx.files.internal("VarTable.png")), 1, 1, 1, 1);
         setBackground(new NinePatchDrawable(patch));
 
-        this.setPosition(position.x, position.y);
         this.setTouchable(Touchable.enabled);
 
-        Label h = new Label(header, skin);
-        h.setName("title");
-        h.setAlignment(Align.center);
-        add(h).expandX().fillX().top();
+
+        title = new Label(name, skin);
+        title.setName("title");
+        title.setAlignment(Align.center);
+        add(title).expandX().fillX().top().colspan(2);
         row();
 
-        pins = new Table();
-        add(pins).expandX().fillX();
 
-        h.pack();
-        headerHeight = h.getHeight();
+        title.pack();
+        headerHeight = title.getHeight();
+
+        row().width(100);
 
         left = new Table();
-        left.setName("left");
         left.left().top();
-        pins.add(left).expand().fill();
+        add(left).expand().fill();
 
         right = new Table();
-        right.setName("right");
         right.right().top();
-        pins.add(right).expand().fill();
+        add(right).expand().fill();
 
         top();
 
         addListener(new InputListener() {
 
-            private float mouseOfsetX;
-            private float mouseOfsetY;
+            private float mouseOffsetX;
+            private float mouseOffsetY;
 
             @Override
             public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
 
-                mouseOfsetX = x;
-                mouseOfsetY = y;
+                mouseOffsetX = x;
+                mouseOffsetY = y;
 
                 return true;
             }
@@ -102,7 +102,7 @@ public class Node extends Table {
 
                 float nodeX = getX(), nodeY = getY();
 
-                float amountX = x - mouseOfsetX, amountY = y - mouseOfsetY;
+                float amountX = x - mouseOffsetX, amountY = y - mouseOffsetY;
 
                 setPosition(((int) ((nodeX + amountX) / 10) * 10), ((int) ((nodeY + amountY) / 10) * 10));
             }
@@ -143,8 +143,16 @@ public class Node extends Table {
         return (Item) findActor(name);
     }
 
-    public void setTitle(String title) {
-        ((Label) findActor("title")).setText(title);
+    public SnapshotArray<Actor> getInputItems() {
+        return left.getChildren();
+    }
+
+    public SnapshotArray<Actor> getOutputItems() {
+        return right.getChildren();
+    }
+
+    public void setTitle(String text) {
+        title.setText(text);
     }
 
     void execute() throws Exception {
@@ -155,11 +163,14 @@ public class Node extends Table {
         throw new Exception("can`t evaluate");
     }
 
-    protected void updateSize() {
+    private void updateSize() {
 
-        pins.pack();
-        if (pins.getHeight() + headerHeight > getHeight()) {
-            setHeight(pins.getHeight() + headerHeight);
+        left.pack();
+        float height = left.getHeight();
+        right().pack();
+        height = Math.max(height, right.getHeight());
+        if (height > getHeight()) {
+            setHeight(height);
         }
     }
 
@@ -168,6 +179,5 @@ public class Node extends Table {
     protected Skin skin = new Skin(Gdx.files.internal("uiskin.json"));
 
     private float headerHeight;
-    private Table pins;
 
 }

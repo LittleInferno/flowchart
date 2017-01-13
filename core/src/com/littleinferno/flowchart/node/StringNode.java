@@ -1,23 +1,18 @@
 package com.littleinferno.flowchart.node;
 
-import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.ui.TextField;
 import com.littleinferno.flowchart.value.StringValue;
 import com.littleinferno.flowchart.value.Value;
 
-/**
- * Created by danil on 09.01.2017.
- */
-
 public class StringNode extends Node {
 
-    public StringNode(Vector2 position) {
-        super(position, "String");
+    public StringNode() {
+        super("String");
 
         addDataOutputPin(Value.Type.STRING, "data");
 
         field = new TextField("", skin);
-        left.add(field);
+        left.add(field).expandX().fillX().minWidth(0);;
     }
 
     @Override

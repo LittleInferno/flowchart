@@ -24,32 +24,9 @@ public class Flowchart extends ApplicationAdapter {
         main = new Main();
         WireConnector.base = main;
 
-        //node = new Node(new Vector2(50, 50), "etet");
-        //node.addDataInputPin(Pin.Data.FLOAT, "");
-        //  node.addDataInputPin(Pin.Data.INT, "");
-        // node.addDataInputPin(Pin.Data.STRING, "");
-        //node.addDataInputPin(Pin.Data.BOOL, "");
-
-
-        // FunctionItem functionItem = new FunctionItem(skin);
-        //functionItem.setPosition(300, 200);
-        //
-        //  stage.addActor(functionItem);
-//
-
-        BeginNode begin = new BeginNode(new Vector2(300, 200));
-        // stage.addActor(begin);
-
-        ///  stage.addActor(new LogNode(new Vector2(350, 250)));
-        //  stage.addActor(new LogNode(new Vector2(350, 300)));
-
-        //  stage.addActor(new StringNode   (new Vector2(400, 150)));
-        //  stage.addActor(new IntegerNode(new Vector2(400, 250)));
-
-
         Gdx.input.setInputProcessor(main);
 
-   //     main.setDebugAll(true);
+        main.setDebugAll(true);
 
     }
 
