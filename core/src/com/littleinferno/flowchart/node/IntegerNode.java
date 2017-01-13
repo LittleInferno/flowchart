@@ -8,8 +8,8 @@ import com.littleinferno.flowchart.value.Value;
 
 public class IntegerNode extends Node {
 
-    public IntegerNode(Vector2 position) {
-        super(position, "Integer");
+    public IntegerNode() {
+        super("Integer");
 
         addDataOutputPin(Value.Type.INT, "data");
 
@@ -22,7 +22,7 @@ public class IntegerNode extends Node {
                 return false;
             }
         });
-        left.add(field);
+        left.add(field).expandX().fillX().minWidth(0);
     }
 
     @Override

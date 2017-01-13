@@ -6,8 +6,8 @@ import com.littleinferno.flowchart.Variable;
 
 public class VariableSetNode extends Node {
 
-    public VariableSetNode(Vector2 pos, Variable variable) {
-        super(pos, String.format("Set %s", variable.getName()));
+    public VariableSetNode(Variable variable) {
+        super(String.format("Set %s", variable.getName()));
 
         this.variable = variable;
         variable.addNode(this);

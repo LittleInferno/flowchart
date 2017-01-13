@@ -1,13 +1,12 @@
 package com.littleinferno.flowchart.node;
 
-import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.ui.Button;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 
 public class BeginNode extends Node {
-    public BeginNode(Vector2 position) {
-        super(position, "Begin");
+    public BeginNode() {
+        super("Begin");
 
         addExecutionOutputPin("start");
 

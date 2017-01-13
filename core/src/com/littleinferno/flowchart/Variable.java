@@ -1,16 +1,15 @@
 package com.littleinferno.flowchart;
 
+import com.badlogic.gdx.utils.Array;
 import com.littleinferno.flowchart.node.Node;
 import com.littleinferno.flowchart.node.VariableGetNode;
 import com.littleinferno.flowchart.value.Value;
-
-import java.util.ArrayList;
 
 public class Variable {
 
     public Variable(String name) {
         this.name = name;
-        this.nodes = new ArrayList<Node>();
+        this.nodes = new Array<Node>();
     }
 
     public Value.Type getValueType() {
@@ -57,11 +56,11 @@ public class Variable {
     }
 
     public void removeNode(Node node) {
-        nodes.remove(node);
+        nodes.removeValue(node, true);
     }
 
     private Value.Type valueType;
     private Value value;
     private String name;
-    private ArrayList<Node> nodes;
+    private Array<Node> nodes;
 }

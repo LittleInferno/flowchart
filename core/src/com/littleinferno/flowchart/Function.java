@@ -1,77 +1,46 @@
 package com.littleinferno.flowchart;
 
-import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.scenes.scene2d.InputEvent;
+import com.badlogic.gdx.scenes.scene2d.ui.Table;
+import com.badlogic.gdx.utils.Array;
 import com.littleinferno.flowchart.node.FunctionBeginNode;
 import com.littleinferno.flowchart.node.FunctionReturnNode;
 import com.littleinferno.flowchart.node.Node;
-import com.littleinferno.flowchart.ui.FunctionWindow;
-import com.littleinferno.flowchart.value.Value;
-
-import java.util.ArrayList;
+import com.littleinferno.flowchart.parameter.InputParameter;
+import com.littleinferno.flowchart.parameter.Parameter;
+import com.littleinferno.flowchart.ui.Main;
 
 public class Function {
 
-    public enum ParameterType {
-        INPUT,
-        OUTPUT
-    }
-
-    public class Parameter {
-
-        public Parameter(ParameterType type, Value.Type valueType, String name) {
-            this.valueType = valueType;
-            this.name = name;
-            this.type = type;
-
-            if (type == ParameterType.INPUT)
-                beginNode.addDataOutputPin(valueType, name);
-            else
-                returnNode.addDataInputPin(valueType, name);
-        }
-
-        public Value.Type getValueType() {
-            return valueType;
-        }
-
-        public void setValueType(Value.Type valueType) {
-            this.valueType = valueType;
-
-            if (type == ParameterType.INPUT)
-                beginNode.getItem(getName()).getPin().setData(valueType);
-            else
-                returnNode.getItem(getName()).getPin().setData(valueType);
-        }
-
-        public String getName() {
-            return name;
-        }
-
-        public void setName(String name) {
-            if (type == ParameterType.INPUT)
-                beginNode.getItem(getName()).setName(name);
-            else
-                returnNode.getItem(getName()).setName(name);
-
-            this.name = name;
-        }
-
-        private Value.Type valueType;
-        private String name;
-        private ParameterType type;
-    }
+    private String name;
+    private Array<Node> nodes;
+    private FunctionBeginNode beginNode;
+    private FunctionReturnNode returnNode;
+    private Table functionWindow;
+    private Array<Parameter> parameters;
 
     public Function(String name) {
         this.name = name;
 
-        beginNode = new FunctionBeginNode(new Vector2(100, 100), this);
-        returnNode = new FunctionReturnNode(new Vector2(400, 100), this);
-    }
+        beginNode = new FunctionBeginNode(this);
+        beginNode.setPosition(100, 100);
+        returnNode = new FunctionReturnNode(this);
+        returnNode.setPosition(400, 100);
 
-    public void setWindow(FunctionWindow functionWindow) {
-        this.functionWindow = functionWindow;
-
+        functionWindow = Main.addWindow(name).getContentTable();
         functionWindow.addActor(beginNode);
         functionWindow.addActor(returnNode);
+
+        nodes = new Array<Node>();
+        parameters = new Array<Parameter>();
+    }
+
+    public FunctionBeginNode getBeginNode() {
+        return beginNode;
+    }
+
+    public FunctionReturnNode getReturnNode() {
+        return returnNode;
     }
 
     public String getName() {
@@ -80,16 +49,43 @@ public class Function {
 
     public void setName(String name) {
         this.name = name;
+
+        for (Node i : nodes) {
+            i.setTitle(String.format("call %s", name));
+        }
+
+        beginNode.setTitle(name);
+        returnNode.setTitle(name);
+    }
+
+    public void addNode(Node node) {
+        nodes.add(node);
+
+        for (int i = 0; i < parameters.size; ++i) {
+            Parameter parameter = parameters.get(i);
+            if (parameter instanceof InputParameter)
+                node.addDataInputPin(parameter.getValueType(), parameter.getName());
+            else
+                node.addDataOutputPin(parameter.getValueType(), parameter.getName());
+        }
+    }
+
+    public void removeNode(Node node) {
+        nodes.removeValue(node, true);
     }
 
     public void addParameter(Parameter parameter) {
+        for (int i = 0; i < nodes.size; ++i) {
+            if (parameter instanceof InputParameter)
+                nodes.get(i).addDataInputPin(parameter.getValueType(), parameter.getName());
+            else
+                nodes.get(i).addDataOutputPin(parameter.getValueType(), parameter.getName());
+        }
+
+        parameters.add(parameter);
     }
 
-    //public void addInputParametr()
-
-    private String name;
-    private ArrayList<Node> nodes;
-    private FunctionBeginNode beginNode;
-    private FunctionReturnNode returnNode;
-    private FunctionWindow functionWindow;
+    public Array<Node> getNodes() {
+        return nodes;
+    }
 }
