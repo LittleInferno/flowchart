@@ -3,7 +3,6 @@ package com.littleinferno.flowchart.node;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.NinePatch;
-import com.badlogic.gdx.graphics.g3d.particles.batches.BufferedParticleBatch;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
@@ -16,44 +15,12 @@ import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.NinePatchDrawable;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Array;
-import com.badlogic.gdx.utils.SnapshotArray;
 import com.littleinferno.flowchart.pin.Pin;
 import com.littleinferno.flowchart.value.Value;
 
 public class Node extends Table {
 
     private final Label title;
-
-    public static class Item extends Table {
-        Label label;
-        Pin pin;
-
-        Item(String name, Pin.Connection connection, Value.Type value, Skin skin) {
-            super.setName(name);
-
-            this.label = new Label(name, skin);
-            this.label.setEllipsis(true);
-            this.pin = new Pin(connection, value);
-
-            if (connection == Pin.Connection.INPUT) {
-                add(pin).padLeft(10).size(16);
-                add(label).expandX().fillX().minWidth(0);
-            } else {
-                add(label).expandX().fillX().minWidth(0);
-                add(pin).padRight(10).size(16);
-            }
-        }
-
-        public Pin getPin() {
-            return pin;
-        }
-
-        @Override
-        public void setName(String name) {
-            super.setName(name);
-            label.setText(name);
-        }
-    }
 
     public Node(final String name, final boolean closable) {
 
@@ -65,18 +32,18 @@ public class Node extends Table {
 
 
         title = new Label(name, skin);
-        title.setName("title");
         title.setAlignment(Align.center);
+        title.setEllipsis(true);
 
         if (closable) {
             Table container = new Table();
 
-            container.add(title).expandX().fillX();
+            container.add(title).expand().fill().minWidth(0);
 
             Button close = new Button(skin);
             container.add(close).width(30);
 
-            add(container).expandX().fillX().top().colspan(2).row();
+            add(container).expandX().fillX().colspan(2).row();
 
             close.addListener(new ChangeListener() {
                 @Override
@@ -86,7 +53,7 @@ public class Node extends Table {
             });
 
         } else {
-            add(title).expandX().fillX().top().colspan(2).row();
+            add(title).expandX().fillX().minWidth(0).colspan(2).row();
         }
 
         title.pack();
@@ -131,26 +98,34 @@ public class Node extends Table {
     }
 
     public void addDataInputPin(final Value.Type type, final String name) {
-        left.add(new Item(name, Pin.Connection.INPUT, type, skin)).expandX().fillX().height(16);
-
+        left.add(new Pin(name, type, Pin.input, skin)).expandX().fillX().padLeft(10);
         left.row();
         updateSize();
     }
 
     public void addDataOutputPin(final Value.Type type, final String name) {
-        right.add(new Item(name, Pin.Connection.OUTPUT, type, skin)).expandX().fillX().height(16);
+        right.add(new Pin(name, type, Pin.output, skin)).expandX().fillX().padRight(10);
         right.row();
         updateSize();
     }
 
+
+    void addExecutionInputPin() {
+        addExecutionInputPin("exec in");
+    }
+
     void addExecutionInputPin(final String name) {
-        left.add(new Item(name, Pin.Connection.INPUT, Value.Type.EXECUTION, skin)).expandX().fillX().height(16);
+        left.add(new Pin(name, Value.Type.EXECUTION, Pin.input, skin)).expandX().fillX().padLeft(10);
         left.row();
         updateSize();
     }
 
+    void addExecutionOutputPin() {
+        addExecutionOutputPin("exec out");
+    }
+
     void addExecutionOutputPin(final String name) {
-        right.add(new Item(name, Pin.Connection.OUTPUT, Value.Type.EXECUTION, skin)).expandX().fillX().height(16);
+        right.add(new Pin(name, Value.Type.EXECUTION, Pin.output, skin)).expandX().fillX().padRight(10);
         right.row();
         updateSize();
     }
@@ -160,26 +135,26 @@ public class Node extends Table {
         right.removeActor(right.findActor(name));
     }
 
-    public Item getItem(String name) {
-        return (Item) findActor(name);
+    public Pin getPin(String name) {
+        return (Pin) findActor(name);
     }
 
-    public Array<Item> getInputItems() {
+    public Array<Pin> getInput() {
         Array<Actor> children = left.getChildren();
 
-        Array<Item> result = new Array<Item>(children.size);
+        Array<Pin> result = new Array<Pin>(children.size);
 
-        for (Actor i : children) result.add((Item) i);
+        for (Actor i : children) result.add((Pin) i);
 
         return result;
     }
 
-    public Array<Item> getOutputItems() {
+    public Array<Pin> getOutput() {
         Array<Actor> children = right.getChildren();
 
-        Array<Item> result = new Array<Item>(children.size);
+        Array<Pin> result = new Array<Pin>(children.size);
 
-        for (Actor i : children) result.add((Item) i);
+        for (Actor i : children) result.add((Pin) i);
 
         return result;
     }
@@ -188,13 +163,30 @@ public class Node extends Table {
         title.setText(text);
     }
 
-    void execute() throws Exception {
+    public void execute() throws Exception {
         throw new Exception("can`t execute");
     }
 
-    Value evaluate() throws Exception {
-        throw new Exception("can`t evaluate");
+    public void executeNext() {
+        Node next = getPin("exec out").getConnectionNode();
+
+        if (next != null) {
+            try {
+                next.execute();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
     }
+
+    public void eval() throws Exception {
+        throw new Exception("can`t eval");
+    }
+
+//    public Value evaluate() throws Exception {
+//        throw new Exception("can`t evaluate");
+//    }
+
 
     private void updateSize() {
 

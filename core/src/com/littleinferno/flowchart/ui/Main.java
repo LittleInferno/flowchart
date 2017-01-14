@@ -1,7 +1,6 @@
 package com.littleinferno.flowchart.ui;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
@@ -9,8 +8,6 @@ import com.badlogic.gdx.scenes.scene2d.ui.TextArea;
 import com.badlogic.gdx.scenes.scene2d.utils.DragAndDrop;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.littleinferno.flowchart.node.BeginNode;
-
-import javafx.scene.control.Tab;
 
 public class Main extends Stage {
 
@@ -51,7 +48,7 @@ public class Main extends Stage {
         console.setPosition(100, 100);
         activity.addActor(console);
 
-        //   setDebugAll(true);
+      //   setDebugAll(true);
     }
 
     static public DragAndDrop getDND() {

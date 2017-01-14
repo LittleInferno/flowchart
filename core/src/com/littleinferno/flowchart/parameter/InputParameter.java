@@ -13,11 +13,11 @@ public class InputParameter extends Parameter {
 
     @Override
     public void setName(String name) {
-        function.getBeginNode().getItem(this.name).setName(name);
+        function.getBeginNode().getPin(this.name).setName(name);
 
         Array<Node> nodes = function.getNodes();
         for (int i = 0; i < nodes.size; ++i) {
-            nodes.get(i).getItem(this.name).setName(name);
+            nodes.get(i).getPin(this.name).setName(name);
         }
 
         this.name = name;
@@ -26,11 +26,11 @@ public class InputParameter extends Parameter {
     @Override
     public void setValueType(Value.Type valueType) {
         this.valueType = valueType;
-        function.getBeginNode().getItem(this.name).getPin().setData(valueType);
+        function.getBeginNode().getPin(this.name).setType(valueType);
 
         Array<Node> nodes = function.getNodes();
         for (int i = 0; i < nodes.size; ++i) {
-            nodes.get(i).getItem(this.name).getPin().setData(valueType);
+            nodes.get(i).getPin(this.name).setType(valueType);
         }
     }
 }

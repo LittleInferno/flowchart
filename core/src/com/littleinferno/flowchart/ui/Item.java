@@ -35,7 +35,7 @@ public class Item extends Table {
                     Value.Type.INT,
                     Value.Type.STRING);
 
-            add(type).expandX().fillX().height(30);
+            add(type).expandX().fillX().height(30).row();
         }
 
         void addTypeSelectedListener(final TypeSelected typeSelected) {

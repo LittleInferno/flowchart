@@ -1,9 +1,9 @@
 package com.littleinferno.flowchart;
 
-import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.utils.Array;
 import com.littleinferno.flowchart.node.FunctionBeginNode;
+import com.littleinferno.flowchart.node.FunctionCallNode;
 import com.littleinferno.flowchart.node.FunctionReturnNode;
 import com.littleinferno.flowchart.node.Node;
 import com.littleinferno.flowchart.parameter.InputParameter;
@@ -16,8 +16,8 @@ public class Function {
     private Array<Node> nodes;
     private FunctionBeginNode beginNode;
     private FunctionReturnNode returnNode;
-    private Table functionWindow;
     private Array<Parameter> parameters;
+    private FunctionCallNode currentCall;
 
     public Function(String name) {
         this.name = name;
@@ -27,7 +27,7 @@ public class Function {
         returnNode = new FunctionReturnNode(this);
         returnNode.setPosition(400, 100);
 
-        functionWindow = Main.addWindow(name).getContentTable();
+        Table functionWindow = Main.addWindow(name).getContentTable();
         functionWindow.addActor(beginNode);
         functionWindow.addActor(returnNode);
 
@@ -85,7 +85,22 @@ public class Function {
         parameters.add(parameter);
     }
 
+    public void removeParameter(Parameter parameter) {
+        if (parameter instanceof InputParameter)
+            beginNode.removePin(parameter.getName());
+        else
+            returnNode.removePin(parameter.getName());
+    }
+
     public Array<Node> getNodes() {
         return nodes;
+    }
+
+    public FunctionCallNode getCurrentCall() {
+        return currentCall;
+    }
+
+    public void setCurrentCall(FunctionCallNode currentCall) {
+        this.currentCall = currentCall;
     }
 }

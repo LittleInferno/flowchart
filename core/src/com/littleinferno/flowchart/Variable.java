@@ -20,11 +20,7 @@ public class Variable {
         this.valueType = valueType;
 
         for (Node i : nodes) {
-
-            if (i instanceof VariableGetNode)
-                i.getItem("get").getPin().setData(valueType);
-            else
-                i.getItem("set").getPin().setData(valueType);
+            i.getPin("data").setType(valueType);
         }
     }
 

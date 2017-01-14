@@ -12,31 +12,19 @@ public class VariableSetNode extends Node {
         this.variable = variable;
         variable.addNode(this);
 
-        addExecutionInputPin("exec in");
-        addExecutionOutputPin("exec out");
+        addExecutionInputPin();
+        addExecutionOutputPin();
 
-        addDataInputPin(variable.getValueType(), "set");
+        addDataInputPin(variable.getValueType(), "data");
     }
 
+
     @Override
-    void execute() {
+    public void execute() {
 
-        Node node = getItem("set").getPin().getConnectionNode();
-        try {
-            variable.setValue(node.evaluate());
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        variable.setValue(getPin("data").getConnectionPin().getValue());
 
-        Node next = getItem("exec out").getPin().getConnectionNode();
-
-        if (next != null) {
-            try {
-                next.execute();
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
+        executeNext();
     }
 
     private Variable variable;

@@ -12,12 +12,12 @@ public class VariableGetNode extends Node {
         this.variable = variable;
         variable.addNode(this);
 
-        addDataOutputPin(variable.getValueType(), "get");
+        addDataOutputPin(variable.getValueType(), "data");
     }
 
     @Override
-    Value evaluate() {
-        return variable.getValue();
+    public void eval() throws Exception {
+        getPin("data").setValue(variable.getValue());
     }
 
     private Variable variable;

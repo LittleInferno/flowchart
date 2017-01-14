@@ -102,6 +102,11 @@ class FunctionItem extends Item {
                 function.addParameter(parameter);
 
                 final Item.PropertyTable propertyItem = new Item.PropertyTable(parameter.getName(), skin);
+
+                Button button = new TextButton("delete", skin);
+
+                propertyItem.add(button).fillX().expandX();
+
                 inputList.addActor(propertyItem);
 
                 propertyItem.addTextEnteredListener(new Item.PropertyTable.TextEntered() {
@@ -115,6 +120,13 @@ class FunctionItem extends Item {
                     @Override
                     public void select(Value.Type type) {
                         parameter.setValueType(type);
+                    }
+                });
+
+                button.addListener(new ChangeListener() {
+                    @Override
+                    public void changed(ChangeEvent event, Actor actor) {
+                        function.removeParameter(parameter);
                     }
                 });
             }
@@ -169,7 +181,7 @@ class FunctionItem extends Item {
         del.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
-             //   FunctionItem.this.getParent().removeActor(FunctionItem.this);
+                //   FunctionItem.this.getParent().removeActor(FunctionItem.this);
             }
         });
 

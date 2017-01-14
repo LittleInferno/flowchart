@@ -26,8 +26,6 @@ public class Flowchart extends ApplicationAdapter {
 
         Gdx.input.setInputProcessor(main);
 
-     //   main.setDebugAll(true);
-
     }
 
     @Override

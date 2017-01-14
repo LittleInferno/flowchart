@@ -22,15 +22,15 @@ public class BeginNode extends Node {
     }
 
     @Override
-    void execute() {
-        Node next = getItem("start").getPin().getConnectionNode();
+    public void execute() {
+        Node next = getPin("start").getConnectionNode();
 
-        if (next != null)
+        if (next != null) {
             try {
                 next.execute();
             } catch (Exception e) {
                 e.printStackTrace();
             }
-
+        }
     }
 }

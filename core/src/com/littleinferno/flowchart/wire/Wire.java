@@ -22,9 +22,17 @@ public class Wire extends Actor {
 
         renderer.begin(ShapeRenderer.ShapeType.Filled);
         renderer.setColor(Color.RED);
-        Vector2 b = begin.getLocation().add(new Vector2(8, 8));
 
-        Vector2 e = end.getLocation().add(new Vector2(8, 8));
+        Vector2 b = begin.getLocation();
+
+        if (begin.getConnection() == Pin.input) b.add(new Vector2(8, 8));
+        else b.add(new Vector2(86, 8));
+
+
+        Vector2 e = end.getLocation();
+
+        if (end.getConnection() == Pin.input) e.add(new Vector2(8, 8));
+        else e.add(new Vector2(86, 8));
 
         renderer.setProjectionMatrix(batch.getProjectionMatrix());
         renderer.line(b.x, b.y, 0.f, e.x, e.y, 0.f);

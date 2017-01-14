@@ -1,12 +1,12 @@
 package com.littleinferno.flowchart.node;
 
-import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.ui.TextField;
-import com.littleinferno.flowchart.pin.Pin;
 import com.littleinferno.flowchart.value.IntegerValue;
 import com.littleinferno.flowchart.value.Value;
 
 public class IntegerNode extends Node {
+
+    private final TextField field;
 
     public IntegerNode() {
         super("Integer", true);
@@ -26,9 +26,7 @@ public class IntegerNode extends Node {
     }
 
     @Override
-    Value evaluate() {
-        return new IntegerValue(Integer.valueOf(field.getText()));
+    public void eval() throws Exception {
+        getPin("data").setValue(new IntegerValue(Integer.valueOf(field.getText())));
     }
-
-    private final TextField field;
 }

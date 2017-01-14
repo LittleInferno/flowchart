@@ -20,7 +20,7 @@ public class NodeTable extends Table {
         final List<String> list = new List(skin);
 
         add(list).expand().fillX().top();
-        list.setItems("Begin", "Integer", "String", "Log");
+        list.setItems("Integer", "String", "Log");
 
         Main.addSource(new DragAndDrop.Source(list) {
             @Override
@@ -28,8 +28,7 @@ public class NodeTable extends Table {
                 DragAndDrop.Payload payload = new DragAndDrop.Payload();
                 String item = list.getSelected();
 
-                if (item.equals("Begin")) payload.setObject(new BeginNode());
-                else if (item.equals("Integer")) payload.setObject(new IntegerNode());
+                if (item.equals("Integer")) payload.setObject(new IntegerNode());
                 else if (item.equals("String")) payload.setObject(new StringNode());
                 else if (item.equals("Log")) payload.setObject(new LogNode());
 

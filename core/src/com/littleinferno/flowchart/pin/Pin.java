@@ -1,94 +1,171 @@
 package com.littleinferno.flowchart.pin;
 
-import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
-import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
+import com.badlogic.gdx.scenes.scene2d.ui.Label;
+import com.badlogic.gdx.scenes.scene2d.ui.Skin;
+import com.badlogic.gdx.scenes.scene2d.ui.Table;
+import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
+import com.badlogic.gdx.utils.Align;
+import com.badlogic.gdx.utils.Array;
 import com.littleinferno.flowchart.node.ConverterNode;
 import com.littleinferno.flowchart.node.Node;
 import com.littleinferno.flowchart.value.Value;
 import com.littleinferno.flowchart.wire.Wire;
 import com.littleinferno.flowchart.wire.WireConnector;
 
-import java.util.ArrayList;
-import java.util.Iterator;
+public class Pin extends Table {
+    private PinStyle style;
 
+    private Pin pin;
+    private Array<Pin> pins = new Array<Pin>();
+    private final int connection;
+    private Value.Type type;
+    private Value value;
+    private boolean isConnect;
 
-public class Pin extends Image {
+    private Label label;
+    private Image image;
 
-    public enum Connection {
-        INPUT,
-        OUTPUT
+    static public final int input = 0, output = 1;
+
+    public Pin(String name, Value.Type type, int connection, Skin skin) {
+        this(name, type, connection, skin.get(PinStyle.class));
     }
 
-    public Pin(Connection connection, Value.Type data) {
-        super(getTexture(data));
+    public Pin(String name, Value.Type type, int connection, PinStyle style) {
 
-        this.pins = new ArrayList<Pin>();
         this.connection = connection;
+        this.style = style;
 
-        this.data = data;
-        addListener(new InputListener() {
+        label = new Label(name, new Label.LabelStyle(style.font, style.fontColor));
+        label.setEllipsis(true);
+        label.setAlignment(Align.center);
+        image = new Image();
 
+        setType(type);
+        add().minWidth(0);
+        if (connection == input) {
+            add(image).size(16);
+            add(label).expandX().fillX().minWidth(0);
+        } else {
+            add(label).expandX().fillX().minWidth(0);
+            add(image).size(16);
+        }
+        setSize(getPrefWidth(), getPrefHeight());
+        setName(name);
+
+
+        image.addListener(new InputListener() {
             @Override
             public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
-
                 WireConnector.add(Pin.this);
                 return true;
             }
-
         });
     }
 
-    public Value.Type getData() {
-        return data;
+    public void setStyle(PinStyle style) {
+        if (style == null) throw new IllegalArgumentException("style cannot be null.");
+        this.style = style;
+        label.setStyle(new Label.LabelStyle(style.font, style.fontColor));
     }
 
-    public void setData(Value.Type data) {
-        this.data = data;
-        setDrawable(new TextureRegionDrawable(getTexture(data)));
+    public PinStyle getStyle() {
+        return style;
     }
 
+    @Override
+    public void setName(String name) {
+        super.setName(name);
+        label.setText(name);
+    }
 
-    public Connection getConnection() {
+    public Value.Type getType() {
+        return type;
+    }
+
+    public void setType(Value.Type type) {
+        this.type = type;
+
+        switch (type) {
+            case EXECUTION:
+                image.setDrawable(style.execution);
+                break;
+            case BOOL:
+                image.setDrawable(style.bool);
+                break;
+            case INT:
+                image.setDrawable(style.integer);
+                break;
+            case FLOAT:
+                image.setDrawable(style.floating);
+                break;
+            case STRING:
+                image.setDrawable(style.string);
+                break;
+        }
+    }
+
+    public int getConnection() {
         return connection;
+    }
+
+    public Value getValue() {
+
+        Node parent = (Node) getParent().getParent();
+
+        try {
+            parent.eval();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return value;
+    }
+
+    public void setValue(Value value) {
+        this.value = value;
+    }
+
+    public boolean isConnect() {
+        return isConnect;
     }
 
     public boolean connect(Pin pin) {
 
         if (pin.getConnection() == getConnection() || pin.getParent() == getParent())
             return false;
-        if (getData() != pin.getData()) {
-            if (getData() == Value.Type.EXECUTION || pin.getData() == Value.Type.EXECUTION)
+        if (getType() != pin.getType()) {
+            if (getType() == Value.Type.EXECUTION || pin.getType() == Value.Type.EXECUTION)
                 return false;
 
-            Vector2 pos = new Vector2();
-
+            Vector2 pos;
             pos = getLocation().add(pin.getLocation());
             pos.x /= 2;
             pos.y /= 2;
 
             ConverterNode converter;
-            if (getConnection() == Connection.INPUT) {
-                converter = new ConverterNode(pin.getData(), this.getData());
-                converter.getItem("from").getPin().connect(pin);
-                converter.getItem("to").getPin().connect(this);
+            if (getConnection() == input) {
+                converter = new ConverterNode(pin.getType(), this.getType());
+                converter.getPin("from").connect(pin);
+                converter.getPin("to").connect(this);
             } else {
-                converter = new ConverterNode(this.getData(), pin.getData());
-                converter.getItem("from").getPin().connect(this);
-                converter.getItem("to").getPin().connect(pin);
+                converter = new ConverterNode(this.getType(), pin.getType());
+                converter.getPin("from").connect(this);
+                converter.getPin("to").connect(pin);
             }
             converter.setPosition(pos.x, pos.y);
             getStage().addActor(converter);
             return true;
         }
 
-        if ((getData() == Value.Type.EXECUTION && getConnection() == Connection.OUTPUT)
-                || (getData() != Value.Type.EXECUTION && getConnection() == Connection.INPUT)) {
+        if ((getType() == Value.Type.EXECUTION && getConnection() == output)
+                || (getType() != Value.Type.EXECUTION && getConnection() == input)) {
 
             if (this.pin != null) pin.disconnect(this);
 
@@ -106,65 +183,56 @@ public class Pin extends Image {
 
     public void disconnect(Pin pin) {
 
-        if ((getData() == Value.Type.EXECUTION && getConnection() == Connection.OUTPUT)
-                || (getData() != Value.Type.EXECUTION && getConnection() == Connection.INPUT)) {
+        if ((getType() == Value.Type.EXECUTION && getConnection() == output)
+                || (getType() != Value.Type.EXECUTION && getConnection() == input)) {
 
             this.pin = null;
         } else {
-
             pin.disconnect(this);
-            Iterator<Pin> i = pins.iterator();
-            while (i.hasNext()) {
-                if (i.next() == pin) {
-                    i.remove();
+
+            for (int i = 0; i < pins.size; ++i) {
+                if (pins.get(i) == pin) {
+                    pins.removeIndex(i);
+                    break;
                 }
             }
-
         }
     }
 
-    static private TextureRegion getTexture(Value.Type data) {
+    public Node getConnectionNode() {
 
-        switch (data) {
-            case EXECUTION:
-                return new TextureRegion(texture, 00, 0, 16, 16);
-            case BOOL:
-                return new TextureRegion(texture, 16, 0, 16, 16);
-            case INT:
-                return new TextureRegion(texture, 32, 0, 16, 16);
-            case FLOAT:
-                return new TextureRegion(texture, 48, 0, 16, 16);
-            case STRING:
-                return new TextureRegion(texture, 64, 0, 16, 16);
-        }
+        if (pin != null)
+            return (Node) pin.getParent().getParent();
 
         return null;
+    }
+
+    public Pin getConnectionPin() {
+        return pin;
     }
 
     public Vector2 getLocation() {
         return localToStageCoordinates(new Vector2(0, 0));
     }
 
-    public Node getConnectionNode() {
 
-        if (pin != null)
-            return (Node) pin.getParent().getParent().getParent();
+    static public class PinStyle {
+        public Drawable execution, bool, integer, floating, string;
+        public BitmapFont font;
+        public Color fontColor;
 
-        return null;
+        public PinStyle() {
+        }
+
+        public PinStyle(Drawable execution, Drawable bool, Drawable integer, Drawable floating,
+                        Drawable string, BitmapFont font, Color fontColor) {
+            this.execution = execution;
+            this.bool = bool;
+            this.integer = integer;
+            this.floating = floating;
+            this.string = string;
+            this.font = font;
+            this.fontColor = fontColor;
+        }
     }
-
-    public Value getValue() {
-        return value;
-    }
-
-    public void setValue(Value value) {
-        this.value = value;
-    }
-
-    private Pin pin;
-    private ArrayList<Pin> pins;
-    private final Connection connection;
-    private Value.Type data;
-    private Value value;
-    private static Texture texture = new Texture(Gdx.files.internal("pin.png"));
 }

@@ -6,6 +6,8 @@ import com.littleinferno.flowchart.value.Value;
 
 public class StringNode extends Node {
 
+    private final TextField field;
+
     public StringNode() {
         super("String", true);
 
@@ -13,13 +15,10 @@ public class StringNode extends Node {
 
         field = new TextField("", skin);
         left.add(field).expandX().fillX().minWidth(0);
-        ;
     }
 
     @Override
-    Value evaluate() {
-        return new StringValue(field.getText());
+    public void eval() throws Exception {
+        getPin("data").setValue(new StringValue(field.getText()));
     }
-
-    private final TextField field;
 }

@@ -190,6 +190,17 @@
       "background": "default-pane",
       "wrapWidth": 150
     }
+  },
+  "com.littleinferno.flowchart.pin.Pin$PinStyle": {
+    "default": {
+      "execution": "white-pin",
+      "bool": "blue-pin",
+      "integer": "green-pin",
+      "floating": "red-pin",
+      "string": "purple-pin",
+      "font": "default-font",
+      "fontColor": "black"
+    }
   }
 }
 
