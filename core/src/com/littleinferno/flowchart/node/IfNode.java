@@ -1,10 +1,13 @@
 package com.littleinferno.flowchart.node;
 
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
-import com.littleinferno.flowchart.pin.Pin;
+import com.littleinferno.flowchart.codegen.ExpressionGeneratable;
+import com.littleinferno.flowchart.codegen.IfStatement;
+import com.littleinferno.flowchart.codegen.Statement;
+import com.littleinferno.flowchart.codegen.StatementGeneratable;
 import com.littleinferno.flowchart.value.Value;
 
-public class IfNode extends Node {
+public class IfNode extends Node implements StatementGeneratable {
     public IfNode(Skin skin) {
         super("if", true, skin);
 
@@ -17,19 +20,20 @@ public class IfNode extends Node {
 
     @Override
     public void execute() throws Exception {
-        Pin a = getPin("Condition").getConnectionPin();
+        genStatement().execute();
+    }
 
-        if (a != null) {
+    @Override
+    public Statement genStatement() {
 
-            Node next;
+        ExpressionGeneratable condition = (ExpressionGeneratable) getPin("Condition").getConnectionNode();
 
-            if (a.getValue().asBool())
-                next = getPin("True").getConnectionNode();
-            else
-                next = getPin("False").getConnectionNode();
+        StatementGeneratable ifStatement = (StatementGeneratable) getPin("True").getConnectionNode();
+        StatementGeneratable elseStatement = (StatementGeneratable) getPin("False").getConnectionNode();
 
-            if (next != null)
-                next.execute();
-        }
+        return new IfStatement(
+                condition.genExpression(),
+                ifStatement.genStatement(),
+                elseStatement != null ? elseStatement.genStatement() : null);
     }
 }

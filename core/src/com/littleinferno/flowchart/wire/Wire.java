@@ -34,7 +34,7 @@ public class Wire extends Actor {
         if (end.getConnection() == Pin.input) e.add(new Vector2(8, 8));
         else e.add(new Vector2(86, 8));
 
-        renderer.setProjectionMatrix(batch.getProjectionMatrix());
+      //  renderer.setProjectionMatrix(batch.getProjectionMatrix());
         renderer.line(b.x, b.y, 0.f, e.x, e.y, 0.f);
         renderer.end();
 

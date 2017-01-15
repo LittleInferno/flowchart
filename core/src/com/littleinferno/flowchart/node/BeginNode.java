@@ -4,8 +4,10 @@ import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.ui.Button;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
+import com.littleinferno.flowchart.codegen.Statement;
+import com.littleinferno.flowchart.codegen.StatementGeneratable;
 
-public class BeginNode extends Node {
+public class BeginNode extends Node implements StatementGeneratable{
     public BeginNode(Skin skin) {
         super("Begin", false, skin);
 
@@ -24,14 +26,12 @@ public class BeginNode extends Node {
 
     @Override
     public void execute() {
-        Node next = getPin("start").getConnectionNode();
+        genStatement().execute();
+    }
 
-        if (next != null) {
-            try {
-                next.execute();
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
+    @Override
+    public Statement genStatement() {
+        StatementGeneratable statement = (StatementGeneratable) getPin("start").getConnectionNode();
+        return statement.genStatement();
     }
 }

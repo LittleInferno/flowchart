@@ -1,10 +1,14 @@
 package com.littleinferno.flowchart.node;
 
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
-import com.littleinferno.flowchart.ui.Main;
+import com.littleinferno.flowchart.codegen.ExpressionGeneratable;
+import com.littleinferno.flowchart.codegen.PrintStatement;
+import com.littleinferno.flowchart.codegen.Statement;
+import com.littleinferno.flowchart.codegen.StatementGeneratable;
+import com.littleinferno.flowchart.codegen.StatementNext;
 import com.littleinferno.flowchart.value.Value;
 
-public class LogNode extends Node {
+public class LogNode extends Node implements StatementGeneratable {
 
 
     public LogNode(Skin skin) {
@@ -18,11 +22,20 @@ public class LogNode extends Node {
 
     @Override
     public void execute() {
+        genStatement().execute();
+    }
 
-        Value str = getPin("string").getConnectionPin().getValue();
-        Main.console.appendText(str.asString());
-        Main.console.appendText(" ");
+    @Override
+    public Statement genStatement() {
 
-        executeNext();
+        ExpressionGeneratable expression = (ExpressionGeneratable) getPin("string").getConnectionNode();
+        PrintStatement printStatement = new PrintStatement(expression.genExpression());
+
+        Node next = getPin("exec out").getConnectionNode();
+        if (next != null) {
+            return new StatementNext(printStatement, ((StatementGeneratable) next).genStatement());
+        }
+
+        return printStatement;
     }
 }

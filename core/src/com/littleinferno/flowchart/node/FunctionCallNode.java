@@ -4,10 +4,18 @@ package com.littleinferno.flowchart.node;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.utils.Array;
 import com.littleinferno.flowchart.Function;
+import com.littleinferno.flowchart.codegen.Expression;
+import com.littleinferno.flowchart.codegen.ExpressionGeneratable;
+import com.littleinferno.flowchart.codegen.FunctionCall;
+import com.littleinferno.flowchart.codegen.Statement;
+import com.littleinferno.flowchart.codegen.StatementGeneratable;
 import com.littleinferno.flowchart.pin.Pin;
 import com.littleinferno.flowchart.value.Value;
 
-public class FunctionCallNode extends Node {
+import java.util.ArrayList;
+import java.util.List;
+
+public class FunctionCallNode extends Node implements StatementGeneratable, ExpressionGeneratable {
     private Function function;
 
     public FunctionCallNode(Function function, Skin skin) {
@@ -30,7 +38,6 @@ public class FunctionCallNode extends Node {
             if (i.getType() != Value.Type.EXECUTION)
                 begNode.getPin(i.getName()).setValue(i.getConnectionPin().getValue());
         }
-
         begNode.execute();
 
         executeNext();
@@ -38,5 +45,38 @@ public class FunctionCallNode extends Node {
 
     @Override
     public void eval() {
+    }
+
+    @Override
+    public Expression genExpression() {
+        com.littleinferno.flowchart.codegen.Functions.set(function.getName(),
+                new com.littleinferno.flowchart.codegen.Function(function.getBeginNode().genStatement()));
+
+        Array<Pin> inputs = getInput();
+
+        List expressions = new ArrayList<Expression>(inputs.size);
+
+        for (int i = 0; i < inputs.size; ++i) {
+            expressions.set(i, ((ExpressionGeneratable) inputs.get(i).getConnectionNode()).genExpression());
+        }
+
+        return new FunctionCall(function.getName(), expressions);
+    }
+
+    @Override
+    public Statement genStatement() {
+        com.littleinferno.flowchart.codegen.Functions.set(function.getName(),
+                new com.littleinferno.flowchart.codegen.Function(function.getBeginNode().genStatement()));
+
+        Array<Pin> inputs = getInput();
+
+        List expressions = new ArrayList<Expression>(inputs.size);
+
+        for (int i = 0; i < inputs.size; ++i) {
+            if (inputs.get(i).getType() != Value.Type.EXECUTION)
+                expressions.set(i, ((ExpressionGeneratable) inputs.get(i).getConnectionNode()).genExpression());
+        }
+
+        return new FunctionCall(function.getName(), expressions);
     }
 }

@@ -1,10 +1,13 @@
 package com.littleinferno.flowchart.node.math;
 
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
+import com.littleinferno.flowchart.codegen.BinaryExpression;
+import com.littleinferno.flowchart.codegen.Expression;
+import com.littleinferno.flowchart.codegen.ExpressionGeneratable;
 import com.littleinferno.flowchart.node.Node;
 import com.littleinferno.flowchart.value.Value;
 
-public class SubNode extends Node {
+public class SubNode extends Node implements ExpressionGeneratable {
     public SubNode(Value.Type type, Skin skin) {
         super("sub", true, skin);
 
@@ -15,9 +18,15 @@ public class SubNode extends Node {
 
     @Override
     public void eval() throws Exception {
-        Value a = getPin("A").getConnectionPin().getValue();
-        Value b = getPin("B").getConnectionPin().getValue();
+        getPin("A - B").setValue(genExpression().eval());
+    }
 
-        getPin("A - B").setValue(Value.sub(a, b));
+
+    @Override
+    public Expression genExpression() {
+        ExpressionGeneratable a = (ExpressionGeneratable) getPin("A").getConnectionNode();
+        ExpressionGeneratable b = (ExpressionGeneratable) getPin("B").getConnectionNode();
+
+        return new BinaryExpression(a.genExpression(), b.genExpression(), BinaryExpression.Operator.sub);
     }
 }

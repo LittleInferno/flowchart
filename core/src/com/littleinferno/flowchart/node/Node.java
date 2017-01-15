@@ -167,10 +167,12 @@ public class Node extends Table {
         title.setText(text);
     }
 
+    @Deprecated
     public void execute() throws Exception {
         throw new Exception("can`t execute");
     }
 
+    @Deprecated
     public void executeNext() {
         Node next = getPin("exec out").getConnectionNode();
 
@@ -183,10 +185,10 @@ public class Node extends Table {
         }
     }
 
+    @Deprecated
     public void eval() throws Exception {
         throw new Exception("can`t eval");
     }
-
 
     static public class NodeStyle {
 

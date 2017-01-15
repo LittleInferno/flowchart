@@ -12,6 +12,7 @@ import com.littleinferno.flowchart.ui.Main;
 
 public class Function {
 
+    private com.littleinferno.flowchart.codegen.Function function;
     private String name;
     private Array<Node> nodes;
     private FunctionBeginNode beginNode;
@@ -33,6 +34,8 @@ public class Function {
 
         nodes = new Array<Node>();
         parameters = new Array<Parameter>();
+
+
     }
 
     public FunctionBeginNode getBeginNode() {
@@ -102,5 +105,11 @@ public class Function {
 
     public void setCurrentCall(FunctionCallNode currentCall) {
         this.currentCall = currentCall;
+    }
+
+
+    public void gen(){
+//        function = new com.littleinferno.flowchart.codegen.Function(beginNode.genStatement(null)) {
+//        };
     }
 }
