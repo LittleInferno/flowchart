@@ -22,9 +22,9 @@ public class Function {
     public Function(String name) {
         this.name = name;
 
-        beginNode = new FunctionBeginNode(this);
+        beginNode = new FunctionBeginNode(this, Main.skin);
         beginNode.setPosition(100, 100);
-        returnNode = new FunctionReturnNode(this);
+        returnNode = new FunctionReturnNode(this, Main.skin);
         returnNode.setPosition(400, 100);
 
         Table functionWindow = Main.addWindow(name).getContentTable();

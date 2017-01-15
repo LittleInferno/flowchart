@@ -1,8 +1,5 @@
 package com.littleinferno.flowchart.node;
 
-import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.NinePatch;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
@@ -12,7 +9,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
-import com.badlogic.gdx.scenes.scene2d.utils.NinePatchDrawable;
+import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Array;
 import com.littleinferno.flowchart.pin.Pin;
@@ -21,17 +18,21 @@ import com.littleinferno.flowchart.value.Value;
 public class Node extends Table {
 
     private final Label title;
+    final Table left;
+    final Table right;
+    final NodeStyle style;
 
-    public Node(final String name, final boolean closable) {
+
+    public Node(final String name, final boolean closable, Skin skin) {
+        super(skin);
+        style = skin.get(NodeStyle.class);
 
         setWidth(200);
-        NinePatch patch = new NinePatch(new Texture(Gdx.files.internal("VarTable.png")), 1, 1, 1, 1);
-        setBackground(new NinePatchDrawable(patch));
+        setBackground(style.normal);
 
         this.setTouchable(Touchable.enabled);
 
-
-        title = new Label(name, skin);
+        title = new Label(name, getSkin());
         title.setAlignment(Align.center);
         title.setEllipsis(true);
 
@@ -40,7 +41,7 @@ public class Node extends Table {
 
             container.add(title).expand().fill().minWidth(0);
 
-            Button close = new Button(skin);
+            Button close = new Button(getSkin());
             container.add(close).width(30);
 
             add(container).expandX().fillX().colspan(2).row();
@@ -56,17 +57,14 @@ public class Node extends Table {
             add(title).expandX().fillX().minWidth(0).colspan(2).row();
         }
 
-        title.pack();
-        headerHeight = title.getHeight();
-
         row().width(100);
 
         left = new Table();
-        left.left().top();
+       // left.top();
         add(left).expand().fill();
 
         right = new Table();
-        right.right().top();
+       // right.top();
         add(right).expand().fill();
 
         top();
@@ -81,7 +79,6 @@ public class Node extends Table {
 
                 mouseOffsetX = x;
                 mouseOffsetY = y;
-
                 return true;
             }
 
@@ -94,40 +91,47 @@ public class Node extends Table {
 
                 setPosition(((int) ((nodeX + amountX) / 10) * 10), ((int) ((nodeY + amountY) / 10) * 10));
             }
+
+            @Override
+            public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
+            }
         });
     }
 
     public void addDataInputPin(final Value.Type type, final String name) {
-        left.add(new Pin(name, type, Pin.input, skin)).expandX().fillX().padLeft(10);
+        left.add(new Pin(name, type, Pin.input, getSkin())).expandX().fillX().padLeft(10).padBottom(10);
+        ;
         left.row();
-        updateSize();
+        pack();
     }
 
     public void addDataOutputPin(final Value.Type type, final String name) {
-        right.add(new Pin(name, type, Pin.output, skin)).expandX().fillX().padRight(10);
+        right.add(new Pin(name, type, Pin.output, getSkin())).expandX().fillX().padRight(10).padBottom(10);
+        ;
         right.row();
-        updateSize();
+        pack();
     }
 
 
-    void addExecutionInputPin() {
+    public void addExecutionInputPin() {
         addExecutionInputPin("exec in");
     }
 
-    void addExecutionInputPin(final String name) {
-        left.add(new Pin(name, Value.Type.EXECUTION, Pin.input, skin)).expandX().fillX().padLeft(10);
+    public void addExecutionInputPin(final String name) {
+        left.add(new Pin(name, Value.Type.EXECUTION, Pin.input, getSkin())).expandX().fillX().padLeft(10).padBottom(10);
+        ;
         left.row();
-        updateSize();
+        pack();
     }
 
-    void addExecutionOutputPin() {
+    public void addExecutionOutputPin() {
         addExecutionOutputPin("exec out");
     }
 
-    void addExecutionOutputPin(final String name) {
-        right.add(new Pin(name, Value.Type.EXECUTION, Pin.output, skin)).expandX().fillX().padRight(10);
+    public void addExecutionOutputPin(final String name) {
+        right.add(new Pin(name, Value.Type.EXECUTION, Pin.output, getSkin())).expandX().fillX().padRight(10).padBottom(10);
         right.row();
-        updateSize();
+        pack();
     }
 
     public void removePin(final String name) {
@@ -183,26 +187,18 @@ public class Node extends Table {
         throw new Exception("can`t eval");
     }
 
-//    public Value evaluate() throws Exception {
-//        throw new Exception("can`t evaluate");
-//    }
 
+    static public class NodeStyle {
 
-    private void updateSize() {
+        public Drawable normal, select;
 
-        left.pack();
-        float height = left.getHeight();
-        right().pack();
-        height = Math.max(height, right.getHeight());
-        if (height > getHeight()) {
-            setHeight(height);
+        public NodeStyle() {
+        }
+
+        public NodeStyle(Drawable normal, Drawable select) {
+            this.normal = normal;
+            this.select = select;
+
         }
     }
-
-    Table left;
-    Table right;
-    protected Skin skin = new Skin(Gdx.files.internal("uiskin.json"));
-
-    private float headerHeight;
-
 }

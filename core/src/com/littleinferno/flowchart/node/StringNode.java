@@ -1,5 +1,6 @@
 package com.littleinferno.flowchart.node;
 
+import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.TextField;
 import com.littleinferno.flowchart.value.StringValue;
 import com.littleinferno.flowchart.value.Value;
@@ -8,8 +9,8 @@ public class StringNode extends Node {
 
     private final TextField field;
 
-    public StringNode() {
-        super("String", true);
+    public StringNode(Skin skin) {
+        super("String", true, skin);
 
         addDataOutputPin(Value.Type.STRING, "data");
 

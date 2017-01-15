@@ -163,7 +163,7 @@ class FunctionItem extends Item {
             @Override
             public DragAndDrop.Payload dragStart(InputEvent event, float x, float y, int pointer) {
                 DragAndDrop.Payload payload = new DragAndDrop.Payload();
-                payload.setObject(new FunctionCallNode(function));
+                payload.setObject(new FunctionCallNode(function,skin));
 
                 payload.setDragActor(new Label(String.format("call %s", function.getName()), skin));
 

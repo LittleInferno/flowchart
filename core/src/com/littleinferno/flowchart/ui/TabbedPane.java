@@ -154,6 +154,10 @@ public class TabbedPane extends Table {
             @Override
             public void drop(DragAndDrop.Source source, DragAndDrop.Payload payload, float x, float y, int pointer) {
                 Actor node = (Actor) payload.getObject();
+
+                x = ((int) x / 10) * 10;
+                y = ((int) y / 10) * 10;
+
                 node.setPosition(x, y);
                 tab.getContentTable().addActor(node);
             }

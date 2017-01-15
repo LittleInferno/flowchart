@@ -1,13 +1,13 @@
 package com.littleinferno.flowchart.node;
 
 
+import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.littleinferno.flowchart.Variable;
-import com.littleinferno.flowchart.value.Value;
 
 public class VariableGetNode extends Node {
 
-    public VariableGetNode(Variable variable) {
-        super(String.format("Get %s", variable.getName()), true);
+    public VariableGetNode(Variable variable, Skin skin) {
+        super(String.format("Get %s", variable.getName()), true, skin);
 
         this.variable = variable;
         variable.addNode(this);

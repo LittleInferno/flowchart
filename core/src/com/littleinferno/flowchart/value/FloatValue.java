@@ -1,7 +1,7 @@
 package com.littleinferno.flowchart.value;
 
-public class FloatValue implements Value {
-    FloatValue(float value) {
+public class FloatValue extends Value {
+    public FloatValue(float value) {
         this.value = value;
     }
 

@@ -1,6 +1,6 @@
 package com.littleinferno.flowchart.value;
 
-public class StringValue implements Value {
+public class StringValue extends Value {
     public StringValue(String value) {
         this.value = value;
     }

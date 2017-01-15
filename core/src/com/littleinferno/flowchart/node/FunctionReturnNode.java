@@ -1,5 +1,6 @@
 package com.littleinferno.flowchart.node;
 
+import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.utils.Array;
 import com.littleinferno.flowchart.Function;
 import com.littleinferno.flowchart.pin.Pin;
@@ -8,8 +9,8 @@ import com.littleinferno.flowchart.value.Value;
 public class FunctionReturnNode extends Node {
     private Function function;
 
-    public FunctionReturnNode(Function function) {
-        super(function.getName(), false);
+    public FunctionReturnNode(Function function, Skin skin) {
+        super(function.getName(), false, skin);
         this.function = function;
 
         addExecutionInputPin();

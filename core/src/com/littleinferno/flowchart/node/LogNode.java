@@ -1,13 +1,14 @@
 package com.littleinferno.flowchart.node;
 
+import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.littleinferno.flowchart.ui.Main;
 import com.littleinferno.flowchart.value.Value;
 
 public class LogNode extends Node {
 
 
-    public LogNode() {
-        super("Log", true);
+    public LogNode(Skin skin) {
+        super("Log", true, skin);
 
         addExecutionInputPin();
         addExecutionOutputPin();

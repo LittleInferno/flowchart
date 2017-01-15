@@ -1,6 +1,6 @@
 package com.littleinferno.flowchart.value;
 
-public class IntegerValue implements Value {
+public class IntegerValue extends Value {
     public IntegerValue(int value) {
         this.value = value;
     }

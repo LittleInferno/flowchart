@@ -13,6 +13,7 @@ import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Array;
 import com.littleinferno.flowchart.node.ConverterNode;
+import com.littleinferno.flowchart.node.FunctionCallNode;
 import com.littleinferno.flowchart.node.Node;
 import com.littleinferno.flowchart.value.Value;
 import com.littleinferno.flowchart.wire.Wire;
@@ -34,13 +35,10 @@ public class Pin extends Table {
     static public final int input = 0, output = 1;
 
     public Pin(String name, Value.Type type, int connection, Skin skin) {
-        this(name, type, connection, skin.get(PinStyle.class));
-    }
-
-    public Pin(String name, Value.Type type, int connection, PinStyle style) {
+        super(skin);
 
         this.connection = connection;
-        this.style = style;
+        this.style = skin.get(PinStyle.class);
 
         label = new Label(name, new Label.LabelStyle(style.font, style.fontColor));
         label.setEllipsis(true);
@@ -120,7 +118,8 @@ public class Pin extends Table {
         Node parent = (Node) getParent().getParent();
 
         try {
-            parent.eval();
+            if (!(parent instanceof FunctionCallNode))
+                parent.eval();
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -151,11 +150,11 @@ public class Pin extends Table {
 
             ConverterNode converter;
             if (getConnection() == input) {
-                converter = new ConverterNode(pin.getType(), this.getType());
+                converter = new ConverterNode(pin.getType(), this.getType(), getSkin());
                 converter.getPin("from").connect(pin);
                 converter.getPin("to").connect(this);
             } else {
-                converter = new ConverterNode(this.getType(), pin.getType());
+                converter = new ConverterNode(this.getType(), pin.getType(), getSkin());
                 converter.getPin("from").connect(this);
                 converter.getPin("to").connect(pin);
             }

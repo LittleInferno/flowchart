@@ -133,7 +133,7 @@
   "com.badlogic.gdx.scenes.scene2d.ui.Label$LabelStyle": {
     "default": {
       "font": "default-font",
-      "fontColor": "black"
+      "fontColor": "white"
     }
   },
   "com.badlogic.gdx.scenes.scene2d.ui.TextField$TextFieldStyle": {
@@ -199,7 +199,13 @@
       "floating": "red-pin",
       "string": "purple-pin",
       "font": "default-font",
-      "fontColor": "black"
+      "fontColor": "white"
+    }
+  },
+  "com.littleinferno.flowchart.node.Node$NodeStyle": {
+    "default": {
+      "normal": "node-background-default",
+      "select": "node-background-select"
     }
   }
 }

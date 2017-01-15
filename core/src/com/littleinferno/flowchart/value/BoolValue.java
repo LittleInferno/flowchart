@@ -1,7 +1,7 @@
 package com.littleinferno.flowchart.value;
 
-public class BoolValue implements Value {
-    BoolValue(boolean value) {
+public class BoolValue extends Value {
+    public BoolValue(boolean value) {
         this.value = value;
     }
 

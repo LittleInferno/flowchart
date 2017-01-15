@@ -233,3 +233,20 @@ purple-pin
   orig: 16, 16
   offset: 0, 0
   index: -1
+node-background-select
+  rotate: false
+  xy: 150, 1
+  size: 16, 16
+  split: 2, 2, 2, 2
+  orig: 16, 16
+  offset: 0, 0
+  index: -1
+node-background-default
+  rotate: false
+  xy: 167, 1
+  size: 16, 16
+  split: 2, 2, 2, 2
+  orig: 16, 16
+  offset: 0, 0
+  index: -1
+

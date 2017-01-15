@@ -1,11 +1,12 @@
 package com.littleinferno.flowchart.node;
 
 
+import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.littleinferno.flowchart.Function;
 
 public class FunctionBeginNode extends Node {
-    public FunctionBeginNode(Function function) {
-        super(function.getName(), false);
+    public FunctionBeginNode(Function function, Skin skin) {
+        super(function.getName(), false, skin);
 
         addExecutionOutputPin();
     }

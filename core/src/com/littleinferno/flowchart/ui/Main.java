@@ -15,7 +15,7 @@ public class Main extends Stage {
     private ControlTable control;
     private Table container;
     private static Table activity = new Table();
-    private Skin skin;
+    public static Skin skin;
     private static DragAndDrop dragAndDrop = new DragAndDrop();
 
     public static TextArea console;
@@ -39,7 +39,7 @@ public class Main extends Stage {
 
         TabbedPane.Tab main = addWindow("main");
 
-        BeginNode node = new BeginNode();
+        BeginNode node = new BeginNode(skin);
         node.setPosition(200, 200);
         main.getContentTable().addActor(node);
 

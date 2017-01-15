@@ -73,7 +73,7 @@ class VariableItem extends Item {
             @Override
             public DragAndDrop.Payload dragStart(InputEvent event, float x, float y, int pointer) {
                 DragAndDrop.Payload payload = new DragAndDrop.Payload();
-                payload.setObject(new VariableSetNode(variable));
+                payload.setObject(new VariableSetNode(variable, skin));
 
                 payload.setDragActor(new Label(String.format("Set %s", variable.getName()), skin));
 
@@ -85,7 +85,7 @@ class VariableItem extends Item {
             @Override
             public DragAndDrop.Payload dragStart(InputEvent event, float x, float y, int pointer) {
                 DragAndDrop.Payload payload = new DragAndDrop.Payload();
-                payload.setObject(new VariableGetNode(variable));
+                payload.setObject(new VariableGetNode(variable, skin));
 
                 payload.setDragActor(new Label(String.format("Get %s", variable.getName()), skin));
 
