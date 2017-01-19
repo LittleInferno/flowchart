@@ -1,21 +1,14 @@
 package com.littleinferno.flowchart.node;
 
-
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.StringBuilder;
 import com.littleinferno.flowchart.Function;
-import com.littleinferno.flowchart.codegen.Expression;
-import com.littleinferno.flowchart.codegen.ExpressionGeneratable;
-import com.littleinferno.flowchart.codegen.FunctionCall;
-import com.littleinferno.flowchart.codegen.Statement;
-import com.littleinferno.flowchart.codegen.StatementGeneratable;
+import com.littleinferno.flowchart.codegen.CodeGen;
 import com.littleinferno.flowchart.pin.Pin;
 import com.littleinferno.flowchart.value.Value;
 
-import java.util.ArrayList;
-import java.util.List;
-
-public class FunctionCallNode extends Node implements StatementGeneratable, ExpressionGeneratable {
+public class FunctionCallNode extends Node implements CodeGen {
     private Function function;
 
     public FunctionCallNode(Function function, Skin skin) {
@@ -29,54 +22,19 @@ public class FunctionCallNode extends Node implements StatementGeneratable, Expr
     }
 
     @Override
-    public void execute() {
-        function.setCurrentCall(this);
-
+    public String gen() {
         Array<Pin> inputs = getInput();
-        FunctionBeginNode begNode = function.getBeginNode();
-        for (Pin i : inputs) {
-            if (i.getType() != Value.Type.EXECUTION)
-                begNode.getPin(i.getName()).setValue(i.getConnectionPin().getValue());
-        }
-        begNode.execute();
+        StringBuilder builder = new StringBuilder();
 
-        executeNext();
-    }
-
-    @Override
-    public void eval() {
-    }
-
-    @Override
-    public Expression genExpression() {
-        com.littleinferno.flowchart.codegen.Functions.set(function.getName(),
-                new com.littleinferno.flowchart.codegen.Function(function.getBeginNode().genStatement()));
-
-        Array<Pin> inputs = getInput();
-
-        List expressions = new ArrayList<Expression>(inputs.size);
-
-        for (int i = 0; i < inputs.size; ++i) {
-            expressions.set(i, ((ExpressionGeneratable) inputs.get(i).getConnectionNode()).genExpression());
-        }
-
-        return new FunctionCall(function.getName(), expressions);
-    }
-
-    @Override
-    public Statement genStatement() {
-        com.littleinferno.flowchart.codegen.Functions.set(function.getName(),
-                new com.littleinferno.flowchart.codegen.Function(function.getBeginNode().genStatement()));
-
-        Array<Pin> inputs = getInput();
-
-        List expressions = new ArrayList<Expression>(inputs.size);
-
-        for (int i = 0; i < inputs.size; ++i) {
+        for (int i = 0; i < inputs.size; i++) {
             if (inputs.get(i).getType() != Value.Type.EXECUTION)
-                expressions.set(i, ((ExpressionGeneratable) inputs.get(i).getConnectionNode()).genExpression());
+                builder.append(inputs.get(i).getName());
+
+            if (i != inputs.size - 1) {
+                builder.append(',');
+            }
         }
 
-        return new FunctionCall(function.getName(), expressions);
+        return String.format("%s(%s)", function.getName(), builder.toString());
     }
 }

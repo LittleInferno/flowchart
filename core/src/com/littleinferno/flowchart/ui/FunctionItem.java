@@ -196,5 +196,5 @@ class FunctionItem extends Item {
     }
 
     private int counter = 1;
-    private Function function;
+    Function function;
 }

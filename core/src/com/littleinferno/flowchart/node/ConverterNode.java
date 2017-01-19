@@ -1,12 +1,10 @@
 package com.littleinferno.flowchart.node;
 
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
-import com.littleinferno.flowchart.codegen.ConversionExpression;
-import com.littleinferno.flowchart.codegen.Expression;
-import com.littleinferno.flowchart.codegen.ExpressionGeneratable;
+import com.littleinferno.flowchart.codegen.CodeGen;
 import com.littleinferno.flowchart.value.Value;
 
-public class ConverterNode extends Node implements ExpressionGeneratable {
+public class ConverterNode extends Node implements CodeGen {
     public ConverterNode(Value.Type from, Value.Type to, Skin skin) {
         super("Converter", true, skin);
 
@@ -15,16 +13,7 @@ public class ConverterNode extends Node implements ExpressionGeneratable {
     }
 
     @Override
-    public void eval() throws Exception {
-        getPin("to").setValue(genExpression().eval());
+    public String gen() {
+        return ((CodeGen) getPin("from").getConnectionNode()).gen();
     }
-
-    @Override
-    public Expression genExpression() {
-        ExpressionGeneratable node = (ExpressionGeneratable) getPin("from").getConnectionNode();
-
-        return new ConversionExpression(node.genExpression());
-    }
-
-
 }

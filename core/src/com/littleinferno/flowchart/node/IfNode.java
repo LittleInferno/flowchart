@@ -1,13 +1,11 @@
 package com.littleinferno.flowchart.node;
 
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
-import com.littleinferno.flowchart.codegen.ExpressionGeneratable;
-import com.littleinferno.flowchart.codegen.IfStatement;
-import com.littleinferno.flowchart.codegen.Statement;
-import com.littleinferno.flowchart.codegen.StatementGeneratable;
+import com.littleinferno.flowchart.codegen.CodeGen;
+import com.littleinferno.flowchart.pin.Pin;
 import com.littleinferno.flowchart.value.Value;
 
-public class IfNode extends Node implements StatementGeneratable {
+public class IfNode extends Node implements CodeGen {
     public IfNode(Skin skin) {
         super("if", true, skin);
 
@@ -19,21 +17,20 @@ public class IfNode extends Node implements StatementGeneratable {
     }
 
     @Override
-    public void execute() throws Exception {
-        genStatement().execute();
-    }
+    public String gen() {
 
-    @Override
-    public Statement genStatement() {
+        CodeGen condition = (CodeGen) getPin("Condition").getConnectionNode();
+        CodeGen tr = (CodeGen) getPin("True").getConnectionNode();
 
-        ExpressionGeneratable condition = (ExpressionGeneratable) getPin("Condition").getConnectionNode();
+        CodeGen fl = (CodeGen) getPin("False").getConnectionNode();
+        String el = "\n";
+        if (fl != null) {
+            el = String.format("else {\n%s\n}\n", fl.gen());
+        }
 
-        StatementGeneratable ifStatement = (StatementGeneratable) getPin("True").getConnectionNode();
-        StatementGeneratable elseStatement = (StatementGeneratable) getPin("False").getConnectionNode();
 
-        return new IfStatement(
-                condition.genExpression(),
-                ifStatement.genStatement(),
-                elseStatement != null ? elseStatement.genStatement() : null);
+        String result = String.format("if (%s) {\n%s}%s", condition.gen(), tr.gen(), el);
+
+        return result;
     }
 }

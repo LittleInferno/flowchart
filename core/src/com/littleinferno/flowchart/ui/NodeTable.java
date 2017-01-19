@@ -12,7 +12,6 @@ import com.littleinferno.flowchart.node.IfNode;
 import com.littleinferno.flowchart.node.IntegerNode;
 import com.littleinferno.flowchart.node.LogNode;
 import com.littleinferno.flowchart.node.StringNode;
-import com.littleinferno.flowchart.node.TestASTGenerate;
 import com.littleinferno.flowchart.node.math.AddNode;
 import com.littleinferno.flowchart.node.math.CompareNode;
 import com.littleinferno.flowchart.node.math.DivNode;
@@ -41,7 +40,7 @@ public class NodeTable extends Table {
                 "less int", "less float", "less string",
                 "great int", "great float", "great string",
                 "compare int", "compare float", "compare string",
-                "if","test ast"
+                "if"
         );
 
         Main.addSource(new DragAndDrop.Source(list) {
@@ -133,9 +132,7 @@ public class NodeTable extends Table {
                     case 26:
                         payload.setObject(new IfNode(skin));
                         break;
-                    case 27:
-                        payload.setObject(new TestASTGenerate(skin));
-                        break;
+
                 }
                 payload.setDragActor(new Label(item, skin));
 

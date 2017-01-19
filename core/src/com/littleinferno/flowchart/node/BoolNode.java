@@ -2,13 +2,11 @@ package com.littleinferno.flowchart.node;
 
 import com.badlogic.gdx.scenes.scene2d.ui.SelectBox;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
-import com.littleinferno.flowchart.codegen.Expression;
-import com.littleinferno.flowchart.codegen.ExpressionGeneratable;
-import com.littleinferno.flowchart.codegen.ValueExpression;
+import com.littleinferno.flowchart.codegen.CodeGen;
 import com.littleinferno.flowchart.value.BoolValue;
 import com.littleinferno.flowchart.value.Value;
 
-public class BoolNode extends Node implements ExpressionGeneratable {
+public class BoolNode extends Node implements CodeGen {
 
     private final SelectBox box;
 
@@ -28,8 +26,7 @@ public class BoolNode extends Node implements ExpressionGeneratable {
     }
 
     @Override
-    public Expression genExpression() {
-        return new ValueExpression(new BoolValue(box.getSelectedIndex() == 0));
-
+    public String gen() {
+        return box.getSelectedIndex() == 0 ? "true" : "false";
     }
 }

@@ -12,7 +12,6 @@ import com.littleinferno.flowchart.ui.Main;
 
 public class Function {
 
-    private com.littleinferno.flowchart.codegen.Function function;
     private String name;
     private Array<Node> nodes;
     private FunctionBeginNode beginNode;

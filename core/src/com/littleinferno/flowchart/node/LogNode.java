@@ -1,15 +1,10 @@
 package com.littleinferno.flowchart.node;
 
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
-import com.littleinferno.flowchart.codegen.ExpressionGeneratable;
-import com.littleinferno.flowchart.codegen.PrintStatement;
-import com.littleinferno.flowchart.codegen.Statement;
-import com.littleinferno.flowchart.codegen.StatementGeneratable;
-import com.littleinferno.flowchart.codegen.StatementNext;
+import com.littleinferno.flowchart.codegen.CodeGen;
 import com.littleinferno.flowchart.value.Value;
 
-public class LogNode extends Node implements StatementGeneratable {
-
+public class LogNode extends Node implements CodeGen {
 
     public LogNode(Skin skin) {
         super("Log", true, skin);
@@ -21,21 +16,12 @@ public class LogNode extends Node implements StatementGeneratable {
     }
 
     @Override
-    public void execute() {
-        genStatement().execute();
-    }
+    public String gen() {
 
-    @Override
-    public Statement genStatement() {
+        CodeGen string = (CodeGen) getPin("string").getConnectionNode();
+        CodeGen next = (CodeGen) getPin("exec out").getConnectionNode();
 
-        ExpressionGeneratable expression = (ExpressionGeneratable) getPin("string").getConnectionNode();
-        PrintStatement printStatement = new PrintStatement(expression.genExpression());
-
-        Node next = getPin("exec out").getConnectionNode();
-        if (next != null) {
-            return new StatementNext(printStatement, ((StatementGeneratable) next).genStatement());
-        }
-
-        return printStatement;
+        return String.format("com.littleinferno.flowchart.codegen.IO.print(%s)\n%s", string.gen(),
+                next != null ? next.gen() : "");
     }
 }

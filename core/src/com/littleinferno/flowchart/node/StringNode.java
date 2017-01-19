@@ -2,13 +2,10 @@ package com.littleinferno.flowchart.node;
 
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.TextField;
-import com.littleinferno.flowchart.codegen.Expression;
-import com.littleinferno.flowchart.codegen.ExpressionGeneratable;
-import com.littleinferno.flowchart.codegen.ValueExpression;
-import com.littleinferno.flowchart.value.StringValue;
+import com.littleinferno.flowchart.codegen.CodeGen;
 import com.littleinferno.flowchart.value.Value;
 
-public class StringNode extends Node implements ExpressionGeneratable {
+public class StringNode extends Node implements CodeGen {
 
     private final TextField field;
 
@@ -22,12 +19,7 @@ public class StringNode extends Node implements ExpressionGeneratable {
     }
 
     @Override
-    public void eval() throws Exception {
-        getPin("data").setValue(new StringValue(field.getText()));
-    }
-
-    @Override
-    public Expression genExpression() {
-        return new ValueExpression(new StringValue(field.getText()));
+    public String gen() {
+        return String.format("\"%s\"", field.getText());
     }
 }

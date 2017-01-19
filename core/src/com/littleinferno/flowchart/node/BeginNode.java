@@ -1,13 +1,15 @@
 package com.littleinferno.flowchart.node;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.ui.Button;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
-import com.littleinferno.flowchart.codegen.Statement;
-import com.littleinferno.flowchart.codegen.StatementGeneratable;
+import com.littleinferno.flowchart.codegen.Builder;
+import com.littleinferno.flowchart.codegen.CodeExecution;
+import com.littleinferno.flowchart.codegen.CodeGen;
 
-public class BeginNode extends Node implements StatementGeneratable{
+public class BeginNode extends Node implements CodeGen {
     public BeginNode(Skin skin) {
         super("Begin", false, skin);
 
@@ -19,19 +21,18 @@ public class BeginNode extends Node implements StatementGeneratable{
         button.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
-                execute();
+                String code = Builder.genVar() + gen();
+
+                Gdx.app.log("", code);
+
+                CodeExecution execute = new CodeExecution();
+                execute.run(code);
             }
         });
     }
 
     @Override
-    public void execute() {
-        genStatement().execute();
-    }
-
-    @Override
-    public Statement genStatement() {
-        StatementGeneratable statement = (StatementGeneratable) getPin("start").getConnectionNode();
-        return statement.genStatement();
+    public String gen() {
+        return ((CodeGen) getPin("start").getConnectionNode()).gen();
     }
 }
