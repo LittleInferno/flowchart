@@ -1,6 +1,7 @@
 package com.littleinferno.flowchart.node;
 
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
+import com.littleinferno.flowchart.pin.Pin;
 import com.littleinferno.flowchart.value.Value;
 
 public class ConverterNode extends Node {
@@ -12,8 +13,9 @@ public class ConverterNode extends Node {
     }
 
     @Override
-    public void eval() throws Exception {
-        getPin("to").setValue(
-                getPin("from").getConnectionPin().getValue());
+    public String gen(Pin with) {
+        Pin.Connector from = getPin("from").getConnector();
+
+        return from.parent.gen(from.pin);
     }
 }

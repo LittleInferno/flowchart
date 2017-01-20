@@ -1,14 +1,16 @@
 package com.littleinferno.flowchart.node;
 
-
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.StringBuilder;
 import com.littleinferno.flowchart.Function;
 import com.littleinferno.flowchart.pin.Pin;
 import com.littleinferno.flowchart.value.Value;
 
 public class FunctionCallNode extends Node {
     private Function function;
+    private String currentTmpCall;
+    private static int counter = 0;
 
     public FunctionCallNode(Function function, Skin skin) {
         super(function.getName(), true, skin);
@@ -21,22 +23,33 @@ public class FunctionCallNode extends Node {
     }
 
     @Override
-    public void execute() {
-        function.setCurrentCall(this);
+    public String gen(Pin with) {
 
-        Array<Pin> inputs = getInput();
-        FunctionBeginNode begNode = function.getBeginNode();
-        for (Pin i : inputs) {
-            if (i.getType() != Value.Type.EXECUTION)
-                begNode.getPin(i.getName()).setValue(i.getConnectionPin().getValue());
+        if (with.getType() == Value.Type.EXECUTION) {
+            Array<Pin> inputs = getInput();
+            StringBuilder parametrBuilder = new StringBuilder();
+
+            for (int i = 0; i < inputs.size; i++) {
+                if (inputs.get(i).getType() != Value.Type.EXECUTION) {
+
+                    Pin.Connector data = inputs.get(i).getConnector();
+                    parametrBuilder.append(data.parent.gen(data.pin));
+
+                    if (i != inputs.size - 1)
+                        parametrBuilder.append(',');
+                }
+            }
+
+            currentTmpCall = String.format("tmpcall%d", counter++);
+
+            Pin.Connector next = getPin("exec out").getConnector();
+            String nextStr = next == null ? "" : next.parent.gen(next.pin);
+
+            return String.format("var %s = %s(%s)\n%s", currentTmpCall, function.getName(),
+                    parametrBuilder.toString(), nextStr);
+
         }
 
-        begNode.execute();
-
-        executeNext();
-    }
-
-    @Override
-    public void eval() {
+        return String.format("%s.%s", currentTmpCall, with.getName());
     }
 }

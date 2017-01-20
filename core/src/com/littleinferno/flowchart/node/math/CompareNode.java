@@ -20,33 +20,38 @@ public class CompareNode extends Node {
         addExecutionOutputPin("A < B");
     }
 
+//    @Override
+//    public void execute() {
+//
+//        Pin a = getPin("A").getConnectionPin();
+//        Pin b = getPin("B").getConnectionPin();
+//
+//        if (a != null && b != null) {
+//            Value aVal = a.getValue();
+//            Value bVal = b.getValue();
+//
+//            Node next;
+//
+//            if (Value.equals(aVal, bVal).asBool())
+//                next = getPin("A == B").getConnectionNode();
+//            else if (Value.less(aVal, bVal).asBool())
+//                next = getPin("A < B").getConnectionNode();
+//            else
+//                next = getPin("A > B").getConnectionNode();
+//
+//            if (next != null) {
+//                try {
+//                    next.execute();
+//                } catch (Exception e) {
+//                    e.printStackTrace();
+//                }
+//            }
+//        }
+//
+//    }
+
     @Override
-    public void execute() {
-
-        Pin a = getPin("A").getConnectionPin();
-        Pin b = getPin("B").getConnectionPin();
-
-        if (a != null && b != null) {
-            Value aVal = a.getValue();
-            Value bVal = b.getValue();
-
-            Node next;
-
-            if (Value.equals(aVal, bVal).asBool())
-                next = getPin("A == B").getConnectionNode();
-            else if (Value.less(aVal, bVal).asBool())
-                next = getPin("A < B").getConnectionNode();
-            else
-                next = getPin("A > B").getConnectionNode();
-
-            if (next != null) {
-                try {
-                    next.execute();
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            }
-        }
-
+    public String gen(Pin with) {
+        return null;
     }
 }

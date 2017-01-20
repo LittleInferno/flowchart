@@ -132,6 +132,7 @@ public class NodeTable extends Table {
                     case 26:
                         payload.setObject(new IfNode(skin));
                         break;
+
                 }
                 payload.setDragActor(new Label(item, skin));
 

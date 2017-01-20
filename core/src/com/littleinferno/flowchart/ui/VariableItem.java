@@ -102,6 +102,6 @@ class VariableItem extends Item {
 
     }
 
-    private Variable variable;
+    Variable variable;
 
 }

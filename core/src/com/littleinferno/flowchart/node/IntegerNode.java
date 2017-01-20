@@ -2,7 +2,7 @@ package com.littleinferno.flowchart.node;
 
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.TextField;
-import com.littleinferno.flowchart.value.IntegerValue;
+import com.littleinferno.flowchart.pin.Pin;
 import com.littleinferno.flowchart.value.Value;
 
 public class IntegerNode extends Node {
@@ -18,16 +18,14 @@ public class IntegerNode extends Node {
         field.setTextFieldFilter(new TextField.TextFieldFilter() {
             @Override
             public boolean acceptChar(TextField textField, char c) {
-                if (c >= '0' && c <= '9')
-                    return true;
-                return false;
+                return c >= '0' && c <= '9' || c == '+' || c == '-';
             }
         });
         left.add(field).expandX().fillX().minWidth(0);
     }
 
     @Override
-    public void eval() throws Exception {
-        getPin("data").setValue(new IntegerValue(Integer.valueOf(field.getText())));
+    public String gen(Pin with) {
+        return field.getText();
     }
 }

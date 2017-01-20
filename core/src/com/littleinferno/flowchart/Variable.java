@@ -55,6 +55,10 @@ public class Variable {
         nodes.removeValue(node, true);
     }
 
+    public String gen() {
+        return String.format("var %s\n", name);
+    }
+
     private Value.Type valueType;
     private Value value;
     private String name;

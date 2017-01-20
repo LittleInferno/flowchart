@@ -1,7 +1,9 @@
 package com.littleinferno.flowchart.node.math;
 
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
+import com.littleinferno.flowchart.codegen.Builder;
 import com.littleinferno.flowchart.node.Node;
+import com.littleinferno.flowchart.pin.Pin;
 import com.littleinferno.flowchart.value.Value;
 
 public class DivNode extends Node {
@@ -15,10 +17,13 @@ public class DivNode extends Node {
     }
 
     @Override
-    public void eval() throws Exception {
-        Value a = getPin("A").getConnectionPin().getValue();
-        Value b = getPin("B").getConnectionPin().getValue();
+    public String gen(Pin with) {
+        Pin.Connector a = getPin("A").getConnector();
+        Pin.Connector b = getPin("B").getConnector();
 
-        getPin("A / B").setValue(Value.div(a, b));
+        String aStr = a.parent.gen(a.pin);
+        String bStr = b.parent.gen(b.pin);
+
+        return Builder.createDiv(aStr, bStr);
     }
 }

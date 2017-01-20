@@ -16,20 +16,17 @@ public class IfNode extends Node {
     }
 
     @Override
-    public void execute() throws Exception {
-        Pin a = getPin("Condition").getConnectionPin();
+    public String gen(Pin with) {
 
-        if (a != null) {
+        Pin.Connector condition = getPin("Condition").getConnector();
 
-            Node next;
+        Pin.Connector tr = getPin("True").getConnector();
+        Pin.Connector fl = getPin("False").getConnector();
 
-            if (a.getValue().asBool())
-                next = getPin("True").getConnectionNode();
-            else
-                next = getPin("False").getConnectionNode();
+        String conditionStr = condition.parent.gen(condition.pin);
+        String trueString = tr.parent.gen(tr.pin);
+        String falseString = fl == null ? "" : fl.parent.gen(fl.pin);
 
-            if (next != null)
-                next.execute();
-        }
+        return String.format("if (%s) {\n%s}%s", conditionStr, trueString, falseString);
     }
 }

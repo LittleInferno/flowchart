@@ -2,7 +2,7 @@ package com.littleinferno.flowchart.node;
 
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.TextField;
-import com.littleinferno.flowchart.value.StringValue;
+import com.littleinferno.flowchart.pin.Pin;
 import com.littleinferno.flowchart.value.Value;
 
 public class StringNode extends Node {
@@ -19,7 +19,7 @@ public class StringNode extends Node {
     }
 
     @Override
-    public void eval() throws Exception {
-        getPin("data").setValue(new StringValue(field.getText()));
+    public String gen(Pin with) {
+        return String.format("\"%s\"", field.getText());
     }
 }

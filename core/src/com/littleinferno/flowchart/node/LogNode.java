@@ -1,11 +1,10 @@
 package com.littleinferno.flowchart.node;
 
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
-import com.littleinferno.flowchart.ui.Main;
+import com.littleinferno.flowchart.pin.Pin;
 import com.littleinferno.flowchart.value.Value;
 
 public class LogNode extends Node {
-
 
     public LogNode(Skin skin) {
         super("Log", true, skin);
@@ -17,12 +16,13 @@ public class LogNode extends Node {
     }
 
     @Override
-    public void execute() {
+    public String gen(Pin with) {
+        Pin.Connector data = getPin("string").getConnector();
+        String dataStr = data.parent.gen(data.pin);
 
-        Value str = getPin("string").getConnectionPin().getValue();
-        Main.console.appendText(str.asString());
-        Main.console.appendText(" ");
+        Pin.Connector next = getPin("exec out").getConnector();
+        String nextStr = next == null ? "" : next.parent.gen(next.pin);
 
-        executeNext();
+        return String.format("com.littleinferno.flowchart.codegen.IO.print(%s)\n%s", dataStr, nextStr);
     }
 }

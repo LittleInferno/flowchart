@@ -1,9 +1,13 @@
 package com.littleinferno.flowchart.node;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.ui.Button;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
+import com.littleinferno.flowchart.codegen.Builder;
+import com.littleinferno.flowchart.codegen.CodeExecution;
+import com.littleinferno.flowchart.pin.Pin;
 
 public class BeginNode extends Node {
     public BeginNode(Skin skin) {
@@ -17,21 +21,20 @@ public class BeginNode extends Node {
         button.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
-                execute();
+                String code = Builder.genFun() + Builder.genVar() + gen(getPin("start"));
+
+                Gdx.app.log("", code);
+
+                CodeExecution execute = new CodeExecution();
+                execute.run(code);
             }
         });
     }
 
     @Override
-    public void execute() {
-        Node next = getPin("start").getConnectionNode();
+    public String gen(Pin with) {
+        Pin.Connector next = getPin("start").getConnector();
 
-        if (next != null) {
-            try {
-                next.execute();
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
+        return next == null ? "" : next.parent.gen(next.pin);
     }
 }
