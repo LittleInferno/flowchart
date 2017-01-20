@@ -2,10 +2,10 @@ package com.littleinferno.flowchart.node;
 
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.TextField;
-import com.littleinferno.flowchart.codegen.CodeGen;
+import com.littleinferno.flowchart.pin.Pin;
 import com.littleinferno.flowchart.value.Value;
 
-public class StringNode extends Node implements CodeGen {
+public class StringNode extends Node {
 
     private final TextField field;
 
@@ -19,7 +19,7 @@ public class StringNode extends Node implements CodeGen {
     }
 
     @Override
-    public String gen() {
+    public String gen(Pin with) {
         return String.format("\"%s\"", field.getText());
     }
 }

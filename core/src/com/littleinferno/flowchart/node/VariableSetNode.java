@@ -2,10 +2,10 @@ package com.littleinferno.flowchart.node;
 
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.littleinferno.flowchart.Variable;
-import com.littleinferno.flowchart.codegen.CodeGen;
+import com.littleinferno.flowchart.pin.Pin;
 
 
-public class VariableSetNode extends Node implements CodeGen {
+public class VariableSetNode extends Node {
 
     private Variable variable;
 
@@ -22,11 +22,13 @@ public class VariableSetNode extends Node implements CodeGen {
     }
 
     @Override
-    public String gen() {
-        CodeGen data = (CodeGen) getPin("data").getConnectionNode();
-        CodeGen next = (CodeGen) getPin("exec out").getConnectionNode();
+    public String gen(Pin with) {
+        Pin.Connector data = getPin("data").getConnector();
+        String dataStr = data.parent.gen(data.pin);
 
-        return String.format("%s = %s\n%s", variable.getName(), data.gen(),
-                next != null ? next.gen() : "");
+        Pin.Connector next = getPin("exec out").getConnector();
+        String nextStr = next == null ? "" : next.parent.gen(next.pin);
+
+        return String.format("%s = %s\n%s", variable.getName(), dataStr, nextStr);
     }
 }

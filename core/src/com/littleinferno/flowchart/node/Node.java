@@ -12,10 +12,11 @@ import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Array;
+import com.littleinferno.flowchart.codegen.CodeGen;
 import com.littleinferno.flowchart.pin.Pin;
 import com.littleinferno.flowchart.value.Value;
 
-public class Node extends Table {
+public abstract class Node extends Table implements CodeGen {
 
     private final Label title;
     final Table left;
@@ -60,11 +61,11 @@ public class Node extends Table {
         row().width(100);
 
         left = new Table();
-       // left.top();
+        left.top();
         add(left).expand().fill();
 
         right = new Table();
-       // right.top();
+        right.top();
         add(right).expand().fill();
 
         top();
@@ -100,14 +101,12 @@ public class Node extends Table {
 
     public void addDataInputPin(final Value.Type type, final String name) {
         left.add(new Pin(name, type, Pin.input, getSkin())).expandX().fillX().padLeft(10).padBottom(10);
-        ;
         left.row();
         pack();
     }
 
     public void addDataOutputPin(final Value.Type type, final String name) {
         right.add(new Pin(name, type, Pin.output, getSkin())).expandX().fillX().padRight(10).padBottom(10);
-        ;
         right.row();
         pack();
     }
@@ -119,7 +118,6 @@ public class Node extends Table {
 
     public void addExecutionInputPin(final String name) {
         left.add(new Pin(name, Value.Type.EXECUTION, Pin.input, getSkin())).expandX().fillX().padLeft(10).padBottom(10);
-        ;
         left.row();
         pack();
     }
@@ -165,29 +163,6 @@ public class Node extends Table {
 
     public void setTitle(String text) {
         title.setText(text);
-    }
-
-    @Deprecated
-    public void execute() throws Exception {
-        throw new Exception("can`t execute");
-    }
-
-    @Deprecated
-    public void executeNext() {
-        Node next = getPin("exec out").getConnectionNode();
-
-        if (next != null) {
-            try {
-                next.execute();
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
-    }
-
-    @Deprecated
-    public void eval() throws Exception {
-        throw new Exception("can`t eval");
     }
 
     static public class NodeStyle {

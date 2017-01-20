@@ -2,12 +2,11 @@ package com.littleinferno.flowchart.node.math;
 
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.littleinferno.flowchart.codegen.Builder;
-import com.littleinferno.flowchart.codegen.CodeGen;
 import com.littleinferno.flowchart.node.Node;
+import com.littleinferno.flowchart.pin.Pin;
 import com.littleinferno.flowchart.value.Value;
 
-public class MulNode extends Node implements CodeGen {
-
+public class MulNode extends Node {
     public MulNode(Value.Type type, Skin skin) {
         super("mul", true, skin);
 
@@ -17,10 +16,13 @@ public class MulNode extends Node implements CodeGen {
     }
 
     @Override
-    public String gen() {
-        CodeGen a = (CodeGen) getPin("A").getConnectionNode();
-        CodeGen b = (CodeGen) getPin("B").getConnectionNode();
+    public String gen(Pin with) {
+        Pin.Connector a = getPin("A").getConnector();
+        Pin.Connector b = getPin("B").getConnector();
 
-        return Builder.createMul(a.gen(), b.gen());
+        String aStr = a.parent.gen(a.pin);
+        String bStr = b.parent.gen(b.pin);
+
+        return Builder.createMul(aStr, bStr);
     }
 }

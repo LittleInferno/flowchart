@@ -37,7 +37,7 @@ public class Builder {
     }
 
     static private String create(String left, String right, String operator) {
-        return String.format("%s %s %s", left, operator, right);
+        return String.format("(%s %s %s)", left, operator, right);
     }
 
 

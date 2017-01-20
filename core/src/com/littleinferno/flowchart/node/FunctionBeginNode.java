@@ -5,11 +5,10 @@ import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.StringBuilder;
 import com.littleinferno.flowchart.Function;
-import com.littleinferno.flowchart.codegen.CodeGen;
 import com.littleinferno.flowchart.pin.Pin;
 import com.littleinferno.flowchart.value.Value;
 
-public class FunctionBeginNode extends Node implements CodeGen {
+public class FunctionBeginNode extends Node {
 
     private final Function function;
 
@@ -21,22 +20,29 @@ public class FunctionBeginNode extends Node implements CodeGen {
     }
 
     @Override
-    public String gen() {
+    public String gen(Pin with) {
 
-        Array<Pin> output = getOutput();
-        StringBuilder builder = new StringBuilder();
+        if (with.getType() == Value.Type.EXECUTION) {
 
-        for (int i = 0; i < output.size; i++) {
-            if (output.get(i).getType() != Value.Type.EXECUTION)
-                builder.append(output.get(i).getName());
+            Array<Pin> output = getOutput();
+            StringBuilder builder = new StringBuilder();
 
-            if (i != output.size - 1) {
-                builder.append(',');
+            for (int i = 0; i < output.size; i++) {
+                if (output.get(i).getType() != Value.Type.EXECUTION) {
+                    builder.append(output.get(i).getName());
+
+                    if (i != output.size - 1)
+                        builder.append(',');
+                }
             }
+
+            Pin.Connector next = getPin("exec out").getConnector();
+            String nextStr = next == null ? "" : next.parent.gen(next.pin);
+
+            return String.format("function %s(%s){\n%s\n}",
+                    function.getName(), builder.toString(), nextStr);
         }
 
-        CodeGen string = (CodeGen) getPin("exec out").getConnectionNode();
-
-        return String.format("function %s(%s){\n%s\n}", function.getName(), builder.toString(), string.gen());
+        return with.getName();
     }
 }

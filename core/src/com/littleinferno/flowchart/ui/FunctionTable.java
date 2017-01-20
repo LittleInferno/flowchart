@@ -26,8 +26,10 @@ public class FunctionTable extends ComponentTable {
 
         StringBuilder builder = new StringBuilder();
 
-        for (int i = 0; i < children.size; i++) {
-            builder.append(((FunctionItem) children.get(i)).function.getBeginNode().gen());
+        for (Actor i : children) {
+
+            builder.append(((FunctionItem) i).function.getBeginNode().gen(((FunctionItem) i).
+                    function.getBeginNode().getPin("exec out")));
             builder.append('\n');
         }
 

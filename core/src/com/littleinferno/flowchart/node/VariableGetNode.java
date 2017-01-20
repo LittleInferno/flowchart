@@ -3,9 +3,11 @@ package com.littleinferno.flowchart.node;
 
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.littleinferno.flowchart.Variable;
-import com.littleinferno.flowchart.codegen.CodeGen;
+import com.littleinferno.flowchart.pin.Pin;
 
-public class VariableGetNode extends Node implements CodeGen {
+public class VariableGetNode extends Node {
+
+    private final Variable variable;
 
     public VariableGetNode(Variable variable, Skin skin) {
         super(String.format("Get %s", variable.getName()), true, skin);
@@ -16,10 +18,8 @@ public class VariableGetNode extends Node implements CodeGen {
         addDataOutputPin(variable.getValueType(), "data");
     }
 
-    private Variable variable;
-
     @Override
-    public String gen() {
+    public String gen(Pin with) {
         return variable.getName();
     }
 }

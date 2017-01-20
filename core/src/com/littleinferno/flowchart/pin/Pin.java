@@ -13,7 +13,6 @@ import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Array;
 import com.littleinferno.flowchart.node.ConverterNode;
-import com.littleinferno.flowchart.node.FunctionCallNode;
 import com.littleinferno.flowchart.node.Node;
 import com.littleinferno.flowchart.value.Value;
 import com.littleinferno.flowchart.wire.Wire;
@@ -26,7 +25,6 @@ public class Pin extends Table {
     private Array<Pin> pins = new Array<Pin>();
     private final int connection;
     private Value.Type type;
-    private Value value;
     private boolean isConnect;
 
     private Label label;
@@ -113,24 +111,6 @@ public class Pin extends Table {
         return connection;
     }
 
-    public Value getValue() {
-
-        Node parent = (Node) getParent().getParent();
-
-        try {
-            if (!(parent instanceof FunctionCallNode))
-                parent.eval();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        return value;
-    }
-
-    public void setValue(Value value) {
-        this.value = value;
-    }
-
     public boolean isConnect() {
         return isConnect;
     }
@@ -198,6 +178,7 @@ public class Pin extends Table {
         }
     }
 
+    @Deprecated
     public Node getConnectionNode() {
 
         if (pin != null)
@@ -206,12 +187,32 @@ public class Pin extends Table {
         return null;
     }
 
+    @Deprecated
     public Pin getConnectionPin() {
         return pin;
     }
 
     public Vector2 getLocation() {
         return localToStageCoordinates(new Vector2(0, 0));
+    }
+
+    public Connector getConnector() {
+        if (pin != null)
+            return new Connector(pin);
+        return null;
+    }
+
+    static public class Connector {
+
+        public final Node parent;
+        public final Pin pin;
+
+        Connector(Pin pin) {
+            this.pin = pin;
+
+            this.parent = (Node) pin.getParent().getParent();
+        }
+
     }
 
 

@@ -1,11 +1,10 @@
 package com.littleinferno.flowchart.node;
 
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
-import com.littleinferno.flowchart.codegen.CodeGen;
 import com.littleinferno.flowchart.pin.Pin;
 import com.littleinferno.flowchart.value.Value;
 
-public class IfNode extends Node implements CodeGen {
+public class IfNode extends Node {
     public IfNode(Skin skin) {
         super("if", true, skin);
 
@@ -17,20 +16,17 @@ public class IfNode extends Node implements CodeGen {
     }
 
     @Override
-    public String gen() {
+    public String gen(Pin with) {
 
-        CodeGen condition = (CodeGen) getPin("Condition").getConnectionNode();
-        CodeGen tr = (CodeGen) getPin("True").getConnectionNode();
+        Pin.Connector condition = getPin("Condition").getConnector();
 
-        CodeGen fl = (CodeGen) getPin("False").getConnectionNode();
-        String el = "\n";
-        if (fl != null) {
-            el = String.format("else {\n%s\n}\n", fl.gen());
-        }
+        Pin.Connector tr = getPin("True").getConnector();
+        Pin.Connector fl = getPin("False").getConnector();
 
+        String conditionStr = condition.parent.gen(condition.pin);
+        String trueString = tr.parent.gen(tr.pin);
+        String falseString = fl == null ? "" : fl.parent.gen(fl.pin);
 
-        String result = String.format("if (%s) {\n%s}%s", condition.gen(), tr.gen(), el);
-
-        return result;
+        return String.format("if (%s) {\n%s}%s", conditionStr, trueString, falseString);
     }
 }

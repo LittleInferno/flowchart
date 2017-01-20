@@ -4,12 +4,13 @@ import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.StringBuilder;
 import com.littleinferno.flowchart.Function;
-import com.littleinferno.flowchart.codegen.CodeGen;
 import com.littleinferno.flowchart.pin.Pin;
 import com.littleinferno.flowchart.value.Value;
 
-public class FunctionCallNode extends Node implements CodeGen {
+public class FunctionCallNode extends Node {
     private Function function;
+    private String currentTmpCall;
+    private static int counter = 0;
 
     public FunctionCallNode(Function function, Skin skin) {
         super(function.getName(), true, skin);
@@ -22,19 +23,33 @@ public class FunctionCallNode extends Node implements CodeGen {
     }
 
     @Override
-    public String gen() {
-        Array<Pin> inputs = getInput();
-        StringBuilder builder = new StringBuilder();
+    public String gen(Pin with) {
 
-        for (int i = 0; i < inputs.size; i++) {
-            if (inputs.get(i).getType() != Value.Type.EXECUTION)
-                builder.append(inputs.get(i).getName());
+        if (with.getType() == Value.Type.EXECUTION) {
+            Array<Pin> inputs = getInput();
+            StringBuilder parametrBuilder = new StringBuilder();
 
-            if (i != inputs.size - 1) {
-                builder.append(',');
+            for (int i = 0; i < inputs.size; i++) {
+                if (inputs.get(i).getType() != Value.Type.EXECUTION) {
+
+                    Pin.Connector data = inputs.get(i).getConnector();
+                    parametrBuilder.append(data.parent.gen(data.pin));
+
+                    if (i != inputs.size - 1)
+                        parametrBuilder.append(',');
+                }
             }
+
+            currentTmpCall = String.format("tmpcall%d", counter++);
+
+            Pin.Connector next = getPin("exec out").getConnector();
+            String nextStr = next == null ? "" : next.parent.gen(next.pin);
+
+            return String.format("var %s = %s(%s)\n%s", currentTmpCall, function.getName(),
+                    parametrBuilder.toString(), nextStr);
+
         }
 
-        return String.format("%s(%s)", function.getName(), builder.toString());
+        return String.format("%s.%s", currentTmpCall, with.getName());
     }
 }

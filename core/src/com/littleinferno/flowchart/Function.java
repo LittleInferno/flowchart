@@ -3,7 +3,6 @@ package com.littleinferno.flowchart;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.utils.Array;
 import com.littleinferno.flowchart.node.FunctionBeginNode;
-import com.littleinferno.flowchart.node.FunctionCallNode;
 import com.littleinferno.flowchart.node.FunctionReturnNode;
 import com.littleinferno.flowchart.node.Node;
 import com.littleinferno.flowchart.parameter.InputParameter;
@@ -15,17 +14,20 @@ public class Function {
     private String name;
     private Array<Node> nodes;
     private FunctionBeginNode beginNode;
-    private FunctionReturnNode returnNode;
+    private Array<FunctionReturnNode> returnNodes;
     private Array<Parameter> parameters;
-    private FunctionCallNode currentCall;
 
     public Function(String name) {
         this.name = name;
 
         beginNode = new FunctionBeginNode(this, Main.skin);
         beginNode.setPosition(100, 100);
-        returnNode = new FunctionReturnNode(this, Main.skin);
+        returnNodes = new Array<FunctionReturnNode>();
+
+
+        FunctionReturnNode returnNode = new FunctionReturnNode(this, Main.skin);
         returnNode.setPosition(400, 100);
+        returnNodes.add(returnNode);
 
         Table functionWindow = Main.addWindow(name).getContentTable();
         functionWindow.addActor(beginNode);
@@ -41,8 +43,8 @@ public class Function {
         return beginNode;
     }
 
-    public FunctionReturnNode getReturnNode() {
-        return returnNode;
+    public Array<FunctionReturnNode> getReturnNodes() {
+        return returnNodes;
     }
 
     public String getName() {
@@ -57,7 +59,10 @@ public class Function {
         }
 
         beginNode.setTitle(name);
-        returnNode.setTitle(name);
+
+        for (Node i : returnNodes) {
+            i.setTitle(name);
+        }
     }
 
     public void addNode(Node node) {
@@ -90,25 +95,15 @@ public class Function {
     public void removeParameter(Parameter parameter) {
         if (parameter instanceof InputParameter)
             beginNode.removePin(parameter.getName());
-        else
-            returnNode.removePin(parameter.getName());
+        else {
+            for (Node i : returnNodes) {
+                i.removePin(parameter.getName());
+            }
+        }
     }
 
     public Array<Node> getNodes() {
         return nodes;
     }
 
-    public FunctionCallNode getCurrentCall() {
-        return currentCall;
-    }
-
-    public void setCurrentCall(FunctionCallNode currentCall) {
-        this.currentCall = currentCall;
-    }
-
-
-    public void gen(){
-//        function = new com.littleinferno.flowchart.codegen.Function(beginNode.genStatement(null)) {
-//        };
-    }
 }

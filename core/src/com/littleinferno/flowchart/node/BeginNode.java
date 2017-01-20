@@ -7,9 +7,9 @@ import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.littleinferno.flowchart.codegen.Builder;
 import com.littleinferno.flowchart.codegen.CodeExecution;
-import com.littleinferno.flowchart.codegen.CodeGen;
+import com.littleinferno.flowchart.pin.Pin;
 
-public class BeginNode extends Node implements CodeGen {
+public class BeginNode extends Node {
     public BeginNode(Skin skin) {
         super("Begin", false, skin);
 
@@ -21,7 +21,7 @@ public class BeginNode extends Node implements CodeGen {
         button.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
-                String code = Builder.genVar() + gen();
+                String code = Builder.genFun() + Builder.genVar() + gen(getPin("start"));
 
                 Gdx.app.log("", code);
 
@@ -32,7 +32,9 @@ public class BeginNode extends Node implements CodeGen {
     }
 
     @Override
-    public String gen() {
-        return ((CodeGen) getPin("start").getConnectionNode()).gen();
+    public String gen(Pin with) {
+        Pin.Connector next = getPin("start").getConnector();
+
+        return next == null ? "" : next.parent.gen(next.pin);
     }
 }

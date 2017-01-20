@@ -13,6 +13,7 @@ import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.DragAndDrop;
 import com.littleinferno.flowchart.Function;
 import com.littleinferno.flowchart.node.FunctionCallNode;
+import com.littleinferno.flowchart.node.FunctionReturnNode;
 import com.littleinferno.flowchart.parameter.InputParameter;
 import com.littleinferno.flowchart.parameter.OutputParameter;
 import com.littleinferno.flowchart.parameter.Parameter;
@@ -40,6 +41,9 @@ class FunctionItem extends Item {
 
         final Button del = new TextButton("del", skin);
         title.add(del).size(30).right();
+
+        final Button ret = new TextButton("ret", skin);
+        title.add(ret).size(30).right();
 
         Tree tree = new Tree(skin);
 
@@ -163,7 +167,7 @@ class FunctionItem extends Item {
             @Override
             public DragAndDrop.Payload dragStart(InputEvent event, float x, float y, int pointer) {
                 DragAndDrop.Payload payload = new DragAndDrop.Payload();
-                payload.setObject(new FunctionCallNode(function,skin));
+                payload.setObject(new FunctionCallNode(function, skin));
 
                 payload.setDragActor(new Label(String.format("call %s", function.getName()), skin));
 
@@ -184,6 +188,25 @@ class FunctionItem extends Item {
                 //   FunctionItem.this.getParent().removeActor(FunctionItem.this);
             }
         });
+
+
+        Main.addSource(new DragAndDrop.Source(ret) {
+            @Override
+            public DragAndDrop.Payload dragStart(InputEvent event, float x, float y, int pointer) {
+                DragAndDrop.Payload payload = new DragAndDrop.Payload();
+                FunctionReturnNode returnNode = new FunctionReturnNode(function, skin);
+
+                function.getReturnNodes().add(returnNode);
+
+
+                payload.setObject(returnNode);
+
+                payload.setDragActor(new Label("return node", skin));
+
+                return payload;
+            }
+        });
+
 
         propertyTree.add(inputTitleNode);
         propertyTree.add(outputTitleNode);
