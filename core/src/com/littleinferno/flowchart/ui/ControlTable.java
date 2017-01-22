@@ -19,7 +19,7 @@ class ControlTable extends Table {
 
         setWidth(200);
         NinePatch patch = new NinePatch(new Texture(Gdx.files.internal("VarTable.png")), 1, 1, 1, 1);
-        setBackground(new NinePatchDrawable(patch));
+      //  setBackground(new NinePatchDrawable(patch));
 
         top();
         Table tabTable = new Table();
@@ -55,7 +55,7 @@ class ControlTable extends Table {
         mainContainer.add(container);
 
         final VariableTable variableTable = new VariableTable(skin);
-        final FunctionTable functionTable = new FunctionTable(skin);
+        final com.littleinferno.flowchart.nui.FunctionTable functionTable = new com.littleinferno.flowchart.nui.FunctionTable();
 
         Stack contents = new Stack();
         contents.add(variableTable);
@@ -87,7 +87,7 @@ class ControlTable extends Table {
                 if (variables.isChecked()) {
                     variableTable.addComponent();
                 } else if (functions.isChecked()) {
-                    functionTable.addComponent();
+                    functionTable.addFunction();
                 }
             }
         });

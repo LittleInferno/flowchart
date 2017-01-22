@@ -7,6 +7,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextArea;
 import com.badlogic.gdx.scenes.scene2d.utils.DragAndDrop;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
+import com.kotcrab.vis.ui.VisUI;
 import com.littleinferno.flowchart.node.BeginNode;
 
 public class Main extends Stage {
@@ -22,7 +23,7 @@ public class Main extends Stage {
 
     public Main() {
         super(new ScreenViewport());
-
+VisUI.load();
         skin = new Skin(Gdx.files.internal("uiskin.json"));
 
         container = new Table();
@@ -48,7 +49,7 @@ public class Main extends Stage {
         console.setPosition(100, 100);
         activity.addActor(console);
 
-      //   setDebugAll(true);
+         setDebugAll(true);
     }
 
     static public DragAndDrop getDND() {

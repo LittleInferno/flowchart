@@ -103,7 +103,6 @@ class FunctionItem extends Item {
             public void changed(ChangeEvent event, Actor actor) {
 
                 final Parameter parameter = new InputParameter(function, Integer.toString(counter++), Value.Type.BOOL);
-                function.addParameter(parameter);
 
                 final Item.PropertyTable propertyItem = new Item.PropertyTable(parameter.getName(), skin);
 
@@ -141,8 +140,6 @@ class FunctionItem extends Item {
             public void changed(ChangeEvent event, Actor actor) {
 
                 final Parameter parameter = new OutputParameter(function, Integer.toString(counter++), Value.Type.BOOL);
-
-                function.addParameter(parameter);
 
                 final Item.PropertyTable propertyItem = new Item.PropertyTable(parameter.getName(), skin);
                 outputList.addActor(propertyItem);

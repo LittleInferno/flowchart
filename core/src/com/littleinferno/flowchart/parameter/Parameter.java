@@ -8,10 +8,11 @@ public abstract class Parameter {
     String name;
     Value.Type valueType;
 
-    public Parameter(Function function,String name,Value.Type type){
+    public Parameter(Function function, String name, Value.Type type) {
         this.function = function;
         this.name = name;
         this.valueType = type;
+   //    function.addParameter(this);
     }
 
     public String getName() {
