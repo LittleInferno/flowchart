@@ -12,15 +12,16 @@ import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Array;
+import com.littleinferno.flowchart.DataType;
+import com.littleinferno.flowchart.codegen.CodeBuilder;
 import com.littleinferno.flowchart.codegen.CodeGen;
 import com.littleinferno.flowchart.pin.Pin;
-import com.littleinferno.flowchart.value.Value;
 
 public abstract class Node extends Table implements CodeGen {
 
     private final Label title;
-    final Table left;
-    final Table right;
+    protected final Table left;
+    protected final Table right;
     final NodeStyle style;
 
 
@@ -99,37 +100,45 @@ public abstract class Node extends Table implements CodeGen {
         });
     }
 
-    public void addDataInputPin(final Value.Type type, final String name) {
-        left.add(new Pin(name, type, Pin.input, getSkin())).expandX().fillX().padLeft(10).padBottom(10);
+    public Pin addDataInputPin(final DataType type, final String name) {
+        Pin pin = new Pin(name, type, Pin.input, getSkin());
+        left.add(pin).expandX().fillX().padLeft(10).padBottom(10);
         left.row();
         pack();
+        return pin;
     }
 
-    public void addDataOutputPin(final Value.Type type, final String name) {
-        right.add(new Pin(name, type, Pin.output, getSkin())).expandX().fillX().padRight(10).padBottom(10);
+    public Pin addDataOutputPin(final DataType type, final String name) {
+        Pin pin = new Pin(name, type, Pin.output, getSkin());
+        right.add(pin).expandX().fillX().padRight(10).padBottom(10);
         right.row();
         pack();
+        return pin;
     }
 
 
-    public void addExecutionInputPin() {
-        addExecutionInputPin("exec in");
+    public Pin addExecutionInputPin() {
+        return addExecutionInputPin("exec in");
     }
 
-    public void addExecutionInputPin(final String name) {
-        left.add(new Pin(name, Value.Type.EXECUTION, Pin.input, getSkin())).expandX().fillX().padLeft(10).padBottom(10);
+    public Pin addExecutionInputPin(final String name) {
+        Pin pin = new Pin(name, DataType.EXECUTION, Pin.input, getSkin());
+        left.add(pin).expandX().fillX().padLeft(10).padBottom(10);
         left.row();
         pack();
+        return pin;
     }
 
-    public void addExecutionOutputPin() {
-        addExecutionOutputPin("exec out");
+    public Pin addExecutionOutputPin() {
+        return addExecutionOutputPin("exec out");
     }
 
-    public void addExecutionOutputPin(final String name) {
-        right.add(new Pin(name, Value.Type.EXECUTION, Pin.output, getSkin())).expandX().fillX().padRight(10).padBottom(10);
+    public Pin addExecutionOutputPin(final String name) {
+        Pin pin = new Pin(name, DataType.EXECUTION, Pin.output, getSkin());
+        right.add(pin).expandX().fillX().padRight(10).padBottom(10);
         right.row();
         pack();
+        return pin;
     }
 
     public void removePin(final String name) {
@@ -137,6 +146,7 @@ public abstract class Node extends Table implements CodeGen {
         right.removeActor(right.findActor(name));
     }
 
+    @Deprecated
     public Pin getPin(String name) {
         return (Pin) findActor(name);
     }

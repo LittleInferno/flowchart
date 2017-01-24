@@ -3,6 +3,7 @@ package com.littleinferno.flowchart.node;
 
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.littleinferno.flowchart.Variable;
+import com.littleinferno.flowchart.codegen.CodeBuilder;
 import com.littleinferno.flowchart.pin.Pin;
 
 public class VariableGetNode extends Node {
@@ -16,10 +17,11 @@ public class VariableGetNode extends Node {
         variable.addNode(this);
 
         addDataOutputPin(variable.getValueType(), "data");
+        getPin("data").setArray(variable.isArray());
     }
 
     @Override
-    public String gen(Pin with) {
+    public String gen(CodeBuilder builder, Pin with) {
         return variable.getName();
     }
 }

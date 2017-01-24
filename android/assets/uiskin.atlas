@@ -198,37 +198,16 @@ white
   orig: 3, 3
   offset: 0, 0
   index: -1
-white-pin
+pin
   rotate: false
   xy: 50, 1
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
   index: -1
-blue-pin
+array-pin
   rotate: false
   xy: 66, 1
-  size: 16, 16
-  orig: 16, 16
-  offset: 0, 0
-  index: -1
-green-pin
-  rotate: false
-  xy: 82, 1
-  size: 16, 16
-  orig: 16, 16
-  offset: 0, 0
-  index: -1
-red-pin
-  rotate: false
-  xy: 98, 1
-  size: 16, 16
-  orig: 16, 16
-  offset: 0, 0
-  index: -1
-purple-pin
-  rotate: false
-  xy: 114, 1
   size: 16, 16
   orig: 16, 16
   offset: 0, 0

@@ -2,8 +2,9 @@ package com.littleinferno.flowchart.node;
 
 import com.badlogic.gdx.scenes.scene2d.ui.SelectBox;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
+import com.littleinferno.flowchart.DataType;
+import com.littleinferno.flowchart.codegen.CodeBuilder;
 import com.littleinferno.flowchart.pin.Pin;
-import com.littleinferno.flowchart.value.Value;
 
 public class BoolNode extends Node {
     private final SelectBox box;
@@ -11,7 +12,7 @@ public class BoolNode extends Node {
     public BoolNode(Skin skin) {
         super("Bool", true, skin);
 
-        addDataOutputPin(Value.Type.BOOL, "data");
+        addDataOutputPin(DataType.BOOL, "data");
 
         box = new SelectBox(skin);
         box.setItems("True", "False");
@@ -19,7 +20,7 @@ public class BoolNode extends Node {
     }
 
     @Override
-    public String gen(Pin with) {
+    public String gen(CodeBuilder builder, Pin with) {
         return box.getSelectedIndex() == 0 ? "true" : "false";
     }
 }

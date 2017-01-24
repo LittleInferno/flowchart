@@ -1,13 +1,14 @@
 package com.littleinferno.flowchart.node.math;
 
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
+import com.littleinferno.flowchart.DataType;
+import com.littleinferno.flowchart.codegen.CodeBuilder;
 import com.littleinferno.flowchart.node.Node;
 import com.littleinferno.flowchart.pin.Pin;
-import com.littleinferno.flowchart.value.Value;
 
 
 public class CompareNode extends Node {
-    public CompareNode(Value.Type type, Skin skin) {
+    public CompareNode(DataType type, Skin skin) {
         super("compare", true, skin);
 
         addExecutionInputPin();
@@ -51,7 +52,7 @@ public class CompareNode extends Node {
 //    }
 
     @Override
-    public String gen(Pin with) {
+    public String gen(CodeBuilder builder, Pin with) {
         return null;
     }
 }

@@ -4,6 +4,7 @@ import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.utils.SnapshotArray;
 import com.badlogic.gdx.utils.StringBuilder;
+import com.littleinferno.flowchart.codegen.CodeBuilder;
 
 public class FunctionTable extends ComponentTable {
 
@@ -20,20 +21,20 @@ public class FunctionTable extends ComponentTable {
     }
 
     //TODO remove it
-    public static String gen() {
+    public static String gen(CodeBuilder builder) {
 
         SnapshotArray<Actor> children = items.getChildren();
 
-        StringBuilder builder = new StringBuilder();
+        StringBuilder stringBuilder = new StringBuilder();
 
         for (Actor i : children) {
 
-            builder.append(((FunctionItem) i).function.getBeginNode().gen(((FunctionItem) i).
+            stringBuilder.append(((FunctionItem) i).function.getBeginNode().gen(builder, ((FunctionItem) i).
                     function.getBeginNode().getPin("exec out")));
-            builder.append('\n');
+            stringBuilder.append('\n');
         }
 
-        return String.valueOf(builder);
+        return stringBuilder.toString();
     }
 
 }

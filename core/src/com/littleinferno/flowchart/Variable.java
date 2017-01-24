@@ -3,7 +3,6 @@ package com.littleinferno.flowchart;
 import com.badlogic.gdx.utils.Array;
 import com.littleinferno.flowchart.node.Node;
 import com.littleinferno.flowchart.node.VariableGetNode;
-import com.littleinferno.flowchart.value.Value;
 
 public class Variable {
 
@@ -12,24 +11,16 @@ public class Variable {
         this.nodes = new Array<Node>();
     }
 
-    public Value.Type getValueType() {
+    public DataType getValueType() {
         return valueType;
     }
 
-    public void setValueType(Value.Type valueType) {
+    public void setValueType(DataType valueType) {
         this.valueType = valueType;
 
         for (Node i : nodes) {
             i.getPin("data").setType(valueType);
         }
-    }
-
-    public Value getValue() {
-        return value;
-    }
-
-    public void setValue(Value value) {
-        this.value = value;
     }
 
     public String getName() {
@@ -56,11 +47,27 @@ public class Variable {
     }
 
     public String gen() {
-        return String.format("var %s\n", name);
+        if (isArray)
+            return String.format("var %s=[];\n", name);
+        else
+            return String.format("var %s;\n", name);
     }
 
-    private Value.Type valueType;
-    private Value value;
+    private DataType valueType;
     private String name;
     private Array<Node> nodes;
+    private boolean isArray;
+
+    public boolean isArray() {
+        return isArray;
+    }
+
+    public void setArray(boolean array) {
+        isArray = array;
+
+        for (Node i : nodes) {
+            i.getPin("data").setArray(isArray);
+        }
+
+    }
 }

@@ -3,10 +3,12 @@ package com.littleinferno.flowchart.node;
 
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.utils.Array;
-import com.badlogic.gdx.utils.StringBuilder;
+import com.littleinferno.flowchart.DataType;
 import com.littleinferno.flowchart.Function;
+import com.littleinferno.flowchart.codegen.CodeBuilder;
 import com.littleinferno.flowchart.pin.Pin;
-import com.littleinferno.flowchart.value.Value;
+
+import java.util.ArrayList;
 
 public class FunctionBeginNode extends Node {
 
@@ -20,27 +22,24 @@ public class FunctionBeginNode extends Node {
     }
 
     @Override
-    public String gen(Pin with) {
+    public String gen(CodeBuilder builder, Pin with) {
 
-        if (with.getType() == Value.Type.EXECUTION) {
+        if (with.getType() == DataType.EXECUTION) {
 
             Array<Pin> output = getOutput();
-            StringBuilder builder = new StringBuilder();
 
-            for (int i = 0; i < output.size; i++) {
-                if (output.get(i).getType() != Value.Type.EXECUTION) {
-                    builder.append(output.get(i).getName());
+            ArrayList<String> params = new ArrayList<String>();
 
-                    if (i != output.size - 1)
-                        builder.append(',');
-                }
+            for (Pin i : output) {
+                if (i.getType() != DataType.EXECUTION) params.add(i.getName());
             }
 
-            Pin.Connector next = getPin("exec out").getConnector();
-            String nextStr = next == null ? "" : next.parent.gen(next.pin);
+            String parameters = builder.createParams(params);
 
-            return String.format("function %s(%s){\n%s\n}",
-                    function.getName(), builder.toString(), nextStr);
+            Pin.Connector next = getPin("exec out").getConnector();
+            String nextStr = next == null ? "" : next.parent.gen(builder, next.pin);
+
+            return builder.createFunction(function.getName(), parameters, nextStr);
         }
 
         return with.getName();

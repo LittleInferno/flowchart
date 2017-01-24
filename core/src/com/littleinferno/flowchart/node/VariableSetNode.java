@@ -2,6 +2,7 @@ package com.littleinferno.flowchart.node;
 
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.littleinferno.flowchart.Variable;
+import com.littleinferno.flowchart.codegen.CodeBuilder;
 import com.littleinferno.flowchart.pin.Pin;
 
 
@@ -19,15 +20,16 @@ public class VariableSetNode extends Node {
         addExecutionOutputPin();
 
         addDataInputPin(variable.getValueType(), "data");
+        getPin("data").setArray(variable.isArray());
     }
 
     @Override
-    public String gen(Pin with) {
+    public String gen(CodeBuilder builder, Pin with) {
         Pin.Connector data = getPin("data").getConnector();
-        String dataStr = data.parent.gen(data.pin);
+        String dataStr = data.parent.gen(builder, data.pin);
 
         Pin.Connector next = getPin("exec out").getConnector();
-        String nextStr = next == null ? "" : next.parent.gen(next.pin);
+        String nextStr = next == null ? "" : next.parent.gen(builder, next.pin);
 
         return String.format("%s = %s\n%s", variable.getName(), dataStr, nextStr);
     }

@@ -1,13 +1,13 @@
 package com.littleinferno.flowchart.node.math;
 
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
-import com.littleinferno.flowchart.codegen.Builder;
+import com.littleinferno.flowchart.DataType;
+import com.littleinferno.flowchart.codegen.CodeBuilder;
 import com.littleinferno.flowchart.node.Node;
 import com.littleinferno.flowchart.pin.Pin;
-import com.littleinferno.flowchart.value.Value;
 
 public class MulNode extends Node {
-    public MulNode(Value.Type type, Skin skin) {
+    public MulNode(DataType type, Skin skin) {
         super("mul", true, skin);
 
         addDataInputPin(type, "A");
@@ -16,13 +16,13 @@ public class MulNode extends Node {
     }
 
     @Override
-    public String gen(Pin with) {
+    public String gen(CodeBuilder builder, Pin with) {
         Pin.Connector a = getPin("A").getConnector();
         Pin.Connector b = getPin("B").getConnector();
 
-        String aStr = a.parent.gen(a.pin);
-        String bStr = b.parent.gen(b.pin);
+        String aStr = a.parent.gen(builder, a.pin);
+        String bStr = b.parent.gen(builder, b.pin);
 
-        return Builder.createMul(aStr, bStr);
+        return builder.createMul(aStr, bStr);
     }
 }
