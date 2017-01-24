@@ -1,13 +1,13 @@
 package com.littleinferno.flowchart.parameter;
 
 import com.badlogic.gdx.utils.Array;
+import com.littleinferno.flowchart.DataType;
 import com.littleinferno.flowchart.Function;
 import com.littleinferno.flowchart.node.FunctionReturnNode;
 import com.littleinferno.flowchart.node.Node;
-import com.littleinferno.flowchart.value.Value;
 
 public class OutputParameter extends Parameter {
-    public OutputParameter(Function function, String name, Value.Type type) {
+    public OutputParameter(Function function, String name, DataType type) {
         super(function, name, type);
 
         Array<FunctionReturnNode> nodes = function.getReturnNodes();
@@ -33,7 +33,7 @@ public class OutputParameter extends Parameter {
     }
 
     @Override
-    public void setValueType(Value.Type valueType) {
+    public void setValueType(DataType valueType) {
         this.valueType = valueType;
 
         Array<FunctionReturnNode> returnNodes = function.getReturnNodes();

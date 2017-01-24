@@ -2,10 +2,13 @@ package com.littleinferno.flowchart.node;
 
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.utils.Array;
-import com.badlogic.gdx.utils.StringBuilder;
+import com.littleinferno.flowchart.DataType;
 import com.littleinferno.flowchart.Function;
+import com.littleinferno.flowchart.codegen.CodeBuilder;
 import com.littleinferno.flowchart.pin.Pin;
-import com.littleinferno.flowchart.value.Value;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public class FunctionReturnNode extends Node {
 
@@ -15,32 +18,21 @@ public class FunctionReturnNode extends Node {
     }
 
     @Override
-    public String gen(Pin with) {
+    public String gen(CodeBuilder builder, Pin with) {
         Array<Pin> input = getInput();
-        StringBuilder builder = new StringBuilder();
-        StringBuilder returnPack = new StringBuilder();
-        returnPack.append("return {");
 
-        for (int i = 0; i < input.size; i++) {
-            Pin pin = input.get(i);
+        Map<String, String> returnPack = new HashMap<String, String>();
 
-            if (pin.getType() != Value.Type.EXECUTION) {
-                builder.append("var ").
-                        append(pin.getName()).
-                        append(" = ");
+        for (Pin i : input) {
 
-                Pin.Connector node = pin.getConnector();
+            if (i.getType() != DataType.EXECUTION) {
+                Pin.Connector node = i.getConnector();
 
-                builder.append(node.parent.gen(node.pin)).append("\n");
-
-                returnPack.append(pin.getName()).append(':').append(pin.getName());
-                if (i != input.size - 1) {
-                    returnPack.append(',');
-                }
+                String p = node.parent.gen(builder, node.pin);
+                returnPack.put(i.getName(), p);
             }
         }
-        returnPack.append("}\n");
 
-        return builder.toString() + returnPack.toString();
+        return builder.createReturn(returnPack);
     }
 }

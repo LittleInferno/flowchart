@@ -9,9 +9,9 @@ import com.kotcrab.vis.ui.widget.VisSelectBox;
 import com.kotcrab.vis.ui.widget.VisTable;
 import com.kotcrab.vis.ui.widget.VisTextButton;
 import com.kotcrab.vis.ui.widget.VisTextField;
+import com.littleinferno.flowchart.DataType;
 import com.littleinferno.flowchart.Function;
 import com.littleinferno.flowchart.parameter.Parameter;
-import com.littleinferno.flowchart.value.Value;
 
 public class FunctionDetails extends VisTable {
 
@@ -25,7 +25,7 @@ public class FunctionDetails extends VisTable {
     }
 
     private void init() {
-       // setFillParent(true);
+        // setFillParent(true);
 
         VisTextField functionName = new VisTextField();
 
@@ -87,17 +87,17 @@ public class FunctionDetails extends VisTable {
 
     private void addInputParameter(VisTable table) {
 
-        //  final Parameter parameter = new InputParameter(function, "newInParam" + counter++, Value.Type.BOOL);
+        //  final Parameter parameter = new InputParameter(function, "newInParam" + counter++, DataType.BOOL);
 
         VisTable paramTable = new VisTable();
 
         VisTextField parameterName = new VisTextField("newParam" + counter++);
-        VisSelectBox<Value.Type> parameterType = new VisSelectBox<Value.Type>();
+        VisSelectBox<DataType> parameterType = new VisSelectBox<DataType>();
 
-        parameterType.setItems(Value.Type.BOOL,
-                Value.Type.FLOAT,
-                Value.Type.INT,
-                Value.Type.STRING);
+        parameterType.setItems(DataType.BOOL,
+                DataType.FLOAT,
+                DataType.INT,
+                DataType.STRING);
 
         paramTable.add(parameterName).fill().expand();
         paramTable.addSeparator(true);
@@ -108,17 +108,17 @@ public class FunctionDetails extends VisTable {
 
     private void addOutputParameter(VisTable table) {
 
-        //  final Parameter parameter = new InputParameter(function, "newInParam" + counter++, Value.Type.BOOL);
+        //  final Parameter parameter = new InputParameter(function, "newInParam" + counter++, DataType.BOOL);
 
         VisTable paramTable = new VisTable();
 
         VisTextField parameterName = new VisTextField("newParam" + counter++);
-        VisSelectBox<Value.Type> parameterType = new VisSelectBox<Value.Type>();
+        VisSelectBox<DataType> parameterType = new VisSelectBox<DataType>();
 
-        parameterType.setItems(Value.Type.BOOL,
-                Value.Type.FLOAT,
-                Value.Type.INT,
-                Value.Type.STRING);
+        parameterType.setItems(DataType.BOOL,
+                DataType.FLOAT,
+                DataType.INT,
+                DataType.STRING);
 
         VisTextButton isArray = new VisTextButton("arr", "toggle");
         VisTextButton delete = new VisTextButton("del");
@@ -136,12 +136,12 @@ public class FunctionDetails extends VisTable {
         VisTable paramTable = new VisTable();
 
         VisTextField parameterName = new VisTextField("newParam" + counter++);
-        VisSelectBox<Value.Type> parameterType = new VisSelectBox<Value.Type>();
+        VisSelectBox<DataType> parameterType = new VisSelectBox<DataType>();
 
-        parameterType.setItems(Value.Type.BOOL,
-                Value.Type.FLOAT,
-                Value.Type.INT,
-                Value.Type.STRING);
+        parameterType.setItems(DataType.BOOL,
+                DataType.FLOAT,
+                DataType.INT,
+                DataType.STRING);
 
         VisTextButton isArray = new VisTextButton("arr", "toggle");
         VisTextButton delete = new VisTextButton("del");

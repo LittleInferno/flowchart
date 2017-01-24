@@ -2,8 +2,9 @@ package com.littleinferno.flowchart.node;
 
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.TextField;
+import com.littleinferno.flowchart.DataType;
+import com.littleinferno.flowchart.codegen.CodeBuilder;
 import com.littleinferno.flowchart.pin.Pin;
-import com.littleinferno.flowchart.value.Value;
 
 public class IntegerNode extends Node {
 
@@ -12,7 +13,7 @@ public class IntegerNode extends Node {
     public IntegerNode(Skin skin) {
         super("Integer", true, skin);
 
-        addDataOutputPin(Value.Type.INT, "data");
+        addDataOutputPin(DataType.INT, "data");
 
         field = new TextField("", skin);
         field.setTextFieldFilter(new TextField.TextFieldFilter() {
@@ -25,7 +26,7 @@ public class IntegerNode extends Node {
     }
 
     @Override
-    public String gen(Pin with) {
+    public String gen(CodeBuilder builder, Pin with) {
         return field.getText();
     }
 }
