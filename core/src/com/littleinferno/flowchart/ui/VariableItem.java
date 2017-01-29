@@ -19,9 +19,7 @@ class VariableItem extends Item {
 
     VariableItem(final String varName, final Skin skin) {
 
-        variable = new Variable(varName);
-        variable.setValueType(DataType.BOOL);
-
+        variable = new Variable(varName, DataType.BOOL, false);
 
         Table title = new Table();
 
@@ -64,7 +62,7 @@ class VariableItem extends Item {
         property.addTypeSelectedListener(new PropertyTable.TypeSelected() {
             @Override
             public void select(DataType type) {
-                variable.setValueType(type);
+                variable.setDataType(type);
             }
         });
 

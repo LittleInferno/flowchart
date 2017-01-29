@@ -140,18 +140,18 @@ public class Function implements NameChangeable {
     }
 
     private void notifyListenersParameterAdded(ParameterListener listener, Parameter parameter) {
-        listener.parameterAdded(parameter);
+        listener.added(parameter);
     }
 
     private void notifyListenersParameterAdded(Parameter parameter) {
         for (ParameterListener listener : parameterListeners) {
-            listener.parameterAdded(parameter);
+            listener.added(parameter);
         }
     }
 
     private void notifyListenersParameterRemoved(Parameter parameter) {
         for (ParameterListener listener : parameterListeners) {
-            listener.parameterRemoved(parameter);
+            listener.removed(parameter);
         }
     }
 

@@ -1,10 +1,10 @@
 package com.littleinferno.flowchart.nui.function;
 
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.ui.VerticalGroup;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
+import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
 import com.badlogic.gdx.utils.Array;
 import com.kotcrab.vis.ui.VisUI;
 import com.kotcrab.vis.ui.util.InputValidator;
@@ -27,8 +27,9 @@ import com.littleinferno.flowchart.ui.Main;
 class FunctionDetails extends VisTable {
 
     Function function;
-    FunctionTable table;
+    private FunctionTable table;
     private int counter = 0;
+
     private final VerticalGroup input = new VerticalGroup();
     private final VerticalGroup output = new VerticalGroup();
 
@@ -41,10 +42,10 @@ class FunctionDetails extends VisTable {
     }
 
     private void init() {
-
         top();
 
         final VisValidatableTextField functionName = new VisValidatableTextField(function.getName());
+
         functionName.addValidator(new InputValidator() {
             @Override
             public boolean validateInput(String input) {
@@ -66,15 +67,14 @@ class FunctionDetails extends VisTable {
         deleteFunction.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
-                Gdx.app.log("deleted", toString());
                 function.delete();
                 table.deleteFunction(FunctionDetails.this);
             }
         });
 
         VisTable header = new VisTable();
-        header.add(new VisLabel("name: "));
-        header.add(functionName).growX();
+        header.add(new VisLabel("name: ")).growY();
+        header.add(functionName).grow();
         header.add(deleteFunction).row();
         add(header).growX().row();
         addSeparator();
@@ -193,9 +193,13 @@ class FunctionDetails extends VisTable {
 
             VisImageButton.VisImageButtonStyle style =
                     VisUI.getSkin().get("toggle", VisImageButton.VisImageButtonStyle.class);
-            style.imageChecked = Main.skin.getDrawable("array");
-            style.imageUp = Main.skin.getDrawable("array");
 
+            Drawable drawable = (Main.scale == VisUI.SkinScale.X1) ?
+                    Main.skin.getDrawable("array-X1") :
+                    Main.skin.getDrawable("array-X2");
+
+            style.imageChecked = drawable;
+            style.imageUp = drawable;
 
             final VisImageButton isArray = new VisImageButton(style);
             isArray.addListener(new ChangeListener() {
@@ -214,8 +218,8 @@ class FunctionDetails extends VisTable {
                 }
             });
 
-            add(parameterName).growX().expandY();
-            add(parameterType).growX().expandY();
+            add(parameterName).grow();
+            add(parameterType).grow();
             add(isArray);
             add(delete);
         }

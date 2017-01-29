@@ -228,11 +228,17 @@ node-background-default
   orig: 16, 16
   offset: 0, 0
   index: -1
-array
+array-X1
   rotate: false
   xy: 100, 1
   size: 10, 10
   orig: 22, 22
   offset: 6, 6
   index: -1
-
+array-X2
+  rotate: false
+  xy: 111, 1
+  size: 20, 20
+  orig: 44, 44
+  offset: 12, 12
+  index: -1

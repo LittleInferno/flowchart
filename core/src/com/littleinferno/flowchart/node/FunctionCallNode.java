@@ -8,7 +8,7 @@ import com.littleinferno.flowchart.Function;
 import com.littleinferno.flowchart.NameChangeable;
 import com.littleinferno.flowchart.codegen.CodeBuilder;
 import com.littleinferno.flowchart.parameter.Parameter;
-import com.littleinferno.flowchart.parameter.ParameterChangedListener;
+import com.littleinferno.flowchart.VariableChangedListener;
 import com.littleinferno.flowchart.parameter.ParameterListener;
 import com.littleinferno.flowchart.pin.Pin;
 
@@ -37,7 +37,7 @@ public class FunctionCallNode extends Node {
             private List<Pin> pins = new ArrayList<Pin>();
 
             @Override
-            public void parameterAdded(Parameter parameter) {
+            public void added(Parameter parameter) {
                 final Pin pin;
                 if (parameter.getConnection() == Connection.INPUT)
                     pin = addDataInputPin(parameter.getDataType(), parameter.getName());
@@ -46,7 +46,7 @@ public class FunctionCallNode extends Node {
 
                 pin.setArray(parameter.isArray());
 
-                parameter.addListener(new ParameterChangedListener() {
+                parameter.addListener(new VariableChangedListener() {
                     @Override
                     public void nameChanged(String newName) {
                         pin.setName(newName);
@@ -66,7 +66,7 @@ public class FunctionCallNode extends Node {
             }
 
             @Override
-            public void parameterRemoved(Parameter parameter) {
+            public void removed(Parameter parameter) {
                 for (Pin pin : pins)
                     if (parameter.getName().equals(pin.getName()))
                         removePin(pin);

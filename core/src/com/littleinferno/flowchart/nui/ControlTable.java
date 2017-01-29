@@ -34,8 +34,8 @@ public class ControlTable extends VisTable {
         add(tabTable).fill().expand();
 
 
+        tabbedPane.add(new com.littleinferno.flowchart.nui.variable.VariableTable());
         tabbedPane.add(new com.littleinferno.flowchart.nui.function.FunctionTable());
-
 
     }
 }

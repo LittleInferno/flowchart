@@ -1,6 +1,8 @@
 package com.littleinferno.flowchart.ui;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input;
+import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
@@ -8,8 +10,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.TextArea;
 import com.badlogic.gdx.scenes.scene2d.utils.DragAndDrop;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.kotcrab.vis.ui.VisUI;
-import com.kotcrab.vis.ui.widget.tabbedpane.Tab;
-import com.kotcrab.vis.ui.widget.tabbedpane.TabbedPaneAdapter;
+import com.kotcrab.vis.ui.widget.VisLabel;
 import com.littleinferno.flowchart.node.BeginNode;
 
 public class Main extends Stage {
@@ -20,6 +21,7 @@ public class Main extends Stage {
     private static Table activity = new Table();
     public static Skin skin;
     private static DragAndDrop dragAndDrop = new DragAndDrop();
+    public static VisUI.SkinScale scale = VisUI.SkinScale.X1;
 
     //TODO remove it
     public static DragAndDrop dndFunctions = new DragAndDrop();
@@ -37,7 +39,10 @@ public class Main extends Stage {
 
         control = new com.littleinferno.flowchart.nui.ControlTable();
 
-        container.add(control).expandY().fillY().width(320);
+        if (scale == VisUI.SkinScale.X1)
+            container.add(control).growY().width(310);
+        else
+            container.add(control).growY().width(460);
         container.add(activity).expand().fill();
 
         tabs = new TabbedPane(skin);

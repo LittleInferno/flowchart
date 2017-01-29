@@ -25,9 +25,8 @@ public class FunctionItem extends PopupMenu {
                 getStage().addActor(callNode);
             }
         }));
-        addSeparator();
 
-        final VisTextButton ret = new VisTextButton("return");
+        addSeparator();
 
         addItem(new MenuItem("return", new ChangeListener() {
             @Override

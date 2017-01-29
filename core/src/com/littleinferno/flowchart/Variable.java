@@ -2,40 +2,44 @@ package com.littleinferno.flowchart;
 
 import com.badlogic.gdx.utils.Array;
 import com.littleinferno.flowchart.node.Node;
-import com.littleinferno.flowchart.node.VariableGetNode;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class Variable {
 
-    public Variable(String name) {
+    private DataType dataType;
+    private String name;
+    private Array<Node> nodes;
+    private boolean isArray;
+    private List<VariableChangedListener> changedListeners;
+
+    public Variable(String name, DataType type, boolean isArray) {
         this.name = name;
+        this.dataType = type;
+        this.isArray = isArray;
         this.nodes = new Array<Node>();
+        this.changedListeners = new ArrayList<VariableChangedListener>();
     }
 
-    public DataType getValueType() {
-        return valueType;
+    public DataType getDataType() {
+        return dataType;
     }
 
-    public void setValueType(DataType valueType) {
-        this.valueType = valueType;
+    public void setDataType(DataType newType) {
+        this.dataType = newType;
 
-        for (Node i : nodes) {
-            i.getPin("data").setType(valueType);
-        }
+        notifyListenersTypeChanged(newType);
     }
 
     public String getName() {
         return name;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setName(String newName) {
+        this.name = newName;
 
-        for (Node i : nodes) {
-            if (i instanceof VariableGetNode)
-                i.setTitle(String.format("Get %s", name));
-            else
-                i.setTitle(String.format("Set %s", name));
-        }
+        notifyListenersNameChanged(newName);
     }
 
     public void addNode(Node node) {
@@ -53,21 +57,35 @@ public class Variable {
             return String.format("var %s;\n", name);
     }
 
-    private DataType valueType;
-    private String name;
-    private Array<Node> nodes;
-    private boolean isArray;
-
     public boolean isArray() {
         return isArray;
     }
 
-    public void setArray(boolean array) {
-        isArray = array;
+    public void setArray(boolean isArray) {
+        this.isArray = isArray;
 
-        for (Node i : nodes) {
-            i.getPin("data").setArray(isArray);
+        notifyListenersIsArrayChanged(isArray);
+    }
+
+    public void addListener(VariableChangedListener listener) {
+        changedListeners.add(listener);
+    }
+
+    private void notifyListenersNameChanged(String newName) {
+        for (VariableChangedListener listener : changedListeners) {
+            listener.nameChanged(newName);
         }
+    }
 
+    private void notifyListenersTypeChanged(DataType newtype) {
+        for (VariableChangedListener listener : changedListeners) {
+            listener.typeChanged(newtype);
+        }
+    }
+
+    private void notifyListenersIsArrayChanged(boolean isArray) {
+        for (VariableChangedListener listener : changedListeners) {
+            listener.isArrayChanged(isArray);
+        }
     }
 }

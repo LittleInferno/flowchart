@@ -1,7 +1,9 @@
 package com.littleinferno.flowchart.node;
 
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
+import com.littleinferno.flowchart.DataType;
 import com.littleinferno.flowchart.Variable;
+import com.littleinferno.flowchart.VariableChangedListener;
 import com.littleinferno.flowchart.codegen.CodeBuilder;
 import com.littleinferno.flowchart.pin.Pin;
 
@@ -13,14 +15,32 @@ public class VariableSetNode extends Node {
     public VariableSetNode(Variable variable, Skin skin) {
         super(String.format("Set %s", variable.getName()), true, skin);
 
-        this.variable = variable;
-        variable.addNode(this);
-
         addExecutionInputPin();
         addExecutionOutputPin();
 
-        addDataInputPin(variable.getValueType(), "data");
-        getPin("data").setArray(variable.isArray());
+        final Pin pin = addDataInputPin(variable.getDataType(), "data");
+        pin.setArray(variable.isArray());
+
+        this.variable = variable;
+        this.variable.addListener(new VariableChangedListener() {
+            @Override
+            public void nameChanged(String newName) {
+                setTitle(newName);
+            }
+
+            @Override
+            public void typeChanged(DataType newType) {
+                pin.setType(newType);
+            }
+
+            @Override
+            public void isArrayChanged(boolean isArray) {
+                pin.setArray(isArray);
+            }
+        });
+
+        this.variable.addNode(this);
+
     }
 
     @Override

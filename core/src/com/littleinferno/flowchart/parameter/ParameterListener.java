@@ -1,6 +1,6 @@
 package com.littleinferno.flowchart.parameter;
 
 public interface ParameterListener {
-    void parameterAdded(Parameter parameter);
-    void parameterRemoved(Parameter parameter);
+    void added(Parameter parameter);
+    void removed(Parameter parameter);
 }

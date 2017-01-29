@@ -1,4 +1,5 @@
-package com.littleinferno.flowchart.nui.function;
+package com.littleinferno.flowchart.nui.variable;
+
 
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
@@ -13,37 +14,37 @@ import com.kotcrab.vis.ui.widget.VisLabel;
 import com.kotcrab.vis.ui.widget.VisTable;
 import com.kotcrab.vis.ui.widget.VisTextButton;
 import com.kotcrab.vis.ui.widget.tabbedpane.Tab;
-import com.littleinferno.flowchart.Function;
-import com.littleinferno.flowchart.NameChangeable;
+import com.littleinferno.flowchart.DataType;
+import com.littleinferno.flowchart.Variable;
+import com.littleinferno.flowchart.VariableChangedAdaptor;
 import com.littleinferno.flowchart.ui.Main;
 
 import java.util.ArrayList;
 
-public class FunctionTable extends Tab {
+public class VariableTable extends Tab {
 
     private final ArrayListAdapter<String, VisTable> adapter;
     private final VisTable details;
-    private ArrayList<FunctionDetails> functionDetailses;
+    private ArrayList<VariableDetails> variableDetailses;
 
     private int counter = 0;
     private VisTable content;
 
-    public FunctionTable() {
+    public VariableTable() {
         super(false, false);
 
-        functionDetailses = new ArrayList<FunctionDetails>();
+        variableDetailses = new ArrayList<VariableDetails>();
         ArrayList<String> array = new ArrayList<String>();
 
-        adapter = new FunctionAdapter(array);
+        adapter = new VariableAdapter(array);
         ListView<String> view = new ListView<String>(adapter);
         view.setItemClickListener(new ListView.ItemClickListener<String>() {
             @Override
             public void clicked(String item) {
-
-                for (FunctionDetails function : functionDetailses) {
-                    if (function.getName().equals(item)) {
+                for (VariableDetails variable : variableDetailses) {
+                    if (variable.getName().equals(item)) {
                         details.clearChildren();
-                        details.add(function).grow();
+                        details.add(variable).grow();
                     }
                 }
             }
@@ -53,7 +54,7 @@ public class FunctionTable extends Tab {
         create.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
-                addFunction();
+                addVariable();
             }
         });
 
@@ -64,13 +65,15 @@ public class FunctionTable extends Tab {
         content.add(create).growX().row();
         content.add(view.getMainTable()).grow().row();
         content.addSeparator();
-        content.add(details).growX().height(250);
-
+        content.add(details).growX().row();
+        content.addSeparator();
     }
 
+
     @Override
+
     public String getTabTitle() {
-        return "Function";
+        return "Variable";
     }
 
     @Override
@@ -78,35 +81,30 @@ public class FunctionTable extends Tab {
         return content;
     }
 
+    private void addVariable() {
+        VariableDetails variableDetails =
+                new VariableDetails(this, new Variable("newVar" + counter++, DataType.BOOL, false));
 
-    private void addFunction() {
-        FunctionDetails functionDetails = new FunctionDetails(this, new Function("newFun" + counter++));
-        functionDetailses.add(functionDetails);
-        final String name = functionDetails.getName();
+        variableDetailses.add(variableDetails);
+        final String name = variableDetails.getName();
         adapter.add(name);
 
-        functionDetails.function.addListener(new NameChangeable.NameChange() {
+        variableDetails.variable.addListener(new VariableChangedAdaptor() {
             String oldName = name;
 
             @Override
-            public void changed(String newName) {
+            public void nameChanged(String newName) {
                 adapter.set(adapter.indexOf(oldName), newName);
                 oldName = newName;
             }
         });
     }
 
-    void deleteFunction(FunctionDetails function) {
-        functionDetailses.remove(function);
-        adapter.remove(function.getName());
-        details.clearChildren();
-    }
-
-    private class FunctionAdapter extends ArrayListAdapter<String, VisTable> {
+    private class VariableAdapter extends ArrayListAdapter<String, VisTable> {
         private final Drawable bg = VisUI.getSkin().getDrawable("window-bg");
         private final Drawable selection = VisUI.getSkin().getDrawable("list-selection");
 
-        FunctionAdapter(ArrayList<String> array) {
+        VariableAdapter(ArrayList<String> array) {
             super(array);
             setSelectionMode(SelectionMode.SINGLE);
         }
@@ -132,9 +130,9 @@ public class FunctionTable extends Tab {
                 public DragAndDrop.Payload dragStart(InputEvent event, float x, float y, int pointer) {
                     DragAndDrop.Payload payload = new DragAndDrop.Payload();
 
-                    for (FunctionDetails function : functionDetailses) {
-                        if (function.getName().equals(it.getText().toString())) {
-                            payload.setObject(new FunctionItem(function.function));
+                    for (VariableDetails variable : variableDetailses) {
+                        if (variable.getName().equals(it.getText().toString())) {
+                            payload.setObject(new VariableItem(variable.variable));
                             payload.setDragActor(new VisLabel(it.getText()));
                         }
                     }
