@@ -73,8 +73,10 @@ public class VariableDetails extends VisTable {
 
         VisImageButton.VisImageButtonStyle style =
                 VisUI.getSkin().get("toggle", VisImageButton.VisImageButtonStyle.class);
-        style.imageChecked = Main.skin.getDrawable("array");
-        style.imageUp = Main.skin.getDrawable("array");
+
+        Drawable drawable = (Main.scale == VisUI.SkinScale.X1) ?
+                Main.skin.getDrawable("array-X1") :
+                Main.skin.getDrawable("array-X2");
 
 
         final VisImageButton isArray = new VisImageButton(style);
