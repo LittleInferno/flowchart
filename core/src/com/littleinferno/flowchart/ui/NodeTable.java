@@ -34,7 +34,7 @@ public class NodeTable extends Table {
 
         final List<String> list = new List(skin);
 
-        add(list).expand().fillX().top();
+        //add(list).expand().fillX().top();
         list.setItems("Bool", "Integer", "Float", "String", "Log",
                 "add int", "add float", "add string",
                 "sub int", "sub float",

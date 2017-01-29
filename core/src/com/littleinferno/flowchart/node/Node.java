@@ -8,20 +8,21 @@ import com.badlogic.gdx.scenes.scene2d.ui.Button;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
+import com.badlogic.gdx.scenes.scene2d.ui.VerticalGroup;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Array;
+import com.littleinferno.flowchart.Connection;
 import com.littleinferno.flowchart.DataType;
-import com.littleinferno.flowchart.codegen.CodeBuilder;
 import com.littleinferno.flowchart.codegen.CodeGen;
 import com.littleinferno.flowchart.pin.Pin;
 
 public abstract class Node extends Table implements CodeGen {
 
     private final Label title;
-    protected final Table left;
-    protected final Table right;
+    protected final VerticalGroup left;
+    protected final VerticalGroup right;
     final NodeStyle style;
 
 
@@ -51,7 +52,7 @@ public abstract class Node extends Table implements CodeGen {
             close.addListener(new ChangeListener() {
                 @Override
                 public void changed(ChangeEvent event, Actor actor) {
-                    Node.this.getParent().removeActor(Node.this);
+                    destroy();
                 }
             });
 
@@ -61,12 +62,14 @@ public abstract class Node extends Table implements CodeGen {
 
         row().width(100);
 
-        left = new Table();
-        left.top();
+        left = new VerticalGroup();
+        left.top().left();
+        left.space(10);
         add(left).expand().fill();
 
-        right = new Table();
-        right.top();
+        right = new VerticalGroup();
+        right.top().right();
+        right.space(10);
         add(right).expand().fill();
 
         top();
@@ -100,18 +103,22 @@ public abstract class Node extends Table implements CodeGen {
         });
     }
 
+    public void destroy() {
+        getParent().removeActor(Node.this);
+    }
+
     public Pin addDataInputPin(final DataType type, final String name) {
-        Pin pin = new Pin(name, type, Pin.input, getSkin());
-        left.add(pin).expandX().fillX().padLeft(10).padBottom(10);
-        left.row();
+        Pin pin = new Pin(name, type, Connection.INPUT, getSkin());
+        left.addActor(pin);//.expandX().fillX().padLeft(10).padBottom(10);
+       // left.row();
         pack();
         return pin;
     }
 
     public Pin addDataOutputPin(final DataType type, final String name) {
-        Pin pin = new Pin(name, type, Pin.output, getSkin());
-        right.add(pin).expandX().fillX().padRight(10).padBottom(10);
-        right.row();
+        Pin pin = new Pin(name, type, Connection.OUTPUT, getSkin());
+        right.addActor(pin);//.expandX().fillX().padRight(10).padBottom(10);
+        //right.row();
         pack();
         return pin;
     }
@@ -122,9 +129,9 @@ public abstract class Node extends Table implements CodeGen {
     }
 
     public Pin addExecutionInputPin(final String name) {
-        Pin pin = new Pin(name, DataType.EXECUTION, Pin.input, getSkin());
-        left.add(pin).expandX().fillX().padLeft(10).padBottom(10);
-        left.row();
+        Pin pin = new Pin(name, DataType.EXECUTION, Connection.INPUT, getSkin());
+        left.addActor(pin);//.expandX().fillX().padLeft(10).padBottom(10);
+        //left.row();
         pack();
         return pin;
     }
@@ -134,9 +141,9 @@ public abstract class Node extends Table implements CodeGen {
     }
 
     public Pin addExecutionOutputPin(final String name) {
-        Pin pin = new Pin(name, DataType.EXECUTION, Pin.output, getSkin());
-        right.add(pin).expandX().fillX().padRight(10).padBottom(10);
-        right.row();
+        Pin pin = new Pin(name, DataType.EXECUTION, Connection.OUTPUT, getSkin());
+        right.addActor(pin);//.expandX().fillX().padRight(10).padBottom(10);
+        //right.row();
         pack();
         return pin;
     }
@@ -144,6 +151,11 @@ public abstract class Node extends Table implements CodeGen {
     public void removePin(final String name) {
         left.removeActor(left.findActor(name));
         right.removeActor(right.findActor(name));
+    }
+
+    public void removePin(final Pin pin) {
+        left.removeActor(pin);
+        right.removeActor(pin);
     }
 
     @Deprecated

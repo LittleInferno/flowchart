@@ -20,7 +20,7 @@ public class BeginNode extends Node {
         start = addExecutionOutputPin("start");
 
         Button button = new Button(skin);
-        left.add(button).expandX().fillX().height(30);
+        left.addActor(button);//.expandX().fillX().height(30);
 
         button.addListener(new ChangeListener() {
             @Override

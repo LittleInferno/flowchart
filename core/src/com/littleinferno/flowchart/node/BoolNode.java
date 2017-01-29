@@ -16,7 +16,7 @@ public class BoolNode extends Node {
 
         box = new SelectBox(skin);
         box.setItems("True", "False");
-        left.add(box).expandX().fillX().minWidth(0);
+        left.addActor(box);//.expandX().fillX().minWidth(0);
     }
 
     @Override

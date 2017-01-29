@@ -24,7 +24,7 @@ public class MakeArrayNode extends Node {
         values = new ArrayList<Pin>();
 
         Button add = new Button(skin);
-        right.add(add).expandX().fillX().height(30);
+        right.addActor(add);//.expandX().fillX().height(30);
 
 
         add.addListener(new ChangeListener() {

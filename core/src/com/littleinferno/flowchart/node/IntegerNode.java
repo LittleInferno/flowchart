@@ -22,7 +22,7 @@ public class IntegerNode extends Node {
                 return c >= '0' && c <= '9' || c == '+' || c == '-';
             }
         });
-        left.add(field).expandX().fillX().minWidth(0);
+        left.addActor(field);//.expandX().fillX().minWidth(0);
     }
 
     @Override

@@ -11,7 +11,6 @@ import com.badlogic.gdx.scenes.scene2d.ui.Stack;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
-import com.badlogic.gdx.scenes.scene2d.utils.NinePatchDrawable;
 
 
 class ControlTable extends Table {
@@ -55,7 +54,7 @@ class ControlTable extends Table {
         mainContainer.add(container);
 
         final VariableTable variableTable = new VariableTable(skin);
-        final com.littleinferno.flowchart.nui.FunctionTable functionTable = new com.littleinferno.flowchart.nui.FunctionTable();
+        final com.littleinferno.flowchart.ui.FunctionTable functionTable = new com.littleinferno.flowchart.ui.FunctionTable(skin);
 
         Stack contents = new Stack();
         contents.add(variableTable);
@@ -87,7 +86,7 @@ class ControlTable extends Table {
                 if (variables.isChecked()) {
                     variableTable.addComponent();
                 } else if (functions.isChecked()) {
-                    functionTable.addFunction();
+                    functionTable.addComponent();
                 }
             }
         });

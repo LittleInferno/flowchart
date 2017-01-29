@@ -11,12 +11,11 @@ import com.badlogic.gdx.scenes.scene2d.ui.TextField;
 import com.badlogic.gdx.scenes.scene2d.ui.VerticalGroup;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.DragAndDrop;
+import com.littleinferno.flowchart.Connection;
 import com.littleinferno.flowchart.DataType;
 import com.littleinferno.flowchart.Function;
 import com.littleinferno.flowchart.node.FunctionCallNode;
 import com.littleinferno.flowchart.node.FunctionReturnNode;
-import com.littleinferno.flowchart.parameter.InputParameter;
-import com.littleinferno.flowchart.parameter.OutputParameter;
 import com.littleinferno.flowchart.parameter.Parameter;
 
 
@@ -102,7 +101,8 @@ class FunctionItem extends Item {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
 
-                final Parameter parameter = new InputParameter(function, Integer.toString(counter++), DataType.BOOL);
+                final Parameter parameter = new Parameter(Integer.toString(counter++), DataType.BOOL, Connection.INPUT, false);
+                function.addParameter(parameter);
 
                 final Item.PropertyTable propertyItem = new Item.PropertyTable(parameter.getName(), skin);
 
@@ -122,7 +122,7 @@ class FunctionItem extends Item {
                 propertyItem.addTypeSelectedListener(new Item.PropertyTable.TypeSelected() {
                     @Override
                     public void select(DataType type) {
-                        parameter.setValueType(type);
+                        parameter.setDataType(type);
                     }
                 });
 
@@ -139,7 +139,8 @@ class FunctionItem extends Item {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
 
-                final Parameter parameter = new OutputParameter(function, Integer.toString(counter++), DataType.BOOL);
+                final Parameter parameter = new Parameter(Integer.toString(counter++), DataType.BOOL, Connection.OUTPUT, false);
+                function.addParameter(parameter);
 
                 final Item.PropertyTable propertyItem = new Item.PropertyTable(parameter.getName(), skin);
                 outputList.addActor(propertyItem);
@@ -154,7 +155,7 @@ class FunctionItem extends Item {
                 propertyItem.addTypeSelectedListener(new Item.PropertyTable.TypeSelected() {
                     @Override
                     public void select(DataType type) {
-                        parameter.setValueType(type);
+                        parameter.setDataType(type);
                     }
                 });
             }

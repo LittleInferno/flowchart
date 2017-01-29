@@ -16,7 +16,7 @@ public class StringNode extends Node {
         addDataOutputPin(DataType.STRING, "data");
 
         field = new TextField("", skin);
-        left.add(field).expandX().fillX().minWidth(0);
+        left.addActor(field);//.expandX().fillX().minWidth(0);
     }
 
     @Override

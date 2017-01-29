@@ -8,31 +8,36 @@ import com.badlogic.gdx.scenes.scene2d.ui.TextArea;
 import com.badlogic.gdx.scenes.scene2d.utils.DragAndDrop;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.kotcrab.vis.ui.VisUI;
+import com.kotcrab.vis.ui.widget.tabbedpane.Tab;
+import com.kotcrab.vis.ui.widget.tabbedpane.TabbedPaneAdapter;
 import com.littleinferno.flowchart.node.BeginNode;
 
 public class Main extends Stage {
 
     private static TabbedPane tabs;
-    private ControlTable control;
+    private com.littleinferno.flowchart.nui.ControlTable control;
     private Table container;
     private static Table activity = new Table();
     public static Skin skin;
     private static DragAndDrop dragAndDrop = new DragAndDrop();
 
+    //TODO remove it
+    public static DragAndDrop dndFunctions = new DragAndDrop();
+
     public static TextArea console;
 
     public Main() {
         super(new ScreenViewport());
-VisUI.load();
+        VisUI.load();
         skin = new Skin(Gdx.files.internal("uiskin.json"));
 
         container = new Table();
         container.setFillParent(true);
         addActor(container);
 
-        control = new ControlTable(skin);
+        control = new com.littleinferno.flowchart.nui.ControlTable();
 
-        container.add(control).expandY().fillY().width(300);
+        container.add(control).expandY().fillY().width(320);
         container.add(activity).expand().fill();
 
         tabs = new TabbedPane(skin);
@@ -49,7 +54,7 @@ VisUI.load();
         console.setPosition(100, 100);
         activity.addActor(console);
 
-         setDebugAll(true);
+    //    setDebugAll(true);
     }
 
     static public DragAndDrop getDND() {
@@ -58,6 +63,10 @@ VisUI.load();
 
     static public void addSource(DragAndDrop.Source source) {
         dragAndDrop.addSource(source);
+    }
+
+    static public void addSourceF(DragAndDrop.Source source) {
+        dndFunctions.addSource(source);
     }
 
     static public Table getActivity() {

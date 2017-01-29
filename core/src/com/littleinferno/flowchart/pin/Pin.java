@@ -12,6 +12,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Array;
+import com.littleinferno.flowchart.Connection;
 import com.littleinferno.flowchart.DataType;
 import com.littleinferno.flowchart.node.ConverterNode;
 import com.littleinferno.flowchart.node.Node;
@@ -23,7 +24,7 @@ public class Pin extends Table {
 
     private Pin pin;
     private Array<Pin> pins = new Array<Pin>();
-    private final int connection;
+    private final Connection connection;
     private DataType type;
     private boolean isConnect;
     private boolean isArray;
@@ -31,9 +32,7 @@ public class Pin extends Table {
     private Label label;
     private Image image;
 
-    static public final int input = 0, output = 1;
-
-    public Pin(String name, DataType type, int connection, Skin skin) {
+    public Pin(String name, DataType type, Connection connection, Skin skin) {
         super(skin);
 
         this.connection = connection;
@@ -47,7 +46,7 @@ public class Pin extends Table {
         setArray(false);
         setType(type);
         add().minWidth(0);
-        if (connection == input) {
+        if (connection == Connection.INPUT) {
             add(image).size(16);
             add(label).expandX().fillX().minWidth(0);
         } else {
@@ -109,7 +108,7 @@ public class Pin extends Table {
         }
     }
 
-    public int getConnection() {
+    public Connection getConnection() {
         return connection;
     }
 
@@ -194,11 +193,11 @@ public class Pin extends Table {
     }
 
     private boolean isExecutionOutput(Pin pin) {
-        return pin.getType() == DataType.EXECUTION && pin.getConnection() == output;
+        return pin.getType() == DataType.EXECUTION && pin.getConnection() == Connection.OUTPUT;
     }
 
     private boolean isDataInput(Pin pin) {
-        return pin.getType() != DataType.EXECUTION && pin.getConnection() == input;
+        return pin.getType() != DataType.EXECUTION && pin.getConnection() == Connection.INPUT;
     }
 
     private void createConverter(Pin first, Pin second) {
@@ -209,7 +208,7 @@ public class Pin extends Table {
         pos.y /= 2;
 
         ConverterNode converter;
-        if (getConnection() == input) {
+        if (getConnection() == Connection.INPUT.INPUT) {
             converter = new ConverterNode(second.getType(), first.getType(), getSkin());
             converter.getPin("from").connect(second);
             converter.getPin("to").connect(first);
