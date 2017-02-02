@@ -8,6 +8,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.VerticalGroup;
 import com.badlogic.gdx.utils.SnapshotArray;
 import com.badlogic.gdx.utils.StringBuilder;
 
+@Deprecated
 public class VariableTable extends Table {
 
     private static int counter = 1;

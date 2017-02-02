@@ -1,4 +1,4 @@
-package com.littleinferno.flowchart.nui;
+package com.littleinferno.flowchart.gui;
 
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 

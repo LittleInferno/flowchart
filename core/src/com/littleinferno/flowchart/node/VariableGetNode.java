@@ -1,7 +1,6 @@
 package com.littleinferno.flowchart.node;
 
 
-import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.littleinferno.flowchart.DataType;
 import com.littleinferno.flowchart.Variable;
 import com.littleinferno.flowchart.VariableChangedListener;
@@ -12,8 +11,8 @@ public class VariableGetNode extends Node {
 
     private final Variable variable;
 
-    public VariableGetNode(Variable variable, Skin skin) {
-        super(String.format("Get %s", variable.getName()), true, skin);
+    public VariableGetNode(Variable variable) {
+        super(String.format("Get %s", variable.getName()), true);
 
         final Pin pin = addDataOutputPin(variable.getDataType(), "data");
         pin.setArray(variable.isArray());
@@ -42,5 +41,11 @@ public class VariableGetNode extends Node {
     @Override
     public String gen(CodeBuilder builder, Pin with) {
         return variable.getName();
+    }
+
+    @Override
+    public void close() {
+        super.close();
+        variable.removeNode(this);
     }
 }

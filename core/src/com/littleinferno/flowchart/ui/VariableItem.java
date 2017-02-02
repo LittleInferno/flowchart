@@ -15,6 +15,7 @@ import com.littleinferno.flowchart.node.VariableGetNode;
 import com.littleinferno.flowchart.node.VariableSetNode;
 
 
+@Deprecated
 class VariableItem extends Item {
 
     VariableItem(final String varName, final Skin skin) {
@@ -90,7 +91,7 @@ class VariableItem extends Item {
             @Override
             public DragAndDrop.Payload dragStart(InputEvent event, float x, float y, int pointer) {
                 DragAndDrop.Payload payload = new DragAndDrop.Payload();
-                payload.setObject(new VariableGetNode(variable, skin));
+                payload.setObject(new VariableGetNode(variable));
 
                 payload.setDragActor(new Label(String.format("Get %s", variable.getName()), skin));
 

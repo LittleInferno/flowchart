@@ -8,6 +8,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Table;
  * Created by danil on 27.12.2016.
  */
 
+@Deprecated
 public class NodeTree extends Table {
 
     public NodeTree(Skin skin) {

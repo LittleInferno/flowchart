@@ -1,122 +1,119 @@
 package com.littleinferno.flowchart.node;
 
 import com.badlogic.gdx.scenes.scene2d.Actor;
-import com.badlogic.gdx.scenes.scene2d.InputEvent;
-import com.badlogic.gdx.scenes.scene2d.InputListener;
-import com.badlogic.gdx.scenes.scene2d.Touchable;
-import com.badlogic.gdx.scenes.scene2d.ui.Button;
-import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
-import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.VerticalGroup;
-import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
-import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Array;
+import com.kotcrab.vis.ui.widget.VisTable;
+import com.kotcrab.vis.ui.widget.VisWindow;
 import com.littleinferno.flowchart.Connection;
 import com.littleinferno.flowchart.DataType;
 import com.littleinferno.flowchart.codegen.CodeGen;
 import com.littleinferno.flowchart.pin.Pin;
+import com.littleinferno.flowchart.ui.Main;
 
-public abstract class Node extends Table implements CodeGen {
+public abstract class Node extends VisWindow implements CodeGen {
 
-    private final Label title;
     protected final VerticalGroup left;
     protected final VerticalGroup right;
     final NodeStyle style;
+    Skin skin;
 
+    public Node(final String name, final boolean closable) {
+        this(name, closable, Main.skin);
+    }
 
     public Node(final String name, final boolean closable, Skin skin) {
-        super(skin);
+        super(name);
+
         style = skin.get(NodeStyle.class);
-
+        this.skin = skin;
         setWidth(200);
-        setBackground(style.normal);
-
-        this.setTouchable(Touchable.enabled);
-
-        title = new Label(name, getSkin());
-        title.setAlignment(Align.center);
-        title.setEllipsis(true);
 
         if (closable) {
-            Table container = new Table();
-
-            container.add(title).expand().fill().minWidth(0);
-
-            Button close = new Button(getSkin());
-            container.add(close).width(30);
-
-            add(container).expandX().fillX().colspan(2).row();
-
-            close.addListener(new ChangeListener() {
-                @Override
-                public void changed(ChangeEvent event, Actor actor) {
-                    destroy();
-                }
-            });
-
-        } else {
-            add(title).expandX().fillX().minWidth(0).colspan(2).row();
+            addCloseButton();
         }
 
-        row().width(100);
+        VisTable container = new VisTable();
+        VisTable main = new VisTable();
+        main.addSeparator();
 
         left = new VerticalGroup();
-        left.top().left();
+        left.top().left().fill();
         left.space(10);
-        add(left).expand().fill();
+        container.add(left).grow().width(100);
+
+        container.addSeparator(true);
 
         right = new VerticalGroup();
-        right.top().right();
+        right.top().right().fill();
         right.space(10);
-        add(right).expand().fill();
+        container.add(right).grow().width(100);
 
+        main.add(container).grow();
+
+        add(main).grow();
         top();
 
-        addListener(new InputListener() {
-
-            private float mouseOffsetX;
-            private float mouseOffsetY;
-
-            @Override
-            public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
-
-                mouseOffsetX = x;
-                mouseOffsetY = y;
-                return true;
-            }
-
-            @Override
-            public void touchDragged(InputEvent event, float x, float y, int pointer) {
-
-                float nodeX = getX(), nodeY = getY();
-
-                float amountX = x - mouseOffsetX, amountY = y - mouseOffsetY;
-
-                setPosition(((int) ((nodeX + amountX) / 10) * 10), ((int) ((nodeY + amountY) / 10) * 10));
-            }
-
-            @Override
-            public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
-            }
-        });
+//        addListener(new InputListener() {
+//
+//            private float mouseOffsetX;
+//            private float mouseOffsetY;
+//
+//            @Override
+//            public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
+//
+//                mouseOffsetX = x;
+//                mouseOffsetY = y;
+//                return true;
+//            }
+//
+//            @Override
+//            public void touchDragged(InputEvent event, float x, float y, int pointer) {
+//
+//                float nodeX = getX(), nodeY = getY();
+//
+//                float amountX = x - mouseOffsetX, amountY = y - mouseOffsetY;
+//
+//                setPosition(((int) ((nodeX + amountX) / 10) * 10), ((int) ((nodeY + amountY) / 10) * 10));
+//            }
+//
+//            @Override
+//            public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
+//            }
+//        });
     }
 
     public void destroy() {
         getParent().removeActor(Node.this);
     }
 
+
+    public Pin addDataInputPin(final String name, DataType... possibleConvert) {
+        Pin pin = new Pin(name, Connection.INPUT, possibleConvert);
+        left.addActor(pin);
+        pack();
+        return pin;
+    }
+
     public Pin addDataInputPin(final DataType type, final String name) {
-        Pin pin = new Pin(name, type, Connection.INPUT, getSkin());
+        Pin pin = new Pin(name, type, Connection.INPUT);
         left.addActor(pin);//.expandX().fillX().padLeft(10).padBottom(10);
-       // left.row();
+        // left.row();
+        pack();
+        return pin;
+    }
+
+    public Pin addDataOutputPin(final String name, DataType... possibleConvert) {
+        Pin pin = new Pin(name, Connection.OUTPUT, possibleConvert);
+        right.addActor(pin);
         pack();
         return pin;
     }
 
     public Pin addDataOutputPin(final DataType type, final String name) {
-        Pin pin = new Pin(name, type, Connection.OUTPUT, getSkin());
+        Pin pin = new Pin(name, type, Connection.OUTPUT);
         right.addActor(pin);//.expandX().fillX().padRight(10).padBottom(10);
         //right.row();
         pack();
@@ -129,7 +126,7 @@ public abstract class Node extends Table implements CodeGen {
     }
 
     public Pin addExecutionInputPin(final String name) {
-        Pin pin = new Pin(name, DataType.EXECUTION, Connection.INPUT, getSkin());
+        Pin pin = new Pin(name, DataType.EXECUTION, Connection.INPUT);
         left.addActor(pin);//.expandX().fillX().padLeft(10).padBottom(10);
         //left.row();
         pack();
@@ -141,7 +138,7 @@ public abstract class Node extends Table implements CodeGen {
     }
 
     public Pin addExecutionOutputPin(final String name) {
-        Pin pin = new Pin(name, DataType.EXECUTION, Connection.OUTPUT, getSkin());
+        Pin pin = new Pin(name, DataType.EXECUTION, Connection.OUTPUT);
         right.addActor(pin);//.expandX().fillX().padRight(10).padBottom(10);
         //right.row();
         pack();
@@ -184,7 +181,12 @@ public abstract class Node extends Table implements CodeGen {
     }
 
     public void setTitle(String text) {
-        title.setText(text);
+        getTitleLabel().setText(text);
+    }
+
+    @Override
+    public void close() {
+        super.close();
     }
 
     static public class NodeStyle {

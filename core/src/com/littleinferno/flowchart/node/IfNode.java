@@ -6,8 +6,8 @@ import com.littleinferno.flowchart.codegen.CodeBuilder;
 import com.littleinferno.flowchart.pin.Pin;
 
 public class IfNode extends Node {
-    public IfNode(Skin skin) {
-        super("if", true, skin);
+    public IfNode() {
+        super("if", true);
 
         addExecutionInputPin();
         addDataInputPin(DataType.BOOL, "Condition");

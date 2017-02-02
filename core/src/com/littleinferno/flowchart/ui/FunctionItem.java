@@ -18,7 +18,7 @@ import com.littleinferno.flowchart.node.FunctionCallNode;
 import com.littleinferno.flowchart.node.FunctionReturnNode;
 import com.littleinferno.flowchart.parameter.Parameter;
 
-
+@Deprecated
 class FunctionItem extends Item {
 
     FunctionItem(final String funName, final Skin skin) {
@@ -165,7 +165,7 @@ class FunctionItem extends Item {
             @Override
             public DragAndDrop.Payload dragStart(InputEvent event, float x, float y, int pointer) {
                 DragAndDrop.Payload payload = new DragAndDrop.Payload();
-                payload.setObject(new FunctionCallNode(function, skin));
+                payload.setObject(new FunctionCallNode(function));
 
                 payload.setDragActor(new Label(String.format("call %s", function.getName()), skin));
 
@@ -192,7 +192,7 @@ class FunctionItem extends Item {
             @Override
             public DragAndDrop.Payload dragStart(InputEvent event, float x, float y, int pointer) {
                 DragAndDrop.Payload payload = new DragAndDrop.Payload();
-                FunctionReturnNode returnNode = new FunctionReturnNode(function, skin);
+                FunctionReturnNode returnNode = new FunctionReturnNode(function);
 
                 function.getReturnNodes().add(returnNode);
 

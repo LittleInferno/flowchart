@@ -1,4 +1,4 @@
-package com.littleinferno.flowchart.nui.variable;
+package com.littleinferno.flowchart.gui.variable;
 
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
@@ -29,7 +29,7 @@ class VariableItem extends PopupMenu {
         addItem(new MenuItem("get", new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
-                VariableGetNode getNode = new VariableGetNode(variable, Main.skin);
+                VariableGetNode getNode = new VariableGetNode(variable);
                 getNode.setPosition(VariableItem.this.getX(), VariableItem.this.getY());
                 getStage().addActor(getNode);
             }

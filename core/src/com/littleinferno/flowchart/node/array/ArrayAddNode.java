@@ -1,28 +1,40 @@
 package com.littleinferno.flowchart.node.array;
 
-import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.littleinferno.flowchart.DataType;
 import com.littleinferno.flowchart.codegen.CodeBuilder;
 import com.littleinferno.flowchart.node.Node;
 import com.littleinferno.flowchart.pin.Pin;
+import com.littleinferno.flowchart.pin.PinListener;
 
 public class ArrayAddNode extends Node {
 
-    private Pin next;
-    private Pin array;
-    private Pin item;
-    private Pin length;
+    private DataType[] converts = {DataType.BOOL, DataType.INT, DataType.FLOAT, DataType.STRING};
+    private final Pin next;
+    private final Pin array;
+    private final Pin item;
+    private final Pin length;
 
-    public ArrayAddNode(DataType type, Skin skin) {
-        super("Add", true, skin);
+    public ArrayAddNode() {
+        super("Add", true);
 
-        addExecutionInputPin();
         next = addExecutionOutputPin();
-        array = addDataInputPin(type, "array");
+        addExecutionInputPin();
+        array = addDataInputPin("array", converts);
         array.setArray(true);
-        item = addDataInputPin(type, "index");
+
+        item = addDataInputPin("item", converts);
         length = addDataOutputPin(DataType.INT, "length");
 
+        PinListener defaultListener = new PinListener() {
+            @Override
+            public void typeChanged(DataType newType) {
+                array.setType(newType);
+                item.setType(newType);
+            }
+        };
+
+        array.addListener(defaultListener);
+        item.addListener(defaultListener);
     }
 
     @Override
@@ -39,7 +51,7 @@ public class ArrayAddNode extends Node {
                 val.parent.gen(builder, val.pin));
 
         Pin.Connector n = next.getConnector();
-        String nextStr = next == null ? "" : n.parent.gen(builder, n.pin);
+        String nextStr = n.parent.gen(builder, n.pin);
 
         return String.format("%s%s", add, nextStr);
     }

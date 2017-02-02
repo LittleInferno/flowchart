@@ -27,21 +27,17 @@ public class Wire extends Actor {
         renderer.setColor(Color.RED);
 
         Vector2 b = begin.getLocation();
-
-        if (begin.getConnection() == Connection.INPUT) b.add(new Vector2(8, 8));
-        else b.add(new Vector2(86, 8));
-
         Vector2 e = end.getLocation();
-
-        if (end.getConnection() == Connection.INPUT) e.add(new Vector2(8, 8));
-        else e.add(new Vector2(86, 8));
 
         float xLength = (e.x - b.x);
         float yLength = Math.abs(e.y - b.y);
 
         if (xLength > -100 || xLength < 100) xLength = 100;
 
-        if (begin.getConnection() == Connection.INPUT) {
+        if(begin.getConnection() == Connection.INPUT) {
+            b.add(new Vector2(8, 8));
+            e.add(new Vector2(86, 8));
+
             float tmp = b.x;
             b.x = e.x;
             e.x = tmp;
@@ -49,6 +45,9 @@ public class Wire extends Actor {
             tmp = b.y;
             b.y = e.y;
             e.y = tmp;
+        } else {
+            b.add(new Vector2(86, 8));
+            e.add(new Vector2(8, 8));
         }
 
         float xHalfLength = xLength / 2;
@@ -56,7 +55,7 @@ public class Wire extends Actor {
         float cx1 = b.x + xHalfLength;
         float cx2 = e.x - xHalfLength;
 
-        renderer.curve(b.x, b.y, cx1, b.y, cx2, e.y, e.x, e.y, 50);
+        renderer.curve(b.x, b.y, cx1, b.y, cx2, e.y, e.x, e.y, 20);
 
         Gdx.gl20.glLineWidth(2);
         renderer.end();

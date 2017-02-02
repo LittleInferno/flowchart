@@ -13,7 +13,7 @@ public class VariableSetNode extends Node {
     private Variable variable;
 
     public VariableSetNode(Variable variable, Skin skin) {
-        super(String.format("Set %s", variable.getName()), true, skin);
+        super(String.format("Set %s", variable.getName()), true);
 
         addExecutionInputPin();
         addExecutionOutputPin();
@@ -52,5 +52,11 @@ public class VariableSetNode extends Node {
         String nextStr = next == null ? "" : next.parent.gen(builder, next.pin);
 
         return String.format("%s = %s\n%s", variable.getName(), dataStr, nextStr);
+    }
+
+    @Override
+    public void close() {
+        super.close();
+        variable.removeNode(this);
     }
 }

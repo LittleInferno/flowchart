@@ -5,7 +5,7 @@ import com.littleinferno.flowchart.pin.Pin;
 
 import java.util.Map;
 
-public class WireConnector {
+public class WireManager {
 
     public static int add(Pin begin, Pin end) {
 

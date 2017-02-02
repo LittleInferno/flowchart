@@ -5,62 +5,85 @@ import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
-import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
-import com.badlogic.gdx.scenes.scene2d.ui.Skin;
-import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
 import com.badlogic.gdx.utils.Align;
-import com.badlogic.gdx.utils.Array;
+import com.kotcrab.vis.ui.VisUI;
+import com.kotcrab.vis.ui.widget.VisImage;
+import com.kotcrab.vis.ui.widget.VisLabel;
+import com.kotcrab.vis.ui.widget.VisTable;
 import com.littleinferno.flowchart.Connection;
 import com.littleinferno.flowchart.DataType;
-import com.littleinferno.flowchart.node.ConverterNode;
 import com.littleinferno.flowchart.node.Node;
+import com.littleinferno.flowchart.ui.Main;
 import com.littleinferno.flowchart.wire.Wire;
-import com.littleinferno.flowchart.wire.WireConnector;
+import com.littleinferno.flowchart.wire.WireManager;
 
-public class Pin extends Table {
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Iterator;
+
+public class Pin extends VisTable {
     private PinStyle style;
 
-    private Pin pin;
-    private Array<Pin> pins = new Array<Pin>();
-    private final Connection connection;
+    private Pin connectedPin;
+    private ArrayList<Pin> connectedPins = new ArrayList<Pin>();
+
+    private Connection connection;
     private DataType type;
     private boolean isConnect;
     private boolean isArray;
+    private boolean isUniversal;
 
-    private Label label;
-    private Image image;
+    private VisLabel label;
+    private VisImage image;
 
-    public Pin(String name, DataType type, Connection connection, Skin skin) {
-        super(skin);
+    private ArrayList<PinListener> listeners = new ArrayList<PinListener>();
+
+    private HashSet<DataType> possibleConvert = new HashSet<DataType>();
+
+    public Pin(String name, Connection connection, DataType... convert) {
+        Collections.addAll(possibleConvert, convert);
+        possibleConvert.add(DataType.UNIVERSAL);
+        init(name, connection, DataType.UNIVERSAL);
+    }
+
+    public Pin(String name, DataType type, Connection connection) {
+        Collections.addAll(possibleConvert, DataType.BOOL, DataType.INT, DataType.FLOAT, DataType.STRING);
+        init(name, connection, type);
+    }
+
+    private void init(String name, Connection connection, DataType type) {
 
         this.connection = connection;
-        this.style = skin.get(PinStyle.class);
+        this.style = Main.skin.get(Main.scale == VisUI.SkinScale.X1 ? "X1" : "X2", PinStyle.class);
 
-        label = new Label(name, new Label.LabelStyle(style.font, style.fontColor));
+        label = new VisLabel(name);
         label.setEllipsis(true);
         label.setAlignment(Align.center);
-        image = new Image();
+
+        image = new VisImage();
 
         setArray(false);
         setType(type);
-        add().minWidth(0);
+
         if (connection == Connection.INPUT) {
-            add(image).size(16);
-            add(label).expandX().fillX().minWidth(0);
+            add(image);
+            add(label).growX().minWidth(0);
         } else {
-            add(label).expandX().fillX().minWidth(0);
-            add(image).size(16);
+            add(label).growX().minWidth(0);
+            add(image);
         }
-        setSize(getPrefWidth(), getPrefHeight());
+
         setName(name);
 
+        isUniversal = type == DataType.UNIVERSAL;
 
-        image.addListener(new InputListener() {
+        addListener(new InputListener() {
             @Override
             public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
-                WireConnector.add(Pin.this);
+                WireManager.add(Pin.this);
                 return true;
             }
         });
@@ -86,10 +109,15 @@ public class Pin extends Table {
         return type;
     }
 
-    public void setType(DataType type) {
-        this.type = type;
+    public boolean setType(DataType newType) {
+        if (newType == type) return true;
 
-        switch (type) {
+        if (!possibleConvert.contains(newType))
+            return false;
+
+        type = newType;
+
+        switch (newType) {
             case EXECUTION:
                 image.setColor(style.execution);
                 break;
@@ -105,72 +133,23 @@ public class Pin extends Table {
             case STRING:
                 image.setColor(style.string);
                 break;
-        }
-    }
-
-    public Connection getConnection() {
-        return connection;
-    }
-
-    public boolean isConnect() {
-        return isConnect;
-    }
-
-    public boolean connect(Pin pin) {
-
-        if (!possibleConnect(pin))
-            return false;
-
-        if (getType() != pin.getType()) {
-            if (getType() == DataType.EXECUTION || pin.getType() == DataType.EXECUTION)
-                return false;
-
-            createConverter(this, pin);
-
-            return true;
+            case UNIVERSAL:
+                image.setColor(style.universal);
+                break;
         }
 
-        if (isExecutionOutput(this) || isDataInput(this)) {
+        if (isUniversal) {
+            notifyListenersTypeChanged(newType);
+            if (connectedPin != null) connectedPin.setType(newType);
 
-            if (isConnect()) pin.disconnect(this);
-
-            this.pin = pin;
-            this.pin.pins.add(this);
-
-            WireConnector.base.addActor(new Wire(this, pin));
-
-            return isConnect = true;
-
-        } else {
-            return pin.connect(this);
-        }
-    }
-
-    public void disconnect(Pin pin) {
-
-        if (isExecutionOutput(this) || isDataInput(this)) {
-            this.pin = null;
-            isConnect = false;
-        } else {
-            pin.disconnect(this);
-
-            for (int i = 0; i < pins.size; ++i) {
-                if (pins.get(i) == pin) {
-                    pins.removeIndex(i);
-                    break;
+            if (!connectedPins.isEmpty()) {
+                for (Pin i : connectedPins) {
+                    i.setType(newType);
                 }
             }
         }
-    }
 
-    public Vector2 getLocation() {
-        return localToStageCoordinates(new Vector2(0, 0));
-    }
-
-    public Connector getConnector() {
-        if (pin != null)
-            return new Connector(pin);
-        return null;
+        return true;
     }
 
     public boolean isArray() {
@@ -184,6 +163,94 @@ public class Pin extends Table {
             image.setDrawable(style.array);
         else
             image.setDrawable(style.pin);
+    }
+
+    public Connection getConnection() {
+        return connection;
+    }
+
+    public boolean isConnect() {
+        return isConnect;
+    }
+
+    public boolean connect(final Pin pin) {
+
+        if (!possibleConnect(pin))
+            return false;
+
+        DataType pinType = pin.getType();
+        DataType thisType = getType();
+
+        if (pinType != thisType) {
+            if (pinType == DataType.UNIVERSAL || thisType == DataType.UNIVERSAL) {
+                boolean success;
+
+                success = pinType == DataType.UNIVERSAL ?
+                        pin.setType(thisType) :
+                        setType(pinType);
+
+                if (!success) return false;
+            } else
+                return false;
+        }
+
+        if (isExecutionOutput(this) || isDataInput(this))
+            connectPin(pin);
+        else
+            connectPins(pin);
+
+        return true;
+    }
+
+    public void disconnect(final Pin pin) {
+        if (isExecutionOutput(this) || isDataInput(this)) {
+            disconnectPin(pin);
+        } else {
+            disconnectPins(pin);
+        }
+    }
+
+    private void connectPin(final Pin pin) {
+        if (isConnect())
+            connectedPin.disconnect(this);
+
+        connectedPin = pin;
+        connectedPin.connectedPins.add(this);
+
+        WireManager.base.addActor(new Wire(this, pin));
+        //WireManager.add(this, pin);
+        isConnect = true;
+    }
+
+    private void connectPins(final Pin pin) {
+        pin.connectPin(this);
+        isConnect = true;
+    }
+
+    private void disconnectPin(final Pin pin) {
+        isConnect = false;
+        connectedPin = null;
+    }
+
+    private void disconnectPins(final Pin pin) {
+        pin.disconnect(this);
+
+        for (Iterator<Pin> i = connectedPins.iterator(); i.hasNext(); ) {
+            if (i.next() == pin)
+                i.remove();
+        }
+
+        if (connectedPins.isEmpty()) isConnect = false;
+    }
+
+    public Vector2 getLocation() {
+        return localToStageCoordinates(new Vector2(0, 0));
+    }
+
+    public Connector getConnector() {
+        if (connectedPin != null)
+            return new Connector(connectedPin);
+        return null;
     }
 
     private boolean possibleConnect(Pin pin) {
@@ -200,27 +267,37 @@ public class Pin extends Table {
         return pin.getType() != DataType.EXECUTION && pin.getConnection() == Connection.INPUT;
     }
 
-    private void createConverter(Pin first, Pin second) {
+//    private void createConverter(Pin first, Pin second) {
+//
+//        Vector2 pos;
+//        pos = getLocation().add(first.getLocation());
+//        pos.x /= 2;
+//        pos.y /= 2;
+//
+//        ConverterNode converter;
+//        if (getConnection() == Connection.INPUT.INPUT) {
+//            converter = new ConverterNode(second.getType(), first.getType(), getSkin());
+//            converter.getPin("from").connect(second);
+//            converter.getPin("to").connect(first);
+//        } else {
+//            converter = new ConverterNode(first.getType(), second.getType(), getSkin());
+//            converter.getPin("from").connect(first);
+//            converter.getPin("to").connect(second);
+//        }
+//        converter.setPosition(pos.x, pos.y);
+//        getStage().addActor(converter);
+//    }
 
-        Vector2 pos;
-        pos = getLocation().add(first.getLocation());
-        pos.x /= 2;
-        pos.y /= 2;
-
-        ConverterNode converter;
-        if (getConnection() == Connection.INPUT.INPUT) {
-            converter = new ConverterNode(second.getType(), first.getType(), getSkin());
-            converter.getPin("from").connect(second);
-            converter.getPin("to").connect(first);
-        } else {
-            converter = new ConverterNode(first.getType(), second.getType(), getSkin());
-            converter.getPin("from").connect(first);
-            converter.getPin("to").connect(second);
-        }
-        converter.setPosition(pos.x, pos.y);
-        getStage().addActor(converter);
+    public void addListener(PinListener listener) {
+        listeners.add(listener);
     }
 
+
+    private void notifyListenersTypeChanged(DataType newType) {
+        for (PinListener listener : listeners) {
+            listener.typeChanged(newType);
+        }
+    }
 
     static public class Connector {
 
@@ -236,24 +313,35 @@ public class Pin extends Table {
     }
 
 
-    static public class PinStyle {
-        public Drawable array, pin;
-        public Color execution, bool, integer, floating, string;
-        public BitmapFont font;
-        public Color fontColor;
+    public static class PinStyle {
+        Drawable array, arrayConnected, pin, pinConnected;
+        Color execution;
+        Color bool;
+        Color integer;
+        Color floating;
+        Color string;
+
+        Color universal;
+        BitmapFont font;
+        Color fontColor;
 
         public PinStyle() {
         }
 
-        public PinStyle(Drawable array, Drawable pin, Color execution, Color bool, Color integer,
-                        Color floating, Color string, BitmapFont font, Color fontColor) {
+        public PinStyle(Drawable array, Drawable arrayConnected, Drawable pin,
+                        Drawable pinConnected, Color execution, Color bool,
+                        Color integer, Color floating, Color string, Color universal,
+                        BitmapFont font, Color fontColor) {
             this.array = array;
+            this.arrayConnected = arrayConnected;
             this.pin = pin;
+            this.pinConnected = pinConnected;
             this.execution = execution;
             this.bool = bool;
             this.integer = integer;
             this.floating = floating;
             this.string = string;
+            this.universal = universal;
             this.font = font;
             this.fontColor = fontColor;
         }

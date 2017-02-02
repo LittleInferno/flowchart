@@ -1,8 +1,7 @@
-package com.littleinferno.flowchart.nui.function;
+package com.littleinferno.flowchart.gui.function;
 
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
-import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.DragAndDrop;
 import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
@@ -12,24 +11,22 @@ import com.kotcrab.vis.ui.widget.ListView;
 import com.kotcrab.vis.ui.widget.VisLabel;
 import com.kotcrab.vis.ui.widget.VisTable;
 import com.kotcrab.vis.ui.widget.VisTextButton;
-import com.kotcrab.vis.ui.widget.tabbedpane.Tab;
 import com.littleinferno.flowchart.Function;
 import com.littleinferno.flowchart.NameChangeable;
 import com.littleinferno.flowchart.ui.Main;
 
 import java.util.ArrayList;
 
-public class FunctionTable extends Tab {
+public class FunctionTable extends VisTable {
 
     private final ArrayListAdapter<String, VisTable> adapter;
     private final VisTable details;
     private ArrayList<FunctionDetails> functionDetailses;
 
     private int counter = 0;
-    private VisTable content;
 
     public FunctionTable() {
-        super(false, false);
+        super(true);
 
         functionDetailses = new ArrayList<FunctionDetails>();
         ArrayList<String> array = new ArrayList<String>();
@@ -59,25 +56,12 @@ public class FunctionTable extends Tab {
 
         details = new VisTable(true);
 
-        content = new VisTable(true);
-        content.setBackground(VisUI.getSkin().getDrawable("window-bg"));
-        content.add(create).growX().row();
-        content.add(view.getMainTable()).grow().row();
-        content.addSeparator();
-        content.add(details).growX().height(250);
+        add(create).growX().row();
+        add(view.getMainTable()).grow().row();
+        addSeparator();
+        add(details).growX().height(250);
 
     }
-
-    @Override
-    public String getTabTitle() {
-        return "Function";
-    }
-
-    @Override
-    public Table getContentTable() {
-        return content;
-    }
-
 
     private void addFunction() {
         FunctionDetails functionDetails = new FunctionDetails(this, new Function("newFun" + counter++));

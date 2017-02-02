@@ -1,7 +1,8 @@
-package com.littleinferno.flowchart.nui.variable;
+package com.littleinferno.flowchart.gui.variable;
 
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
+import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
 import com.kotcrab.vis.ui.VisUI;
 import com.kotcrab.vis.ui.util.InputValidator;
 import com.kotcrab.vis.ui.widget.VisImageButton;
@@ -13,11 +14,10 @@ import com.littleinferno.flowchart.DataType;
 import com.littleinferno.flowchart.Variable;
 import com.littleinferno.flowchart.ui.Main;
 
-public class VariableDetails extends VisTable {
+class VariableDetails extends VisTable {
 
     Variable variable;
     private VariableTable table;
-    private int counter = 0;
 
     VariableDetails(VariableTable table, Variable variable) {
         super(true);
@@ -78,6 +78,8 @@ public class VariableDetails extends VisTable {
                 Main.skin.getDrawable("array-X1") :
                 Main.skin.getDrawable("array-X2");
 
+        style.imageChecked = drawable;
+        style.imageUp = drawable;
 
         final VisImageButton isArray = new VisImageButton(style);
         isArray.addListener(new ChangeListener() {

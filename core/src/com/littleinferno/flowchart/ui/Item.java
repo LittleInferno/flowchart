@@ -10,6 +10,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.TextField;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.littleinferno.flowchart.DataType;
 
+@Deprecated
 public class Item extends Table {
 
     static class PropertyTable extends Table {

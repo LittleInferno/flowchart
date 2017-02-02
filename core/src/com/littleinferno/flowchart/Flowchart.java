@@ -3,9 +3,9 @@ package com.littleinferno.flowchart;
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.GL20;
-import com.littleinferno.flowchart.nui.MainMenu;
+import com.littleinferno.flowchart.gui.MainMenu;
 import com.littleinferno.flowchart.ui.Main;
-import com.littleinferno.flowchart.wire.WireConnector;
+import com.littleinferno.flowchart.wire.WireManager;
 
 public class Flowchart extends ApplicationAdapter {
 
@@ -23,7 +23,7 @@ public class Flowchart extends ApplicationAdapter {
     public void create() {
 
         main = new Main();
-        WireConnector.base = main;
+        WireManager.base = main;
 
         Gdx.input.setInputProcessor(main);
 

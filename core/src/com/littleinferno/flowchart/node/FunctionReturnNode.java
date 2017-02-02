@@ -1,14 +1,13 @@
 package com.littleinferno.flowchart.node;
 
-import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.utils.Array;
 import com.littleinferno.flowchart.Connection;
 import com.littleinferno.flowchart.DataType;
 import com.littleinferno.flowchart.Function;
 import com.littleinferno.flowchart.NameChangeable;
+import com.littleinferno.flowchart.VariableChangedListener;
 import com.littleinferno.flowchart.codegen.CodeBuilder;
 import com.littleinferno.flowchart.parameter.Parameter;
-import com.littleinferno.flowchart.VariableChangedListener;
 import com.littleinferno.flowchart.parameter.ParameterListener;
 import com.littleinferno.flowchart.pin.Pin;
 
@@ -19,8 +18,11 @@ import java.util.Map;
 
 public class FunctionReturnNode extends Node {
 
-    public FunctionReturnNode(Function function, Skin skin) {
-        super(function.getName(), false, skin);
+    Function function;
+
+    public FunctionReturnNode(Function function) {
+        super(function.getName(), false);
+        this.function = function;
         addExecutionInputPin();
 
         function.addListener(new NameChangeable.NameChange() {
@@ -89,5 +91,11 @@ public class FunctionReturnNode extends Node {
         }
 
         return builder.createReturn(returnPack);
+    }
+
+    @Override
+    public void close() {
+        super.close();
+        function.removeNode(this);
     }
 }

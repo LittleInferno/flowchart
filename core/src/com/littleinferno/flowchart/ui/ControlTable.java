@@ -13,6 +13,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 
 
+@Deprecated
 class ControlTable extends Table {
     ControlTable(Skin skin) {
 

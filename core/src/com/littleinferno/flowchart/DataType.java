@@ -6,4 +6,5 @@ public enum DataType {
     INT,
     FLOAT,
     STRING,
+    UNIVERSAL
 }

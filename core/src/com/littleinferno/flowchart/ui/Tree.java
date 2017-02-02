@@ -31,6 +31,7 @@ import com.badlogic.gdx.scenes.scene2d.utils.UIUtils;
 import com.badlogic.gdx.utils.Array;
 
 
+@Deprecated
 public class Tree extends WidgetGroup {
     TreeStyle style;
     final Array<Node> rootNodes = new Array();

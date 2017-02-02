@@ -6,6 +6,7 @@ import com.badlogic.gdx.utils.SnapshotArray;
 import com.badlogic.gdx.utils.StringBuilder;
 import com.littleinferno.flowchart.codegen.CodeBuilder;
 
+@Deprecated
 public class FunctionTable extends ComponentTable {
 
     private static int counter = 1;

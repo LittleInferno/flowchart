@@ -84,9 +84,7 @@ public class Function implements NameChangeable {
         }
     }
 
-    private void removeNode(Node node) {
-
-        node.destroy();
+    public void removeNode(Node node) {
 
         if (node instanceof FunctionBeginNode)
             beginNode = null;
@@ -159,17 +157,17 @@ public class Function implements NameChangeable {
     public void delete() {
 
         // TODO
-      //  removeNode(beginNode);
+        //  removeNode(beginNode);
 
         for (Iterator<FunctionReturnNode> i = returnNodes.iterator(); i.hasNext(); ) {
             Node node = i.next();
-            node.destroy();
+            node.close();
             i.remove();
         }
 
         for (Iterator<FunctionCallNode> i = callNodes.iterator(); i.hasNext(); ) {
             Node node = i.next();
-            node.destroy();
+            node.close();
             i.remove();
         }
     }

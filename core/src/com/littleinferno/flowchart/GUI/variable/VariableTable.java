@@ -1,9 +1,8 @@
-package com.littleinferno.flowchart.nui.variable;
+package com.littleinferno.flowchart.gui.variable;
 
 
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
-import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.DragAndDrop;
 import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
@@ -13,7 +12,6 @@ import com.kotcrab.vis.ui.widget.ListView;
 import com.kotcrab.vis.ui.widget.VisLabel;
 import com.kotcrab.vis.ui.widget.VisTable;
 import com.kotcrab.vis.ui.widget.VisTextButton;
-import com.kotcrab.vis.ui.widget.tabbedpane.Tab;
 import com.littleinferno.flowchart.DataType;
 import com.littleinferno.flowchart.Variable;
 import com.littleinferno.flowchart.VariableChangedAdaptor;
@@ -21,17 +19,16 @@ import com.littleinferno.flowchart.ui.Main;
 
 import java.util.ArrayList;
 
-public class VariableTable extends Tab {
+public class VariableTable extends VisTable {
 
     private final ArrayListAdapter<String, VisTable> adapter;
     private final VisTable details;
     private ArrayList<VariableDetails> variableDetailses;
 
     private int counter = 0;
-    private VisTable content;
 
     public VariableTable() {
-        super(false, false);
+        super(true);
 
         variableDetailses = new ArrayList<VariableDetails>();
         ArrayList<String> array = new ArrayList<String>();
@@ -60,25 +57,11 @@ public class VariableTable extends Tab {
 
         details = new VisTable(true);
 
-        content = new VisTable(true);
-        content.setBackground(VisUI.getSkin().getDrawable("window-bg"));
-        content.add(create).growX().row();
-        content.add(view.getMainTable()).grow().row();
-        content.addSeparator();
-        content.add(details).growX().row();
-        content.addSeparator();
-    }
-
-
-    @Override
-
-    public String getTabTitle() {
-        return "Variable";
-    }
-
-    @Override
-    public Table getContentTable() {
-        return content;
+        add(create).growX().row();
+        add(view.getMainTable()).grow().row();
+        addSeparator();
+        add(details).growX().row();
+        addSeparator();
     }
 
     private void addVariable() {
@@ -132,7 +115,7 @@ public class VariableTable extends Tab {
 
                     for (VariableDetails variable : variableDetailses) {
                         if (variable.getName().equals(it.getText().toString())) {
-                            payload.setObject(new VariableItem(variable.variable));
+                            payload.setObject(new com.littleinferno.flowchart.gui.variable.VariableItem(variable.variable));
                             payload.setDragActor(new VisLabel(it.getText()));
                         }
                     }

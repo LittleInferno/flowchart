@@ -1,24 +1,35 @@
 package com.littleinferno.flowchart.node.array;
 
-import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.littleinferno.flowchart.DataType;
 import com.littleinferno.flowchart.codegen.CodeBuilder;
 import com.littleinferno.flowchart.node.Node;
 import com.littleinferno.flowchart.pin.Pin;
+import com.littleinferno.flowchart.pin.PinListener;
 
 public class ArrayGetNode extends Node {
 
-    private Pin array;
-    private Pin item;
+    private DataType[] converts = {DataType.BOOL, DataType.INT, DataType.FLOAT, DataType.STRING};
+    private final Pin array = addDataInputPin("array", converts);
+    private final Pin item = addDataOutputPin("item", converts);
 
 
-    public ArrayGetNode(DataType type, Skin skin) {
-        super("Get", true, skin);
+    public ArrayGetNode() {
+        super("Get", true);
 
-        array = addDataInputPin(type, "array");
         array.setArray(true);
-        item = addDataInputPin(DataType.INT, "index");
-        addDataOutputPin(type, "item");
+
+        PinListener defaultListener = new PinListener() {
+            @Override
+            public void typeChanged(DataType newType) {
+                array.setType(newType);
+                item.setType(newType);
+            }
+        };
+
+        array.addListener(defaultListener);
+        item.addListener(defaultListener);
+
+        addDataInputPin(DataType.INT, "index");
     }
 
     @Override

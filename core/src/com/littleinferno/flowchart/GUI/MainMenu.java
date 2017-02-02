@@ -1,11 +1,10 @@
-package com.littleinferno.flowchart.nui;
+package com.littleinferno.flowchart.gui;
 
 
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.kotcrab.vis.ui.VisUI;
 import com.kotcrab.vis.ui.widget.VisTable;
 import com.kotcrab.vis.ui.widget.VisTextButton;
-import com.kotcrab.vis.ui.widget.VisTree;
 import com.kotcrab.vis.ui.widget.VisWindow;
 
 public class MainMenu extends Stage {
