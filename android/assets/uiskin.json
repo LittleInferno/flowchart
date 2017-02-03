@@ -192,12 +192,81 @@
     }
   },
   "com.littleinferno.flowchart.pin.Pin$PinStyle": {
-    "default": {
-      "execution": "white-pin",
-      "bool": "blue-pin",
-      "integer": "green-pin",
-      "floating": "red-pin",
-      "string": "purple-pin",
+    "X1": {
+      "execution": "white",
+      "bool": {
+        "r": 0.129,
+        "g": 0.585,
+        "b": 0.949,
+        "a": 1
+      },
+      "integer": {
+        "r": 0.297,
+        "g": 0.684,
+        "b": 0.313,
+        "a": 1
+      },
+      "floating": {
+        "r": 0.953,
+        "g": 0.262,
+        "b": 0.211,
+        "a": 1
+      },
+      "string": {
+        "r": 0.609,
+        "g": 0.152,
+        "b": 0.688,
+        "a": 1
+      },
+      "universal": {
+        "r": 0.502,
+        "g": 0.341,
+        "b": 0.267,
+        "a": 1
+      },
+      "pin": "pin-X1",
+      "pinConnected": "pin-connect-X1",
+      "array": "pin-array-pin-X1",
+      "arrayConnected": "pin-array-connect-X1",
+      "font": "default-font",
+      "fontColor": "white"
+    },
+    "X2": {
+      "execution": "white",
+      "bool": {
+        "r": 0.129,
+        "g": 0.585,
+        "b": 0.949,
+        "a": 1
+      },
+      "integer": {
+        "r": 0.297,
+        "g": 0.684,
+        "b": 0.313,
+        "a": 1
+      },
+      "floating": {
+        "r": 0.953,
+        "g": 0.262,
+        "b": 0.211,
+        "a": 1
+      },
+      "string": {
+        "r": 0.609,
+        "g": 0.152,
+        "b": 0.688,
+        "a": 1
+      },
+      "universal": {
+        "r": 0.502,
+        "g": 0.341,
+        "b": 0.267,
+        "a": 1
+      },
+      "pin": "pin-X2",
+      "pinConnected": "pin-connect-X2",
+      "array": "pin-array-pin-X2",
+      "arrayConnected": "pin-array-connect-X2",
       "font": "default-font",
       "fontColor": "white"
     }

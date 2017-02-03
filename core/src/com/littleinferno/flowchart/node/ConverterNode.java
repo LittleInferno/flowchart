@@ -1,11 +1,12 @@
 package com.littleinferno.flowchart.node;
 
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
+import com.littleinferno.flowchart.DataType;
+import com.littleinferno.flowchart.codegen.CodeBuilder;
 import com.littleinferno.flowchart.pin.Pin;
-import com.littleinferno.flowchart.value.Value;
 
 public class ConverterNode extends Node {
-    public ConverterNode(Value.Type from, Value.Type to, Skin skin) {
+    public ConverterNode(DataType from, DataType to, Skin skin) {
         super("Converter", true, skin);
 
         addDataInputPin(from, "from");
@@ -13,9 +14,9 @@ public class ConverterNode extends Node {
     }
 
     @Override
-    public String gen(Pin with) {
+    public String gen(CodeBuilder builder, Pin with) {
         Pin.Connector from = getPin("from").getConnector();
 
-        return from.parent.gen(from.pin);
+        return from.parent.gen(builder, from.pin);
     }
 }

@@ -5,23 +5,29 @@ import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.ui.Button;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
-import com.littleinferno.flowchart.codegen.Builder;
+import com.littleinferno.flowchart.codegen.CodeBuilder;
 import com.littleinferno.flowchart.codegen.CodeExecution;
+import com.littleinferno.flowchart.codegen.JSBackend;
 import com.littleinferno.flowchart.pin.Pin;
 
 public class BeginNode extends Node {
-    public BeginNode(Skin skin) {
-        super("Begin", false, skin);
 
-        addExecutionOutputPin("start");
+    private Pin start;
+
+    public BeginNode() {
+        super("Begin", false);
+
+        start = addExecutionOutputPin("start");
 
         Button button = new Button(skin);
-        left.add(button).expandX().fillX().height(30);
+        left.addActor(button);//.expandX().fillX().height(30);
 
         button.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
-                String code = Builder.genFun() + Builder.genVar() + gen(getPin("start"));
+
+                CodeBuilder builder = new CodeBuilder(new JSBackend());
+                String code = builder.genFun() + CodeBuilder.genVar() + gen(builder, getPin("start"));
 
                 Gdx.app.log("", code);
 
@@ -29,12 +35,13 @@ public class BeginNode extends Node {
                 execute.run(code);
             }
         });
+        pack();
     }
 
     @Override
-    public String gen(Pin with) {
-        Pin.Connector next = getPin("start").getConnector();
+    public String gen(CodeBuilder builder, Pin with) {
+        Pin.Connector next = start.getConnector();
 
-        return next == null ? "" : next.parent.gen(next.pin);
+        return next == null ? "" : next.parent.gen(builder, next.pin);
     }
 }

@@ -11,15 +11,15 @@ import com.badlogic.gdx.scenes.scene2d.ui.Stack;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
-import com.badlogic.gdx.scenes.scene2d.utils.NinePatchDrawable;
 
 
+@Deprecated
 class ControlTable extends Table {
     ControlTable(Skin skin) {
 
         setWidth(200);
         NinePatch patch = new NinePatch(new Texture(Gdx.files.internal("VarTable.png")), 1, 1, 1, 1);
-        setBackground(new NinePatchDrawable(patch));
+      //  setBackground(new NinePatchDrawable(patch));
 
         top();
         Table tabTable = new Table();
@@ -55,7 +55,7 @@ class ControlTable extends Table {
         mainContainer.add(container);
 
         final VariableTable variableTable = new VariableTable(skin);
-        final FunctionTable functionTable = new FunctionTable(skin);
+        final com.littleinferno.flowchart.ui.FunctionTable functionTable = new com.littleinferno.flowchart.ui.FunctionTable(skin);
 
         Stack contents = new Stack();
         contents.add(variableTable);

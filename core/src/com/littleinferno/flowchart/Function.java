@@ -1,40 +1,52 @@
 package com.littleinferno.flowchart;
 
-import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.utils.Array;
 import com.littleinferno.flowchart.node.FunctionBeginNode;
+import com.littleinferno.flowchart.node.FunctionCallNode;
 import com.littleinferno.flowchart.node.FunctionReturnNode;
 import com.littleinferno.flowchart.node.Node;
-import com.littleinferno.flowchart.parameter.InputParameter;
 import com.littleinferno.flowchart.parameter.Parameter;
+import com.littleinferno.flowchart.parameter.ParameterListener;
 import com.littleinferno.flowchart.ui.Main;
 
-public class Function {
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+
+
+public class Function implements NameChangeable {
 
     private String name;
-    private Array<Node> nodes;
+
     private FunctionBeginNode beginNode;
-    private Array<FunctionReturnNode> returnNodes;
+    private List<FunctionReturnNode> returnNodes;
+    private List<FunctionCallNode> callNodes;
+
     private Array<Parameter> parameters;
+    private List<NameChange> nameChangeListeners;
+    private List<ParameterListener> parameterListeners;
+
 
     public Function(String name) {
         this.name = name;
+        nameChangeListeners = new ArrayList<NameChange>();
+        parameterListeners = new ArrayList<ParameterListener>();
+
+        parameters = new Array<Parameter>();
+
+        //   Table functionWindow = Main.addWindow(name).getContentTable();
+//        functionWindow.addActor(beginNode);
 
         beginNode = new FunctionBeginNode(this, Main.skin);
         beginNode.setPosition(100, 100);
-        returnNodes = new Array<FunctionReturnNode>();
 
+        returnNodes = new ArrayList<FunctionReturnNode>();
 
-        FunctionReturnNode returnNode = new FunctionReturnNode(this, Main.skin);
-        returnNode.setPosition(400, 100);
-        returnNodes.add(returnNode);
+        // FunctionReturnNode returnNode = new FunctionReturnNode(this, Main.skin);
+        //  returnNode.setPosition(400, 100);
+        //   returnNodes.add(returnNode);
 
-        Table functionWindow = Main.addWindow(name).getContentTable();
-        functionWindow.addActor(beginNode);
-        functionWindow.addActor(returnNode);
-
-        nodes = new Array<Node>();
-        parameters = new Array<Parameter>();
+        callNodes = new ArrayList<FunctionCallNode>();
 
 
     }
@@ -43,7 +55,11 @@ public class Function {
         return beginNode;
     }
 
-    public Array<FunctionReturnNode> getReturnNodes() {
+    public Array<Parameter> getParameters() {
+        return parameters;
+    }
+
+    public List<FunctionReturnNode> getReturnNodes() {
         return returnNodes;
     }
 
@@ -54,56 +70,105 @@ public class Function {
     public void setName(String name) {
         this.name = name;
 
-        for (Node i : nodes) {
-            i.setTitle(String.format("call %s", name));
-        }
-
-        beginNode.setTitle(name);
-
-        for (Node i : returnNodes) {
-            i.setTitle(name);
-        }
+        notifyListenersNameChanged(name);
     }
 
-    public void addNode(Node node) {
-        nodes.add(node);
+    public void addNode(FunctionCallNode node) {
+        callNodes.add(node);
 
-        for (int i = 0; i < parameters.size; ++i) {
-            Parameter parameter = parameters.get(i);
-            if (parameter instanceof InputParameter)
-                node.addDataInputPin(parameter.getValueType(), parameter.getName());
-            else
-                node.addDataOutputPin(parameter.getValueType(), parameter.getName());
+        if (!parameterListeners.isEmpty()) {
+            ParameterListener listener = parameterListeners.get(parameterListeners.size() - 1);
+            for (int i = 0; i < parameters.size; ++i) {
+                notifyListenersParameterAdded(listener, parameters.get(i));
+            }
         }
     }
 
     public void removeNode(Node node) {
-        nodes.removeValue(node, true);
+
+        if (node instanceof FunctionBeginNode)
+            beginNode = null;
+        else if (node instanceof FunctionReturnNode)
+            returnNodes.remove(node);
+        else
+            callNodes.remove(node);
     }
 
     public void addParameter(Parameter parameter) {
-        for (int i = 0; i < nodes.size; ++i) {
-            if (parameter instanceof InputParameter)
-                nodes.get(i).addDataInputPin(parameter.getValueType(), parameter.getName());
-            else
-                nodes.get(i).addDataOutputPin(parameter.getValueType(), parameter.getName());
-        }
+        notifyListenersParameterAdded(parameter);
 
         parameters.add(parameter);
     }
 
     public void removeParameter(Parameter parameter) {
-        if (parameter instanceof InputParameter)
-            beginNode.removePin(parameter.getName());
-        else {
-            for (Node i : returnNodes) {
-                i.removePin(parameter.getName());
+        notifyListenersParameterRemoved(parameter);
+
+        parameters.removeValue(parameter, true);
+    }
+
+    public List<FunctionCallNode> getNodes() {
+        return callNodes;
+    }
+
+    @Override
+    public void addListener(NameChange listener) {
+        nameChangeListeners.add(listener);
+    }
+
+    @Override
+    public void notifyListenersNameChanged(String newName) {
+        for (NameChange listener : nameChangeListeners) {
+            listener.changed(newName);
+        }
+    }
+
+    public void addReturnNode(FunctionReturnNode returnNode) {
+        returnNodes.add(returnNode);
+
+        if (!parameterListeners.isEmpty()) {
+            ParameterListener listener = parameterListeners.get(parameterListeners.size() - 1);
+            for (int i = 0; i < parameters.size; ++i) {
+                notifyListenersParameterAdded(listener, parameters.get(i));
             }
         }
     }
 
-    public Array<Node> getNodes() {
-        return nodes;
+    public void addListener(ParameterListener listener) {
+        parameterListeners.add(listener);
     }
 
+    private void notifyListenersParameterAdded(ParameterListener listener, Parameter parameter) {
+        listener.added(parameter);
+    }
+
+    private void notifyListenersParameterAdded(Parameter parameter) {
+        for (ParameterListener listener : parameterListeners) {
+            listener.added(parameter);
+        }
+    }
+
+    private void notifyListenersParameterRemoved(Parameter parameter) {
+        for (ParameterListener listener : parameterListeners) {
+            listener.removed(parameter);
+        }
+    }
+
+
+    public void delete() {
+
+        // TODO
+        //  removeNode(beginNode);
+
+        for (Iterator<FunctionReturnNode> i = returnNodes.iterator(); i.hasNext(); ) {
+            Node node = i.next();
+            node.close();
+            i.remove();
+        }
+
+        for (Iterator<FunctionCallNode> i = callNodes.iterator(); i.hasNext(); ) {
+            Node node = i.next();
+            node.close();
+            i.remove();
+        }
+    }
 }

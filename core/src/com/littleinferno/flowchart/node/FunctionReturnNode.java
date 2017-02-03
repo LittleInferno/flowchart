@@ -1,46 +1,101 @@
 package com.littleinferno.flowchart.node;
 
-import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.utils.Array;
-import com.badlogic.gdx.utils.StringBuilder;
+import com.littleinferno.flowchart.Connection;
+import com.littleinferno.flowchart.DataType;
 import com.littleinferno.flowchart.Function;
+import com.littleinferno.flowchart.NameChangeable;
+import com.littleinferno.flowchart.VariableChangedListener;
+import com.littleinferno.flowchart.codegen.CodeBuilder;
+import com.littleinferno.flowchart.parameter.Parameter;
+import com.littleinferno.flowchart.parameter.ParameterListener;
 import com.littleinferno.flowchart.pin.Pin;
-import com.littleinferno.flowchart.value.Value;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class FunctionReturnNode extends Node {
 
-    public FunctionReturnNode(Function function, Skin skin) {
-        super(function.getName(), false, skin);
+    Function function;
+
+    public FunctionReturnNode(Function function) {
+        super(function.getName(), false);
+        this.function = function;
         addExecutionInputPin();
+
+        function.addListener(new NameChangeable.NameChange() {
+            @Override
+            public void changed(String newName) {
+                setTitle(newName);
+            }
+        });
+
+        function.addListener(new ParameterListener() {
+            private List<Pin> pins = new ArrayList<Pin>();
+
+            @Override
+            public void added(Parameter parameter) {
+                if (parameter.getConnection() == Connection.OUTPUT) {
+                    final Pin pin = addDataInputPin(parameter.getDataType(), parameter.getName());
+
+                    pin.setArray(parameter.isArray());
+
+                    parameter.addListener(new VariableChangedListener() {
+                        @Override
+                        public void nameChanged(String newName) {
+                            pin.setName(newName);
+                        }
+
+                        @Override
+                        public void typeChanged(DataType newType) {
+                            pin.setType(newType);
+                        }
+
+                        @Override
+                        public void isArrayChanged(boolean isArray) {
+                            pin.setArray(isArray);
+                        }
+                    });
+
+                    pins.add(pin);
+                }
+            }
+
+            @Override
+            public void removed(Parameter parameter) {
+                for (Pin pin : pins)
+                    if (parameter.getName().equals(pin.getName()))
+                        removePin(pin);
+            }
+        });
+        function.addReturnNode(this);
+
     }
 
     @Override
-    public String gen(Pin with) {
+    public String gen(CodeBuilder builder, Pin with) {
         Array<Pin> input = getInput();
-        StringBuilder builder = new StringBuilder();
-        StringBuilder returnPack = new StringBuilder();
-        returnPack.append("return {");
 
-        for (int i = 0; i < input.size; i++) {
-            Pin pin = input.get(i);
+        Map<String, String> returnPack = new HashMap<String, String>();
 
-            if (pin.getType() != Value.Type.EXECUTION) {
-                builder.append("var ").
-                        append(pin.getName()).
-                        append(" = ");
+        for (Pin i : input) {
 
-                Pin.Connector node = pin.getConnector();
+            if (i.getType() != DataType.EXECUTION) {
+                Pin.Connector node = i.getConnector();
 
-                builder.append(node.parent.gen(node.pin)).append("\n");
-
-                returnPack.append(pin.getName()).append(':').append(pin.getName());
-                if (i != input.size - 1) {
-                    returnPack.append(',');
-                }
+                String p = node.parent.gen(builder, node.pin);
+                returnPack.put(i.getName(), p);
             }
         }
-        returnPack.append("}\n");
 
-        return builder.toString() + returnPack.toString();
+        return builder.createReturn(returnPack);
+    }
+
+    @Override
+    public void close() {
+        super.close();
+        function.removeNode(this);
     }
 }

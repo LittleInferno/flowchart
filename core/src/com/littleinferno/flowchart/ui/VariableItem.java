@@ -9,19 +9,18 @@ import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.DragAndDrop;
+import com.littleinferno.flowchart.DataType;
 import com.littleinferno.flowchart.Variable;
 import com.littleinferno.flowchart.node.VariableGetNode;
 import com.littleinferno.flowchart.node.VariableSetNode;
-import com.littleinferno.flowchart.value.Value;
 
 
+@Deprecated
 class VariableItem extends Item {
 
-    VariableItem(String varName, final Skin skin) {
+    VariableItem(final String varName, final Skin skin) {
 
-        variable = new Variable(varName);
-        variable.setValueType(Value.Type.BOOL);
-
+        variable = new Variable(varName, DataType.BOOL, false);
 
         Table title = new Table();
 
@@ -63,8 +62,15 @@ class VariableItem extends Item {
 
         property.addTypeSelectedListener(new PropertyTable.TypeSelected() {
             @Override
-            public void select(Value.Type type) {
-                variable.setValueType(type);
+            public void select(DataType type) {
+                variable.setDataType(type);
+            }
+        });
+
+        property.array.addListener(new ChangeListener() {
+            @Override
+            public void changed(ChangeEvent event, Actor actor) {
+                variable.setArray(property.array.isChecked());
             }
         });
 
@@ -85,7 +91,7 @@ class VariableItem extends Item {
             @Override
             public DragAndDrop.Payload dragStart(InputEvent event, float x, float y, int pointer) {
                 DragAndDrop.Payload payload = new DragAndDrop.Payload();
-                payload.setObject(new VariableGetNode(variable, skin));
+                payload.setObject(new VariableGetNode(variable));
 
                 payload.setDragActor(new Label(String.format("Get %s", variable.getName()), skin));
 

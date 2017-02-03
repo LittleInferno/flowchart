@@ -198,41 +198,6 @@ white
   orig: 3, 3
   offset: 0, 0
   index: -1
-white-pin
-  rotate: false
-  xy: 50, 1
-  size: 16, 16
-  orig: 16, 16
-  offset: 0, 0
-  index: -1
-blue-pin
-  rotate: false
-  xy: 66, 1
-  size: 16, 16
-  orig: 16, 16
-  offset: 0, 0
-  index: -1
-green-pin
-  rotate: false
-  xy: 82, 1
-  size: 16, 16
-  orig: 16, 16
-  offset: 0, 0
-  index: -1
-red-pin
-  rotate: false
-  xy: 98, 1
-  size: 16, 16
-  orig: 16, 16
-  offset: 0, 0
-  index: -1
-purple-pin
-  rotate: false
-  xy: 114, 1
-  size: 16, 16
-  orig: 16, 16
-  offset: 0, 0
-  index: -1
 node-background-select
   rotate: false
   xy: 150, 1
@@ -249,4 +214,73 @@ node-background-default
   orig: 16, 16
   offset: 0, 0
   index: -1
-
+array-X1
+  rotate: false
+  xy: 100, 1
+  size: 10, 10
+  orig: 22, 22
+  offset: 6, 6
+  index: -1
+array-X2
+  rotate: false
+  xy: 111, 1
+  size: 20, 20
+  orig: 44, 44
+  offset: 12, 12
+  index: -1
+pin-array-pin-X1
+  rotate: false
+  xy: 185, 1
+  size: 10, 10
+  orig: 22, 22
+  offset: 6, 6
+  index: -1
+pin-array-connect-X1
+  rotate: false
+  xy: 196, 1
+  size: 10, 10
+  orig: 22, 22
+  offset: 6, 6
+  index: -1
+pin-X1
+  rotate: false
+  xy: 185, 12
+  size: 10, 10
+  orig: 22, 22
+  offset: 6, 6
+  index: -1
+pin-connect-X1
+  rotate: false
+  xy: 196, 12
+  size: 10, 10
+  orig: 22, 22
+  offset: 6, 6
+  index: -1
+pin-array-pin-X2
+  rotate: false
+  xy: 207, 1
+  size: 22, 22
+  orig: 44, 44
+  offset: 12, 12
+  index: -1
+pin-array-connect-X2
+  rotate: false
+  xy: 229, 1
+  size: 22, 22
+  orig: 44, 44
+  offset: 12, 12
+  index: -1
+pin-X2
+  rotate: false
+  xy: 207, 23
+  size: 22, 22
+  orig: 44, 44
+  offset: 12, 12
+  index: -1
+pin-connect-X2
+  rotate: false
+  xy: 229, 23
+  size: 22, 22
+  orig: 44, 44
+  offset: 12, 12
+  index: -1

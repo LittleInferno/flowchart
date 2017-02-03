@@ -22,6 +22,7 @@ allprojects {
         box2DLightsVersion = '1.4'
         ashleyVersion = '1.7.0'
         aiVersion = '1.8.0'
+        visuiVersion = '1.2.5'
     }
 
     repositories {
@@ -63,7 +64,8 @@ project(":core") {
 
     dependencies {
         compile "com.badlogicgames.gdx:gdx:$gdxVersion"
-        compile 'rhino:js:1.7R2'
+        compile "com.kotcrab.vis:vis-ui:$visuiVersion"
+        compile group: 'org.mozilla', name: 'rhino', version: '1.7.7.1'
     }
 }
 

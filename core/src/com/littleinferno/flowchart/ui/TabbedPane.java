@@ -163,6 +163,24 @@ public class TabbedPane extends Table {
             }
         });
 
+        Main.dndFunctions.addTarget(new DragAndDrop.Target(tab.getContentTable()) {
+            @Override
+            public boolean drag(DragAndDrop.Source source, DragAndDrop.Payload payload, float x, float y, int pointer) {
+                return true;
+            }
+
+            @Override
+            public void drop(DragAndDrop.Source source, DragAndDrop.Payload payload, float x, float y, int pointer) {
+                Actor node = (Actor) payload.getObject();
+
+                x = ((int) x / 10) * 10 + 320;
+                y = ((int) y / 10) * 10;
+
+                node.setPosition(x, y);
+                tab.getStage().addActor(node);
+            }
+        });
+
         buttonGroup.add(tab);
         openedWindows.addActor(tab);
         tab.setChecked(true);

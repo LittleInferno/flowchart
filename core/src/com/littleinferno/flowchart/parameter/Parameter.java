@@ -1,28 +1,78 @@
 package com.littleinferno.flowchart.parameter;
 
-import com.littleinferno.flowchart.Function;
-import com.littleinferno.flowchart.value.Value;
+import com.littleinferno.flowchart.Connection;
+import com.littleinferno.flowchart.DataType;
+import com.littleinferno.flowchart.VariableChangedListener;
 
-public abstract class Parameter {
-    Function function;
-    String name;
-    Value.Type valueType;
+import java.util.ArrayList;
+import java.util.List;
 
-    public Parameter(Function function,String name,Value.Type type){
-        this.function = function;
+public class Parameter {
+    private String name;
+    private DataType dataType;
+    private Connection connection;
+    private boolean isArray;
+
+    private List<VariableChangedListener> parameterChangedListeners;
+
+    public Parameter(String name, DataType type, Connection connection, boolean isArray) {
         this.name = name;
-        this.valueType = type;
+        this.dataType = type;
+        this.connection = connection;
+        this.isArray = isArray;
+        parameterChangedListeners = new ArrayList<VariableChangedListener>();
     }
 
     public String getName() {
         return name;
     }
 
-    public Value.Type getValueType() {
-        return valueType;
+    public DataType getDataType() {
+        return dataType;
     }
 
-    public abstract void setName(String name);
+    public Connection getConnection() {
+        return connection;
+    }
 
-    public abstract void setValueType(Value.Type valueType);
+    public boolean isArray() {
+        return isArray;
+    }
+
+    public void setName(String newName) {
+        this.name = newName;
+        notifyListenersNameChanged(newName);
+    }
+
+    public void setDataType(DataType dataType) {
+        this.dataType = dataType;
+        notifyListenersTypeChanged(dataType);
+    }
+
+    public void setArray(boolean array) {
+        isArray = array;
+        notifyListenersIsArrayChanged(array);
+    }
+
+    public void addListener(VariableChangedListener listener) {
+        parameterChangedListeners.add(listener);
+    }
+
+    private void notifyListenersNameChanged(String newName) {
+        for (VariableChangedListener listener : parameterChangedListeners) {
+            listener.nameChanged(newName);
+        }
+    }
+
+    private void notifyListenersTypeChanged(DataType newName) {
+        for (VariableChangedListener listener : parameterChangedListeners) {
+            listener.typeChanged(newName);
+        }
+    }
+
+    private void notifyListenersIsArrayChanged(boolean isArray) {
+        for (VariableChangedListener listener : parameterChangedListeners) {
+            listener.isArrayChanged(isArray);
+        }
+    }
 }

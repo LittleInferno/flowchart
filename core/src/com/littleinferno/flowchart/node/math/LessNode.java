@@ -1,28 +1,22 @@
 package com.littleinferno.flowchart.node.math;
 
-import com.badlogic.gdx.scenes.scene2d.ui.Skin;
-import com.littleinferno.flowchart.codegen.Builder;
-import com.littleinferno.flowchart.node.Node;
+import com.littleinferno.flowchart.DataType;
+import com.littleinferno.flowchart.codegen.CodeBuilder;
 import com.littleinferno.flowchart.pin.Pin;
-import com.littleinferno.flowchart.value.Value;
 
-public class LessNode extends Node {
-    public LessNode(Value.Type type, Skin skin) {
-        super("less", true, skin);
-
-        addDataInputPin(type, "A");
-        addDataInputPin(type, "B");
-        addDataOutputPin(Value.Type.BOOL, "A < B");
+public class LessNode extends LogicNode {
+    public LessNode() {
+        super("less", DataType.FLOAT, DataType.INT, DataType.STRING);
     }
 
     @Override
-    public String gen(Pin with) {
-        Pin.Connector a = getPin("A").getConnector();
-        Pin.Connector b = getPin("B").getConnector();
+    public String gen(CodeBuilder builder, Pin with) {
+        Pin.Connector aConnector = a.getConnector();
+        Pin.Connector bConnector = b.getConnector();
 
-        String aStr = a.parent.gen(a.pin);
-        String bStr = b.parent.gen(b.pin);
+        String aStr = aConnector.parent.gen(builder, aConnector.pin);
+        String bStr = bConnector.parent.gen(builder, bConnector.pin);
 
-        return Builder.createLt(aStr, bStr);
+        return builder.createLt(aStr, bStr);
     }
 }

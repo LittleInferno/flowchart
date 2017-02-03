@@ -1,31 +1,32 @@
 package com.littleinferno.flowchart.node;
 
-import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.TextField;
+import com.littleinferno.flowchart.DataType;
+import com.littleinferno.flowchart.codegen.CodeBuilder;
 import com.littleinferno.flowchart.pin.Pin;
-import com.littleinferno.flowchart.value.Value;
+import com.littleinferno.flowchart.ui.Main;
 
 public class IntegerNode extends Node {
 
     private final TextField field;
 
-    public IntegerNode(Skin skin) {
-        super("Integer", true, skin);
+    public IntegerNode() {
+        super("Integer", true);
 
-        addDataOutputPin(Value.Type.INT, "data");
+        addDataOutputPin(DataType.INT, "data");
 
-        field = new TextField("", skin);
+        field = new TextField("", Main.skin);
         field.setTextFieldFilter(new TextField.TextFieldFilter() {
             @Override
             public boolean acceptChar(TextField textField, char c) {
                 return c >= '0' && c <= '9' || c == '+' || c == '-';
             }
         });
-        left.add(field).expandX().fillX().minWidth(0);
+        left.addActor(field);//.expandX().fillX().minWidth(0);
     }
 
     @Override
-    public String gen(Pin with) {
+    public String gen(CodeBuilder builder, Pin with) {
         return field.getText();
     }
 }

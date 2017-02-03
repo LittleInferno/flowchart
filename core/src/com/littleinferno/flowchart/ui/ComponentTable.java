@@ -5,9 +5,10 @@ import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.VerticalGroup;
 
+@Deprecated
 public abstract class ComponentTable extends Table {
 
-    protected static VerticalGroup items;
+    protected static VerticalGroup items = new VerticalGroup();
     protected ScrollPane scroll;
     protected Skin skin;
 

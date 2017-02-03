@@ -1,55 +1,110 @@
 package com.littleinferno.flowchart.node;
 
-import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.utils.Array;
-import com.badlogic.gdx.utils.StringBuilder;
+import com.littleinferno.flowchart.Connection;
+import com.littleinferno.flowchart.DataType;
 import com.littleinferno.flowchart.Function;
+import com.littleinferno.flowchart.NameChangeable;
+import com.littleinferno.flowchart.VariableChangedListener;
+import com.littleinferno.flowchart.codegen.CodeBuilder;
+import com.littleinferno.flowchart.parameter.Parameter;
+import com.littleinferno.flowchart.parameter.ParameterListener;
 import com.littleinferno.flowchart.pin.Pin;
-import com.littleinferno.flowchart.value.Value;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class FunctionCallNode extends Node {
     private Function function;
-    private String currentTmpCall;
-    private static int counter = 0;
+    private String currentCall;
 
-    public FunctionCallNode(Function function, Skin skin) {
-        super(function.getName(), true, skin);
+    public FunctionCallNode(Function function) {
+        super(function.getName(), true);
 
         addExecutionInputPin("exec in");
         addExecutionOutputPin("exec out");
 
         this.function = function;
-        function.addNode(this);
+        this.function.addListener(new NameChangeable.NameChange() {
+            @Override
+            public void changed(String newName) {
+                setTitle(newName);
+            }
+        });
+
+        this.function.addListener(new ParameterListener() {
+            private List<Pin> pins = new ArrayList<Pin>();
+
+            @Override
+            public void added(Parameter parameter) {
+                final Pin pin;
+                if (parameter.getConnection() == Connection.INPUT)
+                    pin = addDataInputPin(parameter.getDataType(), parameter.getName());
+                else
+                    pin = addDataOutputPin(parameter.getDataType(), parameter.getName());
+
+                pin.setArray(parameter.isArray());
+
+                parameter.addListener(new VariableChangedListener() {
+                    @Override
+                    public void nameChanged(String newName) {
+                        pin.setName(newName);
+                    }
+
+                    @Override
+                    public void typeChanged(DataType newType) {
+                        pin.setType(newType);
+                    }
+
+                    @Override
+                    public void isArrayChanged(boolean isArray) {
+                        pin.setArray(isArray);
+                    }
+                });
+                pins.add(pin);
+            }
+
+            @Override
+            public void removed(Parameter parameter) {
+                for (Pin pin : pins)
+                    if (parameter.getName().equals(pin.getName()))
+                        removePin(pin);
+            }
+        });
+
+
+        this.function.addNode(this);
     }
 
     @Override
-    public String gen(Pin with) {
+    public String gen(CodeBuilder builder, Pin with) {
 
-        if (with.getType() == Value.Type.EXECUTION) {
+        if (with.getType() == DataType.EXECUTION) {
             Array<Pin> inputs = getInput();
-            StringBuilder parametrBuilder = new StringBuilder();
 
-            for (int i = 0; i < inputs.size; i++) {
-                if (inputs.get(i).getType() != Value.Type.EXECUTION) {
+            ArrayList<String> params = new ArrayList<String>();
 
-                    Pin.Connector data = inputs.get(i).getConnector();
-                    parametrBuilder.append(data.parent.gen(data.pin));
-
-                    if (i != inputs.size - 1)
-                        parametrBuilder.append(',');
-                }
+            for (Pin i : inputs) {
+                Pin.Connector data = i.getConnector();
+                if (i.getType() != DataType.EXECUTION)
+                    params.add(data.parent.gen(builder, data.pin));
             }
 
-            currentTmpCall = String.format("tmpcall%d", counter++);
+            currentCall = builder.createNamedValue("tmpcall");
 
             Pin.Connector next = getPin("exec out").getConnector();
-            String nextStr = next == null ? "" : next.parent.gen(next.pin);
+            String nextStr = next == null ? "" : next.parent.gen(builder, next.pin);
 
-            return String.format("var %s = %s(%s)\n%s", currentTmpCall, function.getName(),
-                    parametrBuilder.toString(), nextStr);
-
+            return String.format("%s%s",
+                    builder.createCall(function.getName(), params, currentCall), nextStr);
         }
 
-        return String.format("%s.%s", currentTmpCall, with.getName());
+        return String.format("%s.%s", currentCall, with.getName());
+    }
+
+    @Override
+    public void close() {
+        super.close();
+        function.removeNode(this);
     }
 }
