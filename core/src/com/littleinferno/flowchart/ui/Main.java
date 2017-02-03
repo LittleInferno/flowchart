@@ -8,7 +8,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.TextArea;
 import com.badlogic.gdx.scenes.scene2d.utils.DragAndDrop;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.kotcrab.vis.ui.VisUI;
-import com.littleinferno.flowchart.gui.ControlTable;
+import com.littleinferno.flowchart.tempgui.ControlTable;
 import com.littleinferno.flowchart.node.BeginNode;
 import com.littleinferno.flowchart.wire.WireManager;
 

@@ -1,5 +1,4 @@
-package com.littleinferno.flowchart.gui.variable;
-
+package com.littleinferno.flowchart.tempgui.function;
 
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
@@ -12,36 +11,36 @@ import com.kotcrab.vis.ui.widget.ListView;
 import com.kotcrab.vis.ui.widget.VisLabel;
 import com.kotcrab.vis.ui.widget.VisTable;
 import com.kotcrab.vis.ui.widget.VisTextButton;
-import com.littleinferno.flowchart.DataType;
-import com.littleinferno.flowchart.Variable;
-import com.littleinferno.flowchart.VariableChangedAdaptor;
+import com.littleinferno.flowchart.Function;
+import com.littleinferno.flowchart.NameChangeable;
 import com.littleinferno.flowchart.ui.Main;
 
 import java.util.ArrayList;
 
-public class VariableTable extends VisTable {
+public class FunctionTable extends VisTable {
 
     private final ArrayListAdapter<String, VisTable> adapter;
     private final VisTable details;
-    private ArrayList<VariableDetails> variableDetailses;
+    private ArrayList<FunctionDetails> functionDetailses;
 
     private int counter = 0;
 
-    public VariableTable() {
+    public FunctionTable() {
         super(true);
 
-        variableDetailses = new ArrayList<VariableDetails>();
+        functionDetailses = new ArrayList<FunctionDetails>();
         ArrayList<String> array = new ArrayList<String>();
 
-        adapter = new VariableAdapter(array);
+        adapter = new FunctionAdapter(array);
         ListView<String> view = new ListView<String>(adapter);
         view.setItemClickListener(new ListView.ItemClickListener<String>() {
             @Override
             public void clicked(String item) {
-                for (VariableDetails variable : variableDetailses) {
-                    if (variable.getName().equals(item)) {
+
+                for (FunctionDetails function : functionDetailses) {
+                    if (function.getName().equals(item)) {
                         details.clearChildren();
-                        details.add(variable).grow();
+                        details.add(function).grow();
                     }
                 }
             }
@@ -51,7 +50,7 @@ public class VariableTable extends VisTable {
         create.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
-                addVariable();
+                addFunction();
             }
         });
 
@@ -60,34 +59,38 @@ public class VariableTable extends VisTable {
         add(create).growX().row();
         add(view.getMainTable()).grow().row();
         addSeparator();
-        add(details).growX().row();
-        addSeparator();
+        add(details).growX().height(250);
+
     }
 
-    private void addVariable() {
-        VariableDetails variableDetails =
-                new VariableDetails(this, new Variable("newVar" + counter++, DataType.BOOL, false));
-
-        variableDetailses.add(variableDetails);
-        final String name = variableDetails.getName();
+    private void addFunction() {
+        FunctionDetails functionDetails = new FunctionDetails(this, new Function("newFun" + counter++));
+        functionDetailses.add(functionDetails);
+        final String name = functionDetails.getName();
         adapter.add(name);
 
-        variableDetails.variable.addListener(new VariableChangedAdaptor() {
+        functionDetails.function.addListener(new NameChangeable.NameChange() {
             String oldName = name;
 
             @Override
-            public void nameChanged(String newName) {
+            public void changed(String newName) {
                 adapter.set(adapter.indexOf(oldName), newName);
                 oldName = newName;
             }
         });
     }
 
-    private class VariableAdapter extends ArrayListAdapter<String, VisTable> {
+    void deleteFunction(FunctionDetails function) {
+        functionDetailses.remove(function);
+        adapter.remove(function.getName());
+        details.clearChildren();
+    }
+
+    private class FunctionAdapter extends ArrayListAdapter<String, VisTable> {
         private final Drawable bg = VisUI.getSkin().getDrawable("window-bg");
         private final Drawable selection = VisUI.getSkin().getDrawable("list-selection");
 
-        VariableAdapter(ArrayList<String> array) {
+        FunctionAdapter(ArrayList<String> array) {
             super(array);
             setSelectionMode(SelectionMode.SINGLE);
         }
@@ -113,9 +116,9 @@ public class VariableTable extends VisTable {
                 public DragAndDrop.Payload dragStart(InputEvent event, float x, float y, int pointer) {
                     DragAndDrop.Payload payload = new DragAndDrop.Payload();
 
-                    for (VariableDetails variable : variableDetailses) {
-                        if (variable.getName().equals(it.getText().toString())) {
-                            payload.setObject(new com.littleinferno.flowchart.gui.variable.VariableItem(variable.variable));
+                    for (FunctionDetails function : functionDetailses) {
+                        if (function.getName().equals(it.getText().toString())) {
+                            payload.setObject(new FunctionItem(function.function));
                             payload.setDragActor(new VisLabel(it.getText()));
                         }
                     }

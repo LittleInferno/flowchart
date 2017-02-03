@@ -1,4 +1,4 @@
-package com.littleinferno.flowchart.gui;
+package com.littleinferno.flowchart.tempgui;
 
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.kotcrab.vis.ui.widget.tabbedpane.Tab;
