@@ -1,4 +1,4 @@
-package com.littleinferno.flowchart.tempgui;
+package com.littleinferno.flowchart.gui;
 
 import com.kotcrab.vis.ui.widget.VisLabel;
 import com.kotcrab.vis.ui.widget.VisTable;

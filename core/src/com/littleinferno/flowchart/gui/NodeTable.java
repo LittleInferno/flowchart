@@ -1,4 +1,4 @@
-package com.littleinferno.flowchart.tempgui;
+package com.littleinferno.flowchart.gui;
 
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.utils.DragAndDrop;

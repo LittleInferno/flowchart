@@ -1,4 +1,4 @@
-package com.littleinferno.flowchart.tempgui.function;
+package com.littleinferno.flowchart.gui.function;
 
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
