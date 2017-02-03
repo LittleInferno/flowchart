@@ -5,6 +5,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.VerticalGroup;
 import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
 import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.SnapshotArray;
 import com.kotcrab.vis.ui.widget.VisTable;
 import com.kotcrab.vis.ui.widget.VisWindow;
 import com.littleinferno.flowchart.Connection;
@@ -56,66 +57,32 @@ public abstract class Node extends VisWindow implements CodeGen {
         add(main).grow();
         top();
 
-//        addListener(new InputListener() {
-//
-//            private float mouseOffsetX;
-//            private float mouseOffsetY;
-//
-//            @Override
-//            public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
-//
-//                mouseOffsetX = x;
-//                mouseOffsetY = y;
-//                return true;
-//            }
-//
-//            @Override
-//            public void touchDragged(InputEvent event, float x, float y, int pointer) {
-//
-//                float nodeX = getX(), nodeY = getY();
-//
-//                float amountX = x - mouseOffsetX, amountY = y - mouseOffsetY;
-//
-//                setPosition(((int) ((nodeX + amountX) / 10) * 10), ((int) ((nodeY + amountY) / 10) * 10));
-//            }
-//
-//            @Override
-//            public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
-//            }
-//        });
     }
-
-    public void destroy() {
-        getParent().removeActor(Node.this);
-    }
-
 
     public Pin addDataInputPin(final String name, DataType... possibleConvert) {
-        Pin pin = new Pin(name, Connection.INPUT, possibleConvert);
+        Pin pin = new Pin(this, name, Connection.INPUT, possibleConvert);
         left.addActor(pin);
         pack();
         return pin;
     }
 
     public Pin addDataInputPin(final DataType type, final String name) {
-        Pin pin = new Pin(name, type, Connection.INPUT);
-        left.addActor(pin);//.expandX().fillX().padLeft(10).padBottom(10);
-        // left.row();
+        Pin pin = new Pin(this, name, type, Connection.INPUT);
+        left.addActor(pin);
         pack();
         return pin;
     }
 
     public Pin addDataOutputPin(final String name, DataType... possibleConvert) {
-        Pin pin = new Pin(name, Connection.OUTPUT, possibleConvert);
+        Pin pin = new Pin(this, name, Connection.OUTPUT, possibleConvert);
         right.addActor(pin);
         pack();
         return pin;
     }
 
     public Pin addDataOutputPin(final DataType type, final String name) {
-        Pin pin = new Pin(name, type, Connection.OUTPUT);
-        right.addActor(pin);//.expandX().fillX().padRight(10).padBottom(10);
-        //right.row();
+        Pin pin = new Pin(this, name, type, Connection.OUTPUT);
+        right.addActor(pin);
         pack();
         return pin;
     }
@@ -126,9 +93,8 @@ public abstract class Node extends VisWindow implements CodeGen {
     }
 
     public Pin addExecutionInputPin(final String name) {
-        Pin pin = new Pin(name, DataType.EXECUTION, Connection.INPUT);
-        left.addActor(pin);//.expandX().fillX().padLeft(10).padBottom(10);
-        //left.row();
+        Pin pin = new Pin(this, name, DataType.EXECUTION, Connection.INPUT);
+        left.addActor(pin);
         pack();
         return pin;
     }
@@ -138,9 +104,8 @@ public abstract class Node extends VisWindow implements CodeGen {
     }
 
     public Pin addExecutionOutputPin(final String name) {
-        Pin pin = new Pin(name, DataType.EXECUTION, Connection.OUTPUT);
-        right.addActor(pin);//.expandX().fillX().padRight(10).padBottom(10);
-        //right.row();
+        Pin pin = new Pin(this, name, DataType.EXECUTION, Connection.OUTPUT);
+        right.addActor(pin);
         pack();
         return pin;
     }
@@ -186,6 +151,23 @@ public abstract class Node extends VisWindow implements CodeGen {
 
     @Override
     public void close() {
+
+        SnapshotArray<Actor> leftChildren = left.getChildren();
+
+        for (Actor actor : leftChildren) {
+            if (actor instanceof Pin) {
+                ((Pin) actor).disconnect();
+            }
+        }
+
+        SnapshotArray<Actor> rightChildren = right.getChildren();
+
+        for (Actor actor : rightChildren) {
+            if (actor instanceof Pin) {
+                ((Pin) actor).disconnect();
+            }
+        }
+
         super.close();
     }
 

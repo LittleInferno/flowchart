@@ -1,12 +1,11 @@
 package com.littleinferno.flowchart.node.math;
 
-import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.littleinferno.flowchart.DataType;
 import com.littleinferno.flowchart.codegen.CodeBuilder;
 import com.littleinferno.flowchart.pin.Pin;
 
 public class GreatNode extends LogicNode {
-    public GreatNode(DataType type, Skin skin) {
+    public GreatNode() {
         super("great", DataType.FLOAT, DataType.INT, DataType.STRING);
     }
 

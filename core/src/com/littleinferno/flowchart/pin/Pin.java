@@ -16,7 +16,6 @@ import com.littleinferno.flowchart.Connection;
 import com.littleinferno.flowchart.DataType;
 import com.littleinferno.flowchart.node.Node;
 import com.littleinferno.flowchart.ui.Main;
-import com.littleinferno.flowchart.wire.Wire;
 import com.littleinferno.flowchart.wire.WireManager;
 
 import java.util.ArrayList;
@@ -35,27 +34,30 @@ public class Pin extends VisTable {
     private boolean isConnect;
     private boolean isArray;
     private boolean isUniversal;
+    private int pinId = -1;
 
     private VisLabel label;
     private VisImage image;
+
+    private Node parent;
 
     private ArrayList<PinListener> listeners = new ArrayList<PinListener>();
 
     private HashSet<DataType> possibleConvert = new HashSet<DataType>();
 
-    public Pin(String name, Connection connection, DataType... convert) {
+    public Pin(Node parent, String name, Connection connection, DataType... convert) {
         Collections.addAll(possibleConvert, convert);
         possibleConvert.add(DataType.UNIVERSAL);
-        init(name, connection, DataType.UNIVERSAL);
+        init(parent, name, connection, DataType.UNIVERSAL);
     }
 
-    public Pin(String name, DataType type, Connection connection) {
-        Collections.addAll(possibleConvert, DataType.BOOL, DataType.INT, DataType.FLOAT, DataType.STRING);
-        init(name, connection, type);
+    public Pin(Node parent, String name, DataType type, Connection connection) {
+        possibleConvert.add(type);
+        init(parent, name, connection, type);
     }
 
-    private void init(String name, Connection connection, DataType type) {
-
+    private void init(Node parent, String name, Connection connection, DataType type) {
+        this.parent = parent;
         this.connection = connection;
         this.style = Main.skin.get(Main.scale == VisUI.SkinScale.X1 ? "X1" : "X2", PinStyle.class);
 
@@ -217,8 +219,7 @@ public class Pin extends VisTable {
         connectedPin = pin;
         connectedPin.connectedPins.add(this);
 
-        WireManager.base.addActor(new Wire(this, pin));
-        //WireManager.add(this, pin);
+        pinId = WireManager.instance.add(this, pin);
         isConnect = true;
     }
 
@@ -229,7 +230,9 @@ public class Pin extends VisTable {
 
     private void disconnectPin(final Pin pin) {
         isConnect = false;
+        connectedPin.connectedPins.remove(this);
         connectedPin = null;
+        pinId = WireManager.instance.remove(pinId);
     }
 
     private void disconnectPins(final Pin pin) {
@@ -241,6 +244,17 @@ public class Pin extends VisTable {
         }
 
         if (connectedPins.isEmpty()) isConnect = false;
+    }
+
+    public void disconnect() {
+        if (isConnect()) {
+            if (isExecutionOutput(this) || isDataInput(this)) {
+                disconnectPin(connectedPin);
+            } else {
+                for (Pin pin : connectedPins)
+                    pin.disconnect(this);
+            }
+        }
     }
 
     public Vector2 getLocation() {
@@ -307,7 +321,7 @@ public class Pin extends VisTable {
         Connector(Pin pin) {
             this.pin = pin;
 
-            this.parent = (Node) pin.getParent().getParent();
+            this.parent = pin.parent;
         }
 
     }

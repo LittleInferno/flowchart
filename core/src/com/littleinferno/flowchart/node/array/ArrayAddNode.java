@@ -51,7 +51,7 @@ public class ArrayAddNode extends Node {
                 val.parent.gen(builder, val.pin));
 
         Pin.Connector n = next.getConnector();
-        String nextStr = n.parent.gen(builder, n.pin);
+        String nextStr = n != null ? n.parent.gen(builder, n.pin) : "";
 
         return String.format("%s%s", add, nextStr);
     }

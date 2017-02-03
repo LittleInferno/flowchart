@@ -8,23 +8,9 @@ import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.DragAndDrop;
 import com.littleinferno.flowchart.DataType;
-import com.littleinferno.flowchart.node.BoolNode;
-import com.littleinferno.flowchart.node.FloatNode;
-import com.littleinferno.flowchart.node.IfNode;
-import com.littleinferno.flowchart.node.IntegerNode;
-import com.littleinferno.flowchart.node.LogNode;
-import com.littleinferno.flowchart.node.StringNode;
-import com.littleinferno.flowchart.node.array.ArrayAddNode;
-import com.littleinferno.flowchart.node.array.ArrayGetNode;
-import com.littleinferno.flowchart.node.array.MakeArrayNode;
-import com.littleinferno.flowchart.node.math.AddNode;
+import com.littleinferno.flowchart.node.PrintNode;
 import com.littleinferno.flowchart.node.math.CompareNode;
-import com.littleinferno.flowchart.node.math.DivNode;
-import com.littleinferno.flowchart.node.math.EqualNode;
 import com.littleinferno.flowchart.node.math.GreatNode;
-import com.littleinferno.flowchart.node.math.LessNode;
-import com.littleinferno.flowchart.node.math.MulNode;
-import com.littleinferno.flowchart.node.math.SubNode;
 
 
 @Deprecated
@@ -76,9 +62,9 @@ public class NodeTable extends Table {
 //                    case 3:
 //                        payload.setObject(new StringNode(skin));
 //                        break;
-                    case 4:
-                        payload.setObject(new LogNode(skin));
-                        break;
+//                    case 4:
+//                        payload.setObject(new PrintNode(skin));
+//                        break;
 //                    case 5:
 //                        payload.setObject(new AddNode(DataType.INT, skin));
 //                        break;
@@ -124,15 +110,15 @@ public class NodeTable extends Table {
 //                    case 19:
 //                        payload.setObject(new LessNode(DataType.STRING, skin));
 //                        break;
-                    case 20:
-                        payload.setObject(new GreatNode(DataType.INT, skin));
-                        break;
-                    case 21:
-                        payload.setObject(new GreatNode(DataType.FLOAT, skin));
-                        break;
-                    case 22:
-                        payload.setObject(new GreatNode(DataType.STRING, skin));
-                        break;
+//                    case 20:
+//                        payload.setObject(new GreatNode(DataType.INT, skin));
+//                        break;
+//                    case 21:
+//                        payload.setObject(new GreatNode(DataType.FLOAT, skin));
+//                        break;
+//                    case 22:
+//                        payload.setObject(new GreatNode(DataType.STRING, skin));
+//                        break;
                     case 23:
                         payload.setObject(new CompareNode(DataType.INT, skin));
                         break;

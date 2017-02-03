@@ -14,8 +14,8 @@ public class BeginNode extends Node {
 
     private Pin start;
 
-    public BeginNode(Skin skin) {
-        super("Begin", false, skin);
+    public BeginNode() {
+        super("Begin", false);
 
         start = addExecutionOutputPin("start");
 

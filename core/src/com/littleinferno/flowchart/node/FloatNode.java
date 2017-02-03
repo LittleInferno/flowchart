@@ -10,8 +10,8 @@ public class FloatNode extends Node {
 
     private final TextField field;
 
-    public FloatNode(Skin skin) {
-        super("Float", true, skin);
+    public FloatNode() {
+        super("Float", true);
 
         addDataOutputPin(DataType.FLOAT, "data");
 
