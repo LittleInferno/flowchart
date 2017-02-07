@@ -19,6 +19,7 @@ import com.littleinferno.flowchart.ui.Main;
 import com.littleinferno.flowchart.wire.WireManager;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -52,7 +53,8 @@ public class Pin extends VisTable {
     }
 
     public Pin(Node parent, String name, DataType type, Connection connection) {
-        possibleConvert.add(type);
+        possibleConvert.addAll(Arrays.asList(
+                DataType.BOOL, DataType.INT, DataType.FLOAT, DataType.STRING, DataType.EXECUTION));
         init(parent, name, connection, type);
     }
 
@@ -251,8 +253,8 @@ public class Pin extends VisTable {
             if (isExecutionOutput(this) || isDataInput(this)) {
                 disconnectPin(connectedPin);
             } else {
-                for (Pin pin : connectedPins)
-                    pin.disconnect(this);
+                for(int i=0;i<connectedPins.size();++i)
+                    connectedPins.get(i).disconnect(this);
             }
         }
     }
