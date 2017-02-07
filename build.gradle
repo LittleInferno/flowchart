@@ -7,6 +7,7 @@ buildscript {
     }
     dependencies {
         classpath 'com.android.tools.build:gradle:2.2.3'
+        classpath 'me.tatarka:gradle-retrolambda:3.5.0'
     }
 }
 
@@ -45,6 +46,7 @@ project(":desktop") {
 
 project(":android") {
     apply plugin: "android"
+    apply plugin: 'me.tatarka.retrolambda'
 
     configurations { natives }
 
@@ -61,10 +63,12 @@ project(":android") {
 
 project(":core") {
     apply plugin: "java"
+    apply plugin: 'me.tatarka.retrolambda'
 
     dependencies {
         compile "com.badlogicgames.gdx:gdx:$gdxVersion"
         compile "com.kotcrab.vis:vis-ui:$visuiVersion"
+        compile 'com.annimon:stream:1.1.5'
         compile group: 'org.mozilla', name: 'rhino', version: '1.7.7.1'
     }
 }

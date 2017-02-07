@@ -1,18 +1,18 @@
-package com.littleinferno.flowchart.gui.variable;
+package com.littleinferno.flowchart.gui;
 
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.kotcrab.vis.ui.widget.MenuItem;
 import com.kotcrab.vis.ui.widget.PopupMenu;
-import com.littleinferno.flowchart.Variable;
+import com.littleinferno.flowchart.variable.Variable;
 import com.littleinferno.flowchart.node.VariableGetNode;
 import com.littleinferno.flowchart.node.VariableSetNode;
 import com.littleinferno.flowchart.ui.Main;
 
-class VariableItem extends PopupMenu {
+public class VariableItem extends PopupMenu {
     private final Variable variable;
 
-    VariableItem(Variable var) {
+    public VariableItem(Variable var) {
         this.variable = var;
 
         addItem(new MenuItem("set", new ChangeListener() {

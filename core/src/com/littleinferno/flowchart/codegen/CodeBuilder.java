@@ -1,7 +1,6 @@
 package com.littleinferno.flowchart.codegen;
 
 import com.littleinferno.flowchart.ui.FunctionTable;
-import com.littleinferno.flowchart.ui.VariableTable;
 
 import java.util.List;
 import java.util.Map;
@@ -93,9 +92,4 @@ public class CodeBuilder {
     public String genFun() {
         return FunctionTable.gen(this);
     }
-
-    static public String genVar() {
-        return VariableTable.gen();
-    }
-
 }

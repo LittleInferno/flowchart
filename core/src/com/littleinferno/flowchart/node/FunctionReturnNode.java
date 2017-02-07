@@ -57,6 +57,11 @@ public class FunctionReturnNode extends Node {
                         public void isArrayChanged(boolean isArray) {
                             pin.setArray(isArray);
                         }
+
+                        @Override
+                        public void destroed() {
+                            close();
+                        }
                     });
 
                     pins.add(pin);

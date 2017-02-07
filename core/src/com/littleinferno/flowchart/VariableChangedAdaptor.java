@@ -13,4 +13,8 @@ public class VariableChangedAdaptor implements VariableChangedListener {
     @Override
     public void isArrayChanged(boolean isArray) {
     }
+
+    @Override
+    public void destroed() {
+    }
 }

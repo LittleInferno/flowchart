@@ -2,7 +2,7 @@ package com.littleinferno.flowchart.node;
 
 
 import com.littleinferno.flowchart.DataType;
-import com.littleinferno.flowchart.Variable;
+import com.littleinferno.flowchart.variable.Variable;
 import com.littleinferno.flowchart.VariableChangedListener;
 import com.littleinferno.flowchart.codegen.CodeBuilder;
 import com.littleinferno.flowchart.pin.Pin;
@@ -32,6 +32,11 @@ public class VariableGetNode extends Node {
             @Override
             public void isArrayChanged(boolean isArray) {
                 pin.setArray(isArray);
+            }
+
+            @Override
+            public void destroed() {
+                close();
             }
         });
 

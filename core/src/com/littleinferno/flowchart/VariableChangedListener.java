@@ -6,4 +6,6 @@ public interface VariableChangedListener {
     void typeChanged(DataType newType);
 
     void isArrayChanged(boolean isArray);
+
+    void destroed();
 }

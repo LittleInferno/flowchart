@@ -20,7 +20,7 @@ public class Parameter {
         this.dataType = type;
         this.connection = connection;
         this.isArray = isArray;
-        parameterChangedListeners = new ArrayList<VariableChangedListener>();
+        parameterChangedListeners = new ArrayList<>();
     }
 
     public String getName() {

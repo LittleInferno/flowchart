@@ -3,8 +3,8 @@ package com.littleinferno.flowchart.node;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.ui.Button;
-import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
+import com.littleinferno.flowchart.variable.VariableManager;
 import com.littleinferno.flowchart.codegen.CodeBuilder;
 import com.littleinferno.flowchart.codegen.CodeExecution;
 import com.littleinferno.flowchart.codegen.JSBackend;
@@ -27,7 +27,8 @@ public class BeginNode extends Node {
             public void changed(ChangeEvent event, Actor actor) {
 
                 CodeBuilder builder = new CodeBuilder(new JSBackend());
-                String code = builder.genFun() + CodeBuilder.genVar() + gen(builder, getPin("start"));
+                String code = builder.genFun() +
+                        VariableManager.instance.gen(builder) + gen(builder, start);
 
                 Gdx.app.log("", code);
 

@@ -8,6 +8,7 @@ import com.kotcrab.vis.ui.VisUI;
 import com.kotcrab.vis.ui.widget.VisTable;
 import com.kotcrab.vis.ui.widget.VisTextButton;
 import com.littleinferno.flowchart.gui.function.FunctionTable;
+import com.littleinferno.flowchart.variable.VariableManager;
 
 
 public class ControlTable extends VisTable {
@@ -15,7 +16,24 @@ public class ControlTable extends VisTable {
     public ControlTable() {
 
         final VisTable nodeTable = new NodeTable();
-        final VisTable variableTable = new com.littleinferno.flowchart.gui.variable.VariableTable();
+
+
+        final VisTable variableTable = new VisTable();
+
+        VisTextButton create = new VisTextButton("create");
+        create.addListener(new ChangeListener() {
+            @Override
+            public void changed(ChangeEvent event, Actor actor) {
+                VariableManager.instance.createVariable();
+            }
+        });
+        variableTable.add(create).growX().row();
+        variableTable.add(VariableManager.instance.getVarTable()).grow().row();
+        variableTable.addSeparator();
+        variableTable.add(VariableManager.instance.getDetailsTable()).growX().row();
+        variableTable.addSeparator();
+
+
         final VisTable functionTable = new FunctionTable();
 
         final VisTextButton nodes = new VisTextButton("node", "toggle");
