@@ -13,10 +13,10 @@ import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.DragAndDrop;
 import com.littleinferno.flowchart.Connection;
 import com.littleinferno.flowchart.DataType;
-import com.littleinferno.flowchart.Function;
+import com.littleinferno.flowchart.function.Function;
 import com.littleinferno.flowchart.node.FunctionCallNode;
 import com.littleinferno.flowchart.node.FunctionReturnNode;
-import com.littleinferno.flowchart.parameter.Parameter;
+import com.littleinferno.flowchart.function.FunctionParameter;
 
 @Deprecated
 class FunctionItem extends Item {
@@ -101,7 +101,7 @@ class FunctionItem extends Item {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
 
-                final Parameter parameter = new Parameter(Integer.toString(counter++), DataType.BOOL, Connection.INPUT, false);
+                final FunctionParameter parameter = new FunctionParameter(Integer.toString(counter++), DataType.BOOL, Connection.INPUT, false);
                 function.addParameter(parameter);
 
                 final Item.PropertyTable propertyItem = new Item.PropertyTable(parameter.getName(), skin);
@@ -139,7 +139,7 @@ class FunctionItem extends Item {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
 
-                final Parameter parameter = new Parameter(Integer.toString(counter++), DataType.BOOL, Connection.OUTPUT, false);
+                final FunctionParameter parameter = new FunctionParameter(Integer.toString(counter++), DataType.BOOL, Connection.OUTPUT, false);
                 function.addParameter(parameter);
 
                 final Item.PropertyTable propertyItem = new Item.PropertyTable(parameter.getName(), skin);

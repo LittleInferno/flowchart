@@ -4,8 +4,7 @@ package com.littleinferno.flowchart.node;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.utils.Array;
 import com.littleinferno.flowchart.DataType;
-import com.littleinferno.flowchart.Function;
-import com.littleinferno.flowchart.NameChangeable;
+import com.littleinferno.flowchart.function.Function;
 import com.littleinferno.flowchart.codegen.CodeBuilder;
 import com.littleinferno.flowchart.pin.Pin;
 
@@ -19,13 +18,7 @@ public class FunctionBeginNode extends Node {
         super(function.getName(), false, skin);
         this.function = function;
 
-        this.function.addListener(new NameChangeable.NameChange() {
-            @Override
-            public void changed(String newName) {
-                setTitle(newName);
-
-            }
-        });
+        this.function.addListener(this::setTitle);
 
 
         addExecutionOutputPin();

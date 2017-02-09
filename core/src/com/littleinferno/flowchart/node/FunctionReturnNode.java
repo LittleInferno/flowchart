@@ -1,14 +1,10 @@
 package com.littleinferno.flowchart.node;
 
-import com.badlogic.gdx.utils.Array;
+import com.annimon.stream.Stream;
 import com.littleinferno.flowchart.Connection;
 import com.littleinferno.flowchart.DataType;
-import com.littleinferno.flowchart.Function;
-import com.littleinferno.flowchart.NameChangeable;
-import com.littleinferno.flowchart.VariableChangedListener;
 import com.littleinferno.flowchart.codegen.CodeBuilder;
-import com.littleinferno.flowchart.parameter.Parameter;
-import com.littleinferno.flowchart.parameter.ParameterListener;
+import com.littleinferno.flowchart.function.Function;
 import com.littleinferno.flowchart.pin.Pin;
 
 import java.util.ArrayList;
@@ -18,82 +14,58 @@ import java.util.Map;
 
 public class FunctionReturnNode extends Node {
 
-    Function function;
+    private Function function;
+
+    private List<Pin> pins;
 
     public FunctionReturnNode(Function function) {
         super(function.getName(), false);
         this.function = function;
         addExecutionInputPin();
 
-        function.addListener(new NameChangeable.NameChange() {
-            @Override
-            public void changed(String newName) {
-                setTitle(newName);
-            }
-        });
+        function.addListener(this::setTitle);
 
-        function.addListener(new ParameterListener() {
-            private List<Pin> pins = new ArrayList<Pin>();
+        pins = new ArrayList<>();
 
-            @Override
-            public void added(Parameter parameter) {
-                if (parameter.getConnection() == Connection.OUTPUT) {
-                    final Pin pin = addDataInputPin(parameter.getDataType(), parameter.getName());
+        function.addPareameterListener(
+                parameter -> {
+                    if (parameter.getConnection() == Connection.OUTPUT) {
+                        final Pin pin = addDataInputPin(parameter.getDataType(), parameter.getName());
 
-                    pin.setArray(parameter.isArray());
+                        pin.setArray(parameter.isArray());
 
-                    parameter.addListener(new VariableChangedListener() {
-                        @Override
-                        public void nameChanged(String newName) {
-                            pin.setName(newName);
-                        }
+                        parameter.addListener(pin::setArray);
+                        parameter.addListener(pin::setName);
+                        parameter.addListener(pin::setType);
 
-                        @Override
-                        public void typeChanged(DataType newType) {
-                            pin.setType(newType);
-                        }
-
-                        @Override
-                        public void isArrayChanged(boolean isArray) {
-                            pin.setArray(isArray);
-                        }
-
-                        @Override
-                        public void destroed() {
-                            close();
-                        }
-                    });
-
-                    pins.add(pin);
+                        pins.add(pin);
+                    }
+                },
+                parameter -> {
+                    for (Pin pin : pins)
+                        if (parameter.getName().equals(pin.getName()))
+                            removePin(pin);
                 }
-            }
+        );
 
-            @Override
-            public void removed(Parameter parameter) {
-                for (Pin pin : pins)
-                    if (parameter.getName().equals(pin.getName()))
-                        removePin(pin);
-            }
-        });
+        function.applyParameters();
+
         function.addReturnNode(this);
 
     }
 
     @Override
     public String gen(CodeBuilder builder, Pin with) {
-        Array<Pin> input = getInput();
+        Map<String, String> returnPack = new HashMap<>();
 
-        Map<String, String> returnPack = new HashMap<String, String>();
+        Stream.of(pins)
+                .filter(i -> i.getType() != DataType.EXECUTION)
+                .forEach(i -> {
+                    Pin.Connector node = i.getConnector();
 
-        for (Pin i : input) {
-
-            if (i.getType() != DataType.EXECUTION) {
-                Pin.Connector node = i.getConnector();
-
-                String p = node.parent.gen(builder, node.pin);
-                returnPack.put(i.getName(), p);
-            }
-        }
+                    String p = node.parent.gen(builder, node.pin);
+                    returnPack.put(i.getName(), p);
+                });
 
         return builder.createReturn(returnPack);
     }

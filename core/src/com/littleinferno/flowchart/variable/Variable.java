@@ -17,31 +17,38 @@ import com.kotcrab.vis.ui.widget.VisTextButton;
 import com.kotcrab.vis.ui.widget.VisValidatableTextField;
 import com.kotcrab.vis.ui.widget.VisWindow;
 import com.littleinferno.flowchart.DataType;
-import com.littleinferno.flowchart.Destroyable;
-import com.littleinferno.flowchart.VariableChangedAdaptor;
-import com.littleinferno.flowchart.VariableChangedListener;
-import com.littleinferno.flowchart.node.Node;
 import com.littleinferno.flowchart.ui.Main;
+import com.littleinferno.flowchart.util.ArrayChangedListener;
+import com.littleinferno.flowchart.util.DestroyListener;
+import com.littleinferno.flowchart.util.NameChangedListener;
+import com.littleinferno.flowchart.util.TypeChangedListener;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class Variable implements Destroyable {
+public class Variable{
 
     private DataType dataType;
     private String name;
-    private List<Node> nodes;
     private boolean isArray;
-    private List<VariableChangedListener> changedListeners;
+
+    private List<NameChangedListener> nameChangedListeners;
+    private List<TypeChangedListener> typeChangedListeners;
+    private List<ArrayChangedListener> arrayChangedListeners;
+    private List<DestroyListener> destroyListeners;
 
     private VariableDetailsTable variableDetailsTable;
 
-    public Variable(String name, DataType type, boolean isArray) {
+    Variable(String name, DataType type, boolean isArray) {
         this.name = name;
         this.dataType = type;
         this.isArray = isArray;
-        this.nodes = new ArrayList<>();
-        this.changedListeners = new ArrayList<>();
+
+        this.nameChangedListeners = new ArrayList<>();
+        this.typeChangedListeners = new ArrayList<>();
+        this.arrayChangedListeners = new ArrayList<>();
+        this.destroyListeners = new ArrayList<>();
+
         this.variableDetailsTable = new VariableDetailsTable(this);
     }
 
@@ -65,10 +72,6 @@ public class Variable implements Destroyable {
         notifyListenersNameChanged(newName);
     }
 
-    public void addNode(Node node) {
-        nodes.add(node);
-    }
-
     public boolean isArray() {
         return isArray;
     }
@@ -79,10 +82,6 @@ public class Variable implements Destroyable {
         notifyListenersIsArrayChanged(isArray);
     }
 
-    public void removeNode(Node node) {
-        nodes.remove(node);
-    }
-
     public String gen() {
         if (isArray)
             return String.format("var %s=[];\n", name);
@@ -90,32 +89,43 @@ public class Variable implements Destroyable {
             return String.format("var %s;\n", name);
     }
 
-    public void addListener(VariableChangedListener listener) {
-        changedListeners.add(listener);
+    public void addListener(NameChangedListener listener) {
+        nameChangedListeners.add(listener);
+    }
+
+    public void addListener(TypeChangedListener listener) {
+        typeChangedListeners.add(listener);
+    }
+
+    public void addListener(ArrayChangedListener listener) {
+        arrayChangedListeners.add(listener);
+    }
+
+    public void addListener(DestroyListener listener) {
+        destroyListeners.add(listener);
     }
 
     private void notifyListenersNameChanged(String newName) {
-        Stream.of(changedListeners).forEach(var -> var.nameChanged(newName));
+        Stream.of(nameChangedListeners).forEach(var -> var.changed(newName));
     }
 
     private void notifyListenersTypeChanged(DataType newtype) {
-        Stream.of(changedListeners).forEach(var -> var.typeChanged(newtype));
+        Stream.of(typeChangedListeners).forEach(var -> var.changed(newtype));
     }
 
     private void notifyListenersIsArrayChanged(boolean isArray) {
-        Stream.of(changedListeners).forEach(var -> var.isArrayChanged(isArray));
+        Stream.of(arrayChangedListeners).forEach(var -> var.changed(isArray));
     }
 
     private void notifyListenersDestroed() {
-        Stream.of(changedListeners).forEach(VariableChangedListener::destroed);
+        Stream.of(destroyListeners).forEach(DestroyListener::destroyed);
     }
 
     public VariableDetailsTable getTable() {
         return variableDetailsTable;
     }
 
-    @Override
-    public void destroy() {
+    void destroy() {
         notifyListenersDestroed();
     }
 
@@ -215,12 +225,7 @@ public class Variable implements Destroyable {
                 }
             });
 
-            variable.addListener(new VariableChangedAdaptor() {
-                @Override
-                public void nameChanged(String newName) {
-                    variableName.setText(newName);
-                }
-            });
+            variable.addListener(variableName::setText);
 
             final VisImageButton deleteVariable = new VisImageButton("close");
 

@@ -1,11 +1,9 @@
 package com.littleinferno.flowchart.node;
 
 
-import com.littleinferno.flowchart.DataType;
-import com.littleinferno.flowchart.variable.Variable;
-import com.littleinferno.flowchart.VariableChangedListener;
 import com.littleinferno.flowchart.codegen.CodeBuilder;
 import com.littleinferno.flowchart.pin.Pin;
+import com.littleinferno.flowchart.variable.Variable;
 
 public class VariableGetNode extends Node {
 
@@ -18,39 +16,15 @@ public class VariableGetNode extends Node {
         pin.setArray(variable.isArray());
 
         this.variable = variable;
-        this.variable.addListener(new VariableChangedListener() {
-            @Override
-            public void nameChanged(String newName) {
-                setTitle(newName);
-            }
 
-            @Override
-            public void typeChanged(DataType newType) {
-                pin.setType(newType);
-            }
-
-            @Override
-            public void isArrayChanged(boolean isArray) {
-                pin.setArray(isArray);
-            }
-
-            @Override
-            public void destroed() {
-                close();
-            }
-        });
-
-        this.variable.addNode(this);
+        this.variable.addListener(pin::setArray);
+        this.variable.addListener(this::setTitle);
+        this.variable.addListener(pin::setType);
+        this.variable.addListener(this::close);
     }
 
     @Override
     public String gen(CodeBuilder builder, Pin with) {
         return variable.getName();
-    }
-
-    @Override
-    public void close() {
-        super.close();
-        variable.removeNode(this);
     }
 }

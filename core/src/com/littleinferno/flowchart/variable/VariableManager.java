@@ -10,7 +10,6 @@ import com.kotcrab.vis.ui.widget.ListView;
 import com.kotcrab.vis.ui.widget.VisLabel;
 import com.kotcrab.vis.ui.widget.VisTable;
 import com.littleinferno.flowchart.DataType;
-import com.littleinferno.flowchart.VariableChangedAdaptor;
 import com.littleinferno.flowchart.codegen.CodeBuilder;
 import com.littleinferno.flowchart.gui.SceneUi;
 import com.littleinferno.flowchart.gui.VariableItem;
@@ -53,6 +52,8 @@ public class VariableManager {
     }
 
     void removeVariable(Variable variable) {
+        variable.destroy();
+        detailsTable.clearChildren();
         variables.remove(variable);
     }
 
@@ -98,12 +99,7 @@ public class VariableManager {
             final VisTable table = new VisTable();
             final VisLabel it = new VisLabel(item.getName());
 
-            item.addListener(new VariableChangedAdaptor() {
-                @Override
-                public void nameChanged(String newName) {
-                    it.setText(newName);
-                }
-            });
+            item.addListener(it::setText);
 
             SceneUi.addDragAndDropSource(new DragAndDrop.Source(table) {
                 @Override

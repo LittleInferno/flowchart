@@ -1,67 +1,44 @@
 package com.littleinferno.flowchart.node;
 
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
-import com.littleinferno.flowchart.DataType;
-import com.littleinferno.flowchart.variable.Variable;
-import com.littleinferno.flowchart.VariableChangedListener;
 import com.littleinferno.flowchart.codegen.CodeBuilder;
 import com.littleinferno.flowchart.pin.Pin;
+import com.littleinferno.flowchart.variable.Variable;
 
 
 public class VariableSetNode extends Node {
 
     private Variable variable;
 
+    private final Pin pin;
+    private final Pin next;
+
     public VariableSetNode(Variable variable, Skin skin) {
         super(String.format("Set %s", variable.getName()), true);
 
         addExecutionInputPin();
-        addExecutionOutputPin();
+        next = addExecutionOutputPin();
 
-        final Pin pin = addDataInputPin(variable.getDataType(), "data");
-        pin.setArray(variable.isArray());
+        this.pin = addDataInputPin(variable.getDataType(), "data");
+        this.pin.setArray(variable.isArray());
 
         this.variable = variable;
-        this.variable.addListener(new VariableChangedListener() {
-            @Override
-            public void nameChanged(String newName) {
-                setTitle(newName);
-            }
 
-            @Override
-            public void typeChanged(DataType newType) {
-                pin.setType(newType);
-            }
-
-            @Override
-            public void isArrayChanged(boolean isArray) {
-                pin.setArray(isArray);
-            }
-
-            @Override
-            public void destroed() {
-                close();
-            }
-        });
-
-        this.variable.addNode(this);
-
+        this.variable.addListener(this.pin::setArray);
+        this.variable.addListener(this::setTitle);
+        this.variable.addListener(this.pin::setType);
+        this.variable.addListener(this::close);
     }
 
     @Override
     public String gen(CodeBuilder builder, Pin with) {
-        Pin.Connector data = getPin("data").getConnector();
+
+        Pin.Connector data = pin.getConnector();
         String dataStr = data.parent.gen(builder, data.pin);
 
-        Pin.Connector next = getPin("exec out").getConnector();
-        String nextStr = next == null ? "" : next.parent.gen(builder, next.pin);
+        Pin.Connector n = next.getConnector();
+        String nextStr = n == null ? "" : n.parent.gen(builder, n.pin);
 
         return String.format("%s = %s\n%s", variable.getName(), dataStr, nextStr);
-    }
-
-    @Override
-    public void close() {
-        super.close();
-        variable.removeNode(this);
     }
 }

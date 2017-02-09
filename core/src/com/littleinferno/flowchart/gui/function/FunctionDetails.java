@@ -19,9 +19,11 @@ import com.kotcrab.vis.ui.widget.VisTextButton;
 import com.kotcrab.vis.ui.widget.VisValidatableTextField;
 import com.littleinferno.flowchart.Connection;
 import com.littleinferno.flowchart.DataType;
-import com.littleinferno.flowchart.Function;
-import com.littleinferno.flowchart.parameter.Parameter;
+import com.littleinferno.flowchart.function.Function;
+import com.littleinferno.flowchart.function.FunctionParameter;
 import com.littleinferno.flowchart.ui.Main;
+
+import java.util.List;
 
 
 class FunctionDetails extends VisTable {
@@ -148,17 +150,17 @@ class FunctionDetails extends VisTable {
     private class ParameterTable extends VisTable {
 
         ParameterTable(Connection connection) {
-            final Parameter parameter = new Parameter("newOutParam" + counter++, DataType.BOOL, connection, false);
+            final FunctionParameter parameter = new FunctionParameter("newOutParam" + counter++, DataType.BOOL, connection, false);
             function.addParameter(parameter);
 
             final VisValidatableTextField parameterName = new VisValidatableTextField(parameter.getName());
             parameterName.addValidator(new InputValidator() {
-                Array<Parameter> parameters = function.getParameters();
+                List<FunctionParameter> parameters = function.getParameters();
 
                 @Override
                 public boolean validateInput(String input) {
 
-                    for (Parameter par : parameters)
+                    for (FunctionParameter par : parameters)
                         if (par.getName().equals(input) && par != parameter)
                             return false;
 
