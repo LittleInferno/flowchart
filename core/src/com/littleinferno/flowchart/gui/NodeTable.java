@@ -24,7 +24,6 @@ import com.littleinferno.flowchart.node.math.GreatNode;
 import com.littleinferno.flowchart.node.math.LessNode;
 import com.littleinferno.flowchart.node.math.MulNode;
 import com.littleinferno.flowchart.node.math.SubNode;
-import com.littleinferno.flowchart.ui.Main;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -95,7 +94,7 @@ class NodeTable extends VisTable {
 
             final VisLabel it = new VisLabel(strings[strings.length - 1]);
 
-            Main.addSourceF(new DragAndDrop.Source(table) {
+            SceneUi.addDragAndDropSource(new DragAndDrop.Source(table) {
                 @Override
                 public DragAndDrop.Payload dragStart(InputEvent event, float x, float y, int pointer) {
                     DragAndDrop.Payload payload = new DragAndDrop.Payload();
@@ -104,11 +103,7 @@ class NodeTable extends VisTable {
                     try {
                         Class<?> node = Class.forName(item);
                         object = node.newInstance();
-                    } catch (ClassNotFoundException e) {
-                        e.printStackTrace();
-                    } catch (InstantiationException e) {
-                        e.printStackTrace();
-                    } catch (IllegalAccessException e) {
+                    } catch (ClassNotFoundException | IllegalAccessException | InstantiationException e) {
                         e.printStackTrace();
                     }
 

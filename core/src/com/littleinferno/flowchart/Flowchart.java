@@ -1,51 +1,42 @@
 package com.littleinferno.flowchart;
 
-import com.badlogic.gdx.ApplicationAdapter;
-import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.graphics.GL20;
-import com.littleinferno.flowchart.gui.MainMenu;
-import com.littleinferno.flowchart.ui.Main;
-import com.littleinferno.flowchart.wire.WireManager;
+import com.badlogic.gdx.Game;
+import com.badlogic.gdx.Screen;
+import com.kotcrab.vis.ui.VisUI;
+import com.littleinferno.flowchart.gui.SceneScreen;
 
-public class Flowchart extends ApplicationAdapter {
+public class Flowchart extends Game {
 
-    private Main main;
-    private MainMenu mainMenu;
+    private Screen scene;
+    private static boolean change;
 
-    @Override
-    public void resize(int width, int height) {
-        super.resize(width, height);
-        main.getViewport().update(width, height, true);
-//        mainMenu.getViewport().update(width, height, true);
-    }
+//    @Override
+//    public void resize(int width, int height) {
+//        super.resize(width, height);
+//        main.getViewport().update(width, height, true);
+//    }
 
     @Override
     public void create() {
+        VisUI.load();
 
-        main = new Main();
-        WireManager.base = main;
-
-        Gdx.input.setInputProcessor(main);
-
-//        mainMenu = new MainMenu();
-//        Gdx.input.setInputProcessor(mainMenu);
+        scene = new SceneScreen();
+        setScreen(scene);
 
     }
 
     @Override
     public void render() {
-        Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
-        main.act();
-        main.draw();
+        // Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
+        // main.act();
+        //  main.draw();
 
-//        mainMenu.act();
-//        mainMenu.draw();
+        super.render();
     }
 
-    @Override
-    public void dispose() {
-//        mainMenu.dispose();
-
-        main.dispose();
-    }
+//    @Override
+//    public void dispose() {
+//
+//        main.dispose();
+//    }
 }

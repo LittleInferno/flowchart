@@ -14,6 +14,7 @@ import com.kotcrab.vis.ui.widget.VisLabel;
 import com.kotcrab.vis.ui.widget.VisTable;
 import com.littleinferno.flowchart.Connection;
 import com.littleinferno.flowchart.DataType;
+import com.littleinferno.flowchart.gui.Scene;
 import com.littleinferno.flowchart.node.Node;
 import com.littleinferno.flowchart.ui.Main;
 import com.littleinferno.flowchart.wire.WireManager;
@@ -221,7 +222,7 @@ public class Pin extends VisTable {
         connectedPin = pin;
         connectedPin.connectedPins.add(this);
 
-        pinId = WireManager.instance.add(this, pin);
+        pinId = getStage().getWireManager().add(this, pin);
         isConnect = true;
     }
 
@@ -234,7 +235,12 @@ public class Pin extends VisTable {
         isConnect = false;
         connectedPin.connectedPins.remove(this);
         connectedPin = null;
-        pinId = WireManager.instance.remove(pinId);
+        pinId = getStage().getWireManager().remove(pinId);
+    }
+
+    @Override
+    public Scene getStage() {
+        return (Scene) super.getStage();
     }
 
     private void disconnectPins(final Pin pin) {
@@ -253,7 +259,7 @@ public class Pin extends VisTable {
             if (isExecutionOutput(this) || isDataInput(this)) {
                 disconnectPin(connectedPin);
             } else {
-                for(int i=0;i<connectedPins.size();++i)
+                for (int i = 0; i < connectedPins.size(); ++i)
                     connectedPins.get(i).disconnect(this);
             }
         }

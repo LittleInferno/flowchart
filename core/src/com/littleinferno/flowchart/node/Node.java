@@ -27,6 +27,9 @@ public abstract class Node extends VisWindow implements CodeGen {
 
     public Node(final String name, final boolean closable, Skin skin) {
         super(name);
+        setKeepWithinStage(false);
+        setKeepWithinParent(false);
+
 
         style = skin.get(NodeStyle.class);
         this.skin = skin;

@@ -12,8 +12,8 @@ import com.kotcrab.vis.ui.widget.VisTable;
 import com.littleinferno.flowchart.DataType;
 import com.littleinferno.flowchart.VariableChangedAdaptor;
 import com.littleinferno.flowchart.codegen.CodeBuilder;
+import com.littleinferno.flowchart.gui.SceneUi;
 import com.littleinferno.flowchart.gui.VariableItem;
-import com.littleinferno.flowchart.ui.Main;
 
 import java.util.ArrayList;
 
@@ -105,7 +105,7 @@ public class VariableManager {
                 }
             });
 
-            Main.addSourceF(new DragAndDrop.Source(table) {
+            SceneUi.addDragAndDropSource(new DragAndDrop.Source(table) {
                 @Override
                 public DragAndDrop.Payload dragStart(InputEvent event, float x, float y, int pointer) {
                     DragAndDrop.Payload payload = new DragAndDrop.Payload();

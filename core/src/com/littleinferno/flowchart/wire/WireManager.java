@@ -3,7 +3,6 @@ package com.littleinferno.flowchart.wire;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.scenes.scene2d.Actor;
-import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.littleinferno.flowchart.pin.Pin;
 
 import java.util.HashMap;
@@ -11,10 +10,13 @@ import java.util.Map;
 
 public class WireManager extends Actor {
 
-    public static final WireManager instance = new WireManager();
+    public WireManager() {
+        renderer = new ShapeRenderer();
+        wires = new HashMap<>();
+        counter = 0;
+    }
 
-
-    public static int add(Pin begin, Pin end) {
+    public int add(Pin begin, Pin end) {
 
         wires.put(counter, new Wire(begin, end));
         return counter++;
@@ -54,13 +56,11 @@ public class WireManager extends Actor {
         }
     }
 
-    private static Map<Integer, Wire> wires = new HashMap<Integer, Wire>();
+    private Map<Integer, Wire> wires;
 
-    private static int counter = 0;
+    private int counter;
 
     private static Pin first;
 
-    public static Stage base;
-
-    private ShapeRenderer renderer = new ShapeRenderer();
+    private ShapeRenderer renderer;
 }
