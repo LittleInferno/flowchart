@@ -1,4 +1,4 @@
-package com.littleinferno.flowchart.variable;
+package com.littleinferno.flowchart.function;
 
 import com.annimon.stream.Stream;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
@@ -9,77 +9,79 @@ import com.kotcrab.vis.ui.util.adapter.ArrayListAdapter;
 import com.kotcrab.vis.ui.widget.ListView;
 import com.kotcrab.vis.ui.widget.VisLabel;
 import com.kotcrab.vis.ui.widget.VisTable;
-import com.littleinferno.flowchart.DataType;
 import com.littleinferno.flowchart.codegen.CodeBuilder;
+import com.littleinferno.flowchart.gui.FunctionItem;
 import com.littleinferno.flowchart.gui.SceneUi;
-import com.littleinferno.flowchart.gui.VariableItem;
 
 import java.util.ArrayList;
 
-public class VariableManager {
+public class FunctionManager {
 
-    private ArrayListAdapter<Variable, VisTable> variables;
+    private ArrayListAdapter<Function, VisTable> functions;
     private final VisTable detailsTable;
-    private final VisTable varTable;
+    private final VisTable funTable;
 
     private int counter;
 
     private SceneUi sceneUi;
 
-    public VariableManager(SceneUi sceneUi) {
+    public FunctionManager(SceneUi sceneUi) {
         this.sceneUi = sceneUi;
-        variables = new VariableListAdapter(new ArrayList<>());
+        functions = new FunctionManager.FunctionListAdapter(new ArrayList<>());
         detailsTable = new VisTable(true);
-        varTable = new VisTable(true);
+        funTable = new VisTable(true);
         counter = 0;
 
-        ListView<Variable> view = new ListView<>(variables);
+        ListView<Function> view = new ListView<>(functions);
 
         view.setItemClickListener(item -> {
             detailsTable.clearChildren();
             detailsTable.add(item.getTable()).grow();
+            sceneUi.pinToTabbedPane(item.getScene().getUiTab());
         });
 
-        varTable.add(view.getMainTable()).grow().row();
-
+        funTable.add(view.getMainTable()).grow().row();
     }
 
-    public Variable createVariable() {
-        Variable variable = new Variable("newVar" + counter++, DataType.BOOL, false);
+    public Function createFunction() {
+        Function function = new Function("newFun" + counter++, sceneUi);
 
-        variables.add(variable);
+        functions.add(function);
 
-        return variable;
+        sceneUi.pinToTabbedPane(function.getScene().getUiTab());
+
+        return function;
     }
 
-    void removeVariable(Variable variable) {
-        variable.destroy();
+    void removeFunction(Function function) {
+        function.destroy();
+
+        sceneUi.unpinFromTabbedPane(function.getScene().getUiTab());
         detailsTable.clearChildren();
-        variables.remove(variable);
+        functions.remove(function);
     }
 
-    public String gen(CodeBuilder builder) {
-        final StringBuilder stringBuilder = new StringBuilder();
-
-        Stream.of(variables.iterable()).forEach(variable -> stringBuilder.append(variable.gen()));
-
-        return stringBuilder.toString();
-    }
-
-    public VisTable getVarTable() {
-        return varTable;
+    public VisTable getFunTable() {
+        return funTable;
     }
 
     public VisTable getDetailsTable() {
         return detailsTable;
     }
 
+    public String gen(CodeBuilder builder) {
+        final StringBuilder stringBuilder = new StringBuilder();
 
-    private class VariableListAdapter extends ArrayListAdapter<Variable, VisTable> {
+        Stream.of(functions.iterable()).forEach(function -> stringBuilder.append(function.gen(builder)));
+
+        return stringBuilder.toString();
+    }
+
+    private class FunctionListAdapter extends ArrayListAdapter<Function, VisTable> {
         private final Drawable bg = VisUI.getSkin().getDrawable("window-bg");
         private final Drawable selection = VisUI.getSkin().getDrawable("list-selection");
 
-        VariableListAdapter(ArrayList<Variable> array) {
+        FunctionListAdapter(ArrayList<Function> array) {
             super(array);
             setSelectionMode(SelectionMode.SINGLE);
         }
@@ -95,7 +97,7 @@ public class VariableManager {
         }
 
         @Override
-        protected VisTable createView(Variable item) {
+        protected VisTable createView(Function item) {
 
             final VisTable table = new VisTable();
             final VisLabel it = new VisLabel(item.getName());
@@ -107,7 +109,7 @@ public class VariableManager {
                 public DragAndDrop.Payload dragStart(InputEvent event, float x, float y, int pointer) {
                     DragAndDrop.Payload payload = new DragAndDrop.Payload();
 
-                    payload.setObject(new VariableItem(item));
+                    payload.setObject(new FunctionItem(item));
                     payload.setDragActor(new VisLabel(it.getText()));
 
                     deselectView(table);

@@ -1,46 +1,87 @@
 package com.littleinferno.flowchart.gui;
 
 import com.badlogic.gdx.InputMultiplexer;
+import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
+import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.DragAndDrop;
+import com.kotcrab.vis.ui.widget.ButtonBar;
 import com.kotcrab.vis.ui.widget.VisTable;
+import com.kotcrab.vis.ui.widget.VisTextButton;
 import com.kotcrab.vis.ui.widget.tabbedpane.Tab;
 import com.kotcrab.vis.ui.widget.tabbedpane.TabbedPane;
 import com.kotcrab.vis.ui.widget.tabbedpane.TabbedPaneAdapter;
-
-import java.util.ArrayList;
+import com.littleinferno.flowchart.codegen.CodeBuilder;
+import com.littleinferno.flowchart.codegen.CodeExecution;
+import com.littleinferno.flowchart.codegen.JSBackend;
+import com.littleinferno.flowchart.function.FunctionManager;
+import com.littleinferno.flowchart.variable.VariableManager;
 
 public class SceneUi extends Stage {
 
-    private ArrayList<Scene> scenes;
+    private final TabbedPane tabbedPane;
     private InputMultiplexer inputMultiplexer;
     private Scene show;
 
 
-    static private DragAndDrop dragAndDrop;
+    private static VariableManager variableManager;
+    private static FunctionManager functionManager;
 
+
+    private static DragAndDrop dragAndDrop;
+
+    private CodeExecution codeExecution;
+    private Begin begin;
+    private CodeBuilder builder;
 
     public SceneUi() {
-
-        scenes = new ArrayList<>();
 
         inputMultiplexer = new InputMultiplexer();
         inputMultiplexer.addProcessor(this);
 
         show = null;
 
+        codeExecution = new CodeExecution();
+
+        variableManager = new VariableManager(this);
+        functionManager = new FunctionManager(this);
+
+        builder = new CodeBuilder(new JSBackend());
+        builder.setGenVariables(variableManager::gen);
+        builder.setGenFunctions(functionManager::gen);
+
         dragAndDrop = new DragAndDrop();
 
         VisTable container = new VisTable();
         container.setFillParent(true);
 
-        ControlTable controlTable = new ControlTable();
+        ButtonBar buttonBar = new ButtonBar();
+
+        VisTextButton run = new VisTextButton("run");
+
+        run.addListener(new ChangeListener() {
+            @Override
+            public void changed(ChangeEvent event, Actor actor) {
+
+                String code = builder.genVar() + builder.genFun() + begin.gen(builder);
+
+                codeExecution.run(code);
+            }
+        });
+
+        buttonBar.setButton(ButtonBar.ButtonType.LEFT, run);
+        VisTable tmp = new VisTable();
+        tmp.add(buttonBar.createTable()).grow().row();
+        tmp.addSeparator();
+        container.add(tmp).growX().colspan(3).row();
+
+        ControlTable controlTable = new ControlTable(this);
 
         VisTable activityContainer = new VisTable();
 
         Table activity = new Table();
-        TabbedPane tabbedPane = new TabbedPane();
+        tabbedPane = new TabbedPane();
 
         tabbedPane.addListener(new TabbedPaneAdapter() {
             @Override
@@ -49,6 +90,7 @@ public class SceneUi extends Stage {
 
                 activity.clearChildren();
                 activity.add(content).grow();
+
 
                 if (show != null) {
                     inputMultiplexer.removeProcessor(show);
@@ -62,11 +104,10 @@ public class SceneUi extends Stage {
             }
         });
 
-        scenes.add(new Scene(this));
+        show = (new MainScene(this));
 
-        tabbedPane.add(scenes.get(0).getUiTab());
-
-        container.add(controlTable).width(310).height(getHeight());
+        pinToTabbedPane(show.getUiTab());
+        container.add(controlTable).width(310).growY();
 
         activityContainer.add(tabbedPane.getTable()).expandX().fillX().row();
         activityContainer.addSeparator();
@@ -77,14 +118,38 @@ public class SceneUi extends Stage {
         addActor(container);
     }
 
-    static public void addDragAndDropTarget(final DragAndDrop.Target target) {
+    public void addDragAndDropTarget(final DragAndDrop.Target target) {
         dragAndDrop.addTarget(target);
     }
 
-    static public void addDragAndDropSource(final DragAndDrop.Source source) {
+    public void addDragAndDropSource(final DragAndDrop.Source source) {
         dragAndDrop.addSource(source);
     }
 
+    public static FunctionManager getFunctionManager() {
+        return functionManager;
+    }
+
+    public static VariableManager getVariableManager() {
+        return variableManager;
+    }
+
+    public void pinToTabbedPane(Scene.UiTab uiTab) {
+        if (tabbedPane.getUIOrderedTabs().contains(uiTab, true))
+            tabbedPane.switchTab(uiTab);
+        else
+            tabbedPane.add(uiTab);
+
+        show = uiTab.getScene();
+    }
+
+    public void unpinFromTabbedPane(Scene.UiTab uiTab) {
+        tabbedPane.remove(uiTab);
+    }
+
+    public void setBegin(Begin begin) {
+        this.begin = begin;
+    }
 
     @Override
     public void draw() {
@@ -100,5 +165,9 @@ public class SceneUi extends Stage {
 
     public InputMultiplexer getInputMultiplexer() {
         return inputMultiplexer;
+    }
+
+    public interface Begin {
+        String gen(CodeBuilder builder);
     }
 }

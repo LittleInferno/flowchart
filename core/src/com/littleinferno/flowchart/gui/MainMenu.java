@@ -21,7 +21,7 @@ public class MainMenu extends Stage {
         VisTextButton createNew = new VisTextButton("create new");
     //    main.add(createNew).width(300).row();
 
-        //main.add(new FunctionDetails()).top();
+        //main.add(new FunctionDetailsTable()).top();
 
         main.addSeparator(true);
 

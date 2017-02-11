@@ -10,6 +10,7 @@ import com.kotcrab.vis.ui.widget.VisLabel;
 import com.kotcrab.vis.ui.widget.VisTable;
 import com.kotcrab.vis.ui.widget.VisTextButton;
 import com.littleinferno.flowchart.DataType;
+import com.littleinferno.flowchart.gui.SceneUi;
 import com.littleinferno.flowchart.ui.Main;
 import com.littleinferno.flowchart.util.ArrayChangedListener;
 import com.littleinferno.flowchart.util.DataSelectBox;
@@ -158,7 +159,7 @@ public class Variable {
             deleteVariable.addListener(new ChangeListener() {
                 @Override
                 public void changed(ChangeEvent event, Actor actor) {
-                    VariableManager.instance.removeVariable(variable);
+                    SceneUi.getVariableManager().removeVariable(variable);
                 }
             });
 

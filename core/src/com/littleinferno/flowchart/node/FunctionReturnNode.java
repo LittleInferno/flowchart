@@ -20,10 +20,12 @@ public class FunctionReturnNode extends Node {
 
     public FunctionReturnNode(Function function) {
         super(function.getName(), false);
-        this.function = function;
+
         addExecutionInputPin();
 
-        function.addListener(this::setTitle);
+        this.function = function;
+        this.function.addListener(this::setTitle);
+        this.function.addListener(this::close);
 
         pins = new ArrayList<>();
 
@@ -48,9 +50,9 @@ public class FunctionReturnNode extends Node {
                 }
         );
 
-        function.applyParameters();
+        this.function.applyParameters();
 
-        function.addReturnNode(this);
+        this.function.addReturnNode(this);
 
     }
 
@@ -73,6 +75,6 @@ public class FunctionReturnNode extends Node {
     @Override
     public void close() {
         super.close();
-        function.removeNode(this);
+        function.removeReturnNode(this);
     }
 }

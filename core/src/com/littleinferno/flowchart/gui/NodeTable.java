@@ -31,8 +31,11 @@ import java.util.List;
 
 class NodeTable extends VisTable {
 
-    NodeTable() {
+    private SceneUi sceneUi;
+
+    NodeTable(SceneUi sceneUi) {
         super(true);
+        this.sceneUi = sceneUi;
         String[] items = new String[]{
                 BoolNode.class.getName(),
                 IntegerNode.class.getName(),
@@ -94,7 +97,7 @@ class NodeTable extends VisTable {
 
             final VisLabel it = new VisLabel(strings[strings.length - 1]);
 
-            SceneUi.addDragAndDropSource(new DragAndDrop.Source(table) {
+            sceneUi.addDragAndDropSource(new DragAndDrop.Source(table) {
                 @Override
                 public DragAndDrop.Payload dragStart(InputEvent event, float x, float y, int pointer) {
                     DragAndDrop.Payload payload = new DragAndDrop.Payload();

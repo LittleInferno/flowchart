@@ -8,35 +8,49 @@ import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.kotcrab.vis.ui.VisUI;
 import com.kotcrab.vis.ui.widget.VisTable;
 import com.kotcrab.vis.ui.widget.VisTextButton;
-import com.littleinferno.flowchart.gui.function.FunctionTable;
-import com.littleinferno.flowchart.variable.VariableManager;
 
 
 public class ControlTable extends VisTable {
 
     static private ConsoleTable consoleTable;
 
-    public ControlTable() {
+    public ControlTable(SceneUi sceneUi) {
         setTouchable(Touchable.enabled);
 
-        final VisTable nodeTable = new NodeTable();
+        final VisTable nodeTable = new NodeTable(sceneUi);
+
+
         final VisTable variableTable = new VisTable();
 
         VisTextButton createVariable = new VisTextButton("create");
         createVariable.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
-                VariableManager.instance.createVariable();
+                sceneUi.getVariableManager().createVariable();
             }
         });
         variableTable.add(createVariable).growX().row();
-        variableTable.add(VariableManager.instance.getVarTable()).grow().row();
+        variableTable.add(sceneUi.getVariableManager().getVarTable()).grow().row();
         variableTable.addSeparator();
-        variableTable.add(VariableManager.instance.getDetailsTable()).growX().row();
+        variableTable.add(sceneUi.getVariableManager().getDetailsTable()).growX().row();
         variableTable.addSeparator();
 
 
-        final VisTable functionTable = new FunctionTable();
+        final VisTable functionTable = new VisTable();
+
+        VisTextButton createFunction = new VisTextButton("create");
+        createFunction.addListener(new ChangeListener() {
+            @Override
+            public void changed(ChangeEvent event, Actor actor) {
+                sceneUi.getFunctionManager().createFunction();
+            }
+        });
+        functionTable.add(createFunction).growX().row();
+        functionTable.add(sceneUi.getFunctionManager().getFunTable()).grow().row();
+        functionTable.addSeparator();
+        functionTable.add(sceneUi.getFunctionManager().getDetailsTable()).growX().height(250).row();
+        functionTable.addSeparator();
+
         consoleTable = new ConsoleTable();
 
         final VisTextButton nodes = new VisTextButton("node", "toggle");
@@ -44,7 +58,7 @@ public class ControlTable extends VisTable {
         final VisTextButton functions = new VisTextButton("function", "toggle");
         final VisTextButton console = new VisTextButton("console", "toggle");
 
-        ButtonGroup<VisTextButton> tabs = new ButtonGroup<VisTextButton>();
+        ButtonGroup<VisTextButton> tabs = new ButtonGroup<>();
         tabs.setMinCheckCount(1);
         tabs.setMaxCheckCount(1);
         tabs.add(nodes, variables, functions, console);

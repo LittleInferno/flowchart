@@ -85,6 +85,5 @@ public class FunctionCallNode extends Node {
     @Override
     public void close() {
         super.close();
-        function.removeNode(this);
     }
 }

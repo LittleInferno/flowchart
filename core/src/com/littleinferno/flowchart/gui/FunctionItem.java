@@ -1,4 +1,4 @@
-package com.littleinferno.flowchart.gui.function;
+package com.littleinferno.flowchart.gui;
 
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
@@ -8,11 +8,11 @@ import com.littleinferno.flowchart.function.Function;
 import com.littleinferno.flowchart.node.FunctionCallNode;
 import com.littleinferno.flowchart.node.FunctionReturnNode;
 
-class FunctionItem extends PopupMenu {
+public class FunctionItem extends PopupMenu {
 
     private final Function function;
 
-    FunctionItem(Function fun) {
+    public FunctionItem(Function fun) {
         function = fun;
 
         addItem(new MenuItem("call", new ChangeListener() {

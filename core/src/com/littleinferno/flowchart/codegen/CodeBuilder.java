@@ -1,7 +1,5 @@
 package com.littleinferno.flowchart.codegen;
 
-import com.littleinferno.flowchart.ui.FunctionTable;
-
 import java.util.List;
 import java.util.Map;
 
@@ -9,9 +7,13 @@ public class CodeBuilder {
 
     private BaseBackendGenerator codeBuilderBackend;
 
+    private GenVariables genVariables;
+    private GenFunctions genFunctions;
+
     public CodeBuilder(BaseBackendGenerator codeBuilderBackend) {
         this.codeBuilderBackend = codeBuilderBackend;
     }
+
 
     public BaseBackendGenerator getCodeBuilderBackend() {
         return codeBuilderBackend;
@@ -89,7 +91,27 @@ public class CodeBuilder {
         return codeBuilderBackend.makeGetArrayItem(array, item);
     }
 
+    public void setGenVariables(GenVariables genVariables) {
+        this.genVariables = genVariables;
+    }
+
+    public void setGenFunctions(GenFunctions genFunctions) {
+        this.genFunctions = genFunctions;
+    }
+
     public String genFun() {
-        return FunctionTable.gen(this);
+        return genFunctions.gen(this);
+    }
+
+    public String genVar() {
+        return genVariables.gen(this);
+    }
+
+    public interface GenVariables {
+        String gen(CodeBuilder builder);
+    }
+
+    public interface GenFunctions {
+        String gen(CodeBuilder builder);
     }
 }

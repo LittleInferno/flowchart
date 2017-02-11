@@ -1,6 +1,7 @@
 package com.littleinferno.flowchart.node;
 
 import com.badlogic.gdx.scenes.scene2d.Actor;
+import com.badlogic.gdx.scenes.scene2d.ui.Cell;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.VerticalGroup;
 import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
@@ -150,6 +151,12 @@ public abstract class Node extends VisWindow implements CodeGen {
 
     public void setTitle(String text) {
         getTitleLabel().setText(text);
+    }
+
+    public void removeCloseButton() {
+        Array<Cell> cells = getTitleTable().getCells();
+        cells.get(cells.size - 1).clearActor();
+        cells.removeIndex(cells.size - 1);
     }
 
     @Override

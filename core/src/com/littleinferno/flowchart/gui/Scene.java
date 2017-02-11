@@ -9,7 +9,6 @@ import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.DragAndDrop;
 import com.kotcrab.vis.ui.widget.VisTable;
 import com.kotcrab.vis.ui.widget.tabbedpane.Tab;
-import com.littleinferno.flowchart.node.BeginNode;
 import com.littleinferno.flowchart.wire.WireManager;
 
 public class Scene extends Stage {
@@ -18,15 +17,18 @@ public class Scene extends Stage {
     private GestureDetector gesture;
     private WireManager wireManager;
     private SceneUi sceneUi;
+    private String name;
 
-    Scene(SceneUi sceneUi) {
+    Scene(String name, boolean closeable, SceneUi sceneUi) {
         this.sceneUi = sceneUi;
 
-        uiTab = new UiTab(this);
+        this.name = name;
+
+        uiTab = new UiTab(this, closeable);
         gesture = new GestureDetector(new Gesture());
         wireManager = new WireManager();
 
-        SceneUi.addDragAndDropTarget(new DragAndDrop.Target(uiTab.getContentTable()) {
+        sceneUi.addDragAndDropTarget(new DragAndDrop.Target(uiTab.getContentTable()) {
             @Override
             public boolean drag(DragAndDrop.Source source, DragAndDrop.Payload payload, float x, float y, int pointer) {
                 return true;
@@ -47,10 +49,6 @@ public class Scene extends Stage {
         });
 
         addActor(wireManager);
-
-        BeginNode node = new BeginNode();
-        node.setPosition(500, 200);
-        addActor(node);
     }
 
     public UiTab getUiTab() {
@@ -65,19 +63,33 @@ public class Scene extends Stage {
         return wireManager;
     }
 
-    class UiTab extends Tab {
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public SceneUi getSceneUi() {
+        return sceneUi;
+    }
+
+    static class UiTab extends Tab {
 
         private VisTable uiTable;
         private Scene scene;
 
-        private UiTab(Scene scene) {
+        private UiTab(Scene scene, boolean closeable) {
+            super(false, closeable);
+
             this.scene = scene;
             uiTable = new VisTable();
         }
 
         @Override
         public String getTabTitle() {
-            return "tab";
+            return scene.getName();
         }
 
         @Override
@@ -88,6 +100,8 @@ public class Scene extends Stage {
         public Scene getScene() {
             return scene;
         }
+
+
     }
 
     private class Gesture implements GestureDetector.GestureListener {

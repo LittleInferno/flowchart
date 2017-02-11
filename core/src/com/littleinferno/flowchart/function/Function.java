@@ -1,11 +1,34 @@
 package com.littleinferno.flowchart.function;
 
 import com.annimon.stream.Stream;
+import com.badlogic.gdx.scenes.scene2d.Actor;
+import com.badlogic.gdx.scenes.scene2d.ui.VerticalGroup;
+import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
+import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
+import com.badlogic.gdx.utils.Array;
+import com.kotcrab.vis.ui.VisUI;
+import com.kotcrab.vis.ui.building.OneColumnTableBuilder;
+import com.kotcrab.vis.ui.building.utilities.CellWidget;
+import com.kotcrab.vis.ui.util.InputValidator;
+import com.kotcrab.vis.ui.util.adapter.ArrayAdapter;
+import com.kotcrab.vis.ui.widget.CollapsibleWidget;
+import com.kotcrab.vis.ui.widget.ListView;
+import com.kotcrab.vis.ui.widget.VisImageButton;
+import com.kotcrab.vis.ui.widget.VisLabel;
+import com.kotcrab.vis.ui.widget.VisTable;
+import com.kotcrab.vis.ui.widget.VisTextButton;
+import com.kotcrab.vis.ui.widget.VisValidatableTextField;
+import com.littleinferno.flowchart.Connection;
+import com.littleinferno.flowchart.DataType;
+import com.littleinferno.flowchart.codegen.CodeBuilder;
+import com.littleinferno.flowchart.gui.FunctionScene;
+import com.littleinferno.flowchart.gui.SceneUi;
 import com.littleinferno.flowchart.node.FunctionBeginNode;
 import com.littleinferno.flowchart.node.FunctionReturnNode;
-import com.littleinferno.flowchart.node.Node;
 import com.littleinferno.flowchart.ui.Main;
+import com.littleinferno.flowchart.util.DataSelectBox;
 import com.littleinferno.flowchart.util.DestroyListener;
+import com.littleinferno.flowchart.util.InputForm;
 import com.littleinferno.flowchart.util.NameChangedListener;
 
 import java.util.ArrayList;
@@ -16,7 +39,6 @@ public class Function {
 
     private String name;
 
-    private FunctionBeginNode beginNode;
     private List<FunctionReturnNode> returnNodes;
 
     private List<FunctionParameter> parameters;
@@ -26,10 +48,13 @@ public class Function {
 
     private List<FunctionParameter.Added> parameterAddedListeners;
     private List<FunctionParameter.Removed> parameterRemovedListeners;
+    private GenerateListener generateListener;
 
+    private FunctionDetailsTable functionDetailsTable;
 
+    private FunctionScene scene;
 
-    public Function(String name) {
+    public Function(String name, SceneUi sceneUi) {
         this.name = name;
 
         parameters = new ArrayList<>();
@@ -40,33 +65,27 @@ public class Function {
         parameterAddedListeners = new ArrayList<>();
         parameterRemovedListeners = new ArrayList<>();
 
-
-        //   Table functionWindow = Main.addWindow(name).getContentTable();
-//        functionWindow.addActor(beginNode);
-
-        beginNode = new FunctionBeginNode(this, Main.skin);
-        beginNode.setPosition(100, 100);
+        functionDetailsTable = new FunctionDetailsTable(this);
 
         returnNodes = new ArrayList<>();
 
-        // FunctionReturnNode returnNode = new FunctionReturnNode(this, Main.skin);
-        //  returnNode.setPosition(400, 100);
-        //   returnNodes.add(returnNode);
+        scene = new FunctionScene(this, sceneUi);
 
+        FunctionBeginNode beginNode = new FunctionBeginNode(this);
+        beginNode.setPosition(350, 250);
 
+        scene.addActor(beginNode);
 
-    }
+        FunctionReturnNode returnNode = new FunctionReturnNode(this);
+        returnNode.setPosition(600, 250);
+        returnNode.removeCloseButton();
 
-    public FunctionBeginNode getBeginNode() {
-        return beginNode;
+        scene.addActor(returnNode);
+
     }
 
     public List<FunctionParameter> getParameters() {
         return parameters;
-    }
-
-    public List<FunctionReturnNode> getReturnNodes() {
-        return returnNodes;
     }
 
     public String getName() {
@@ -79,17 +98,19 @@ public class Function {
         notifyListenersNameChanged(name);
     }
 
-    public void removeNode(Node node) {
-
-        if (node instanceof FunctionBeginNode)
-            beginNode = null;
-        else if (node instanceof FunctionReturnNode)
-            returnNodes.remove(node);
+    public void removeReturnNode(FunctionReturnNode node) {
+        returnNodes.remove(node);
+        if (returnNodes.size() == 1)
+            returnNodes.get(0).removeCloseButton();
     }
 
-    public void addParameter(FunctionParameter parameter) {
+    public FunctionParameter addParameter(String name, DataType type, Connection connection, boolean isArray) {
+        FunctionParameter parameter = new FunctionParameter(name, type, connection, isArray);
+
         notifyListenersParameterAdded(parameter);
         parameters.add(parameter);
+
+        return parameter;
     }
 
     public void removeParameter(FunctionParameter parameter) {
@@ -110,6 +131,10 @@ public class Function {
         parameterRemovedListeners.add(removed);
     }
 
+    public void setGenerateListener(GenerateListener listener) {
+        generateListener = listener;
+    }
+
     private void notifyListenersNameChanged(String newName) {
         Stream.of(nameChangedListeners).forEach(var -> var.changed(newName));
     }
@@ -128,6 +153,7 @@ public class Function {
 
     public void addReturnNode(FunctionReturnNode returnNode) {
         returnNodes.add(returnNode);
+        returnNode.addCloseButton();
     }
 
     public void applyParameters() {
@@ -137,29 +163,229 @@ public class Function {
         }
     }
 
-
-    public void delete() {
-
-        // TODO
-        //  removeNode(beginNode);
-        notifyListenersDestroed();
-//
-//        for (Iterator<FunctionReturnNode> i = returnNodes.iterator(); i.hasNext(); ) {
-//            Node node = i.next();
-//            node.close();
-//            i.remove();
-//        }
-//
-//        for (Iterator<FunctionCallNode> i = callNodes.iterator(); i.hasNext(); ) {
-//            Node node = i.next();
-//            node.close();
-//            i.remove();
-//        }
+    public String gen(CodeBuilder builder) {
+        return generateListener.gen(builder);
     }
 
+    public FunctionDetailsTable getTable() {
+        return functionDetailsTable;
+    }
+
+    void destroy() {
+        notifyListenersDestroed();
+    }
+
+    public FunctionScene getScene() {
+        return scene;
+    }
+
+    private class FunctionDetailsTable extends VisTable {
+
+        Function function;
+        private int counter;
+
+        private final VerticalGroup input = new VerticalGroup();
+        private final VerticalGroup output = new VerticalGroup();
 
 
+        FunctionDetailsTable(Function function) {
+            super(true);
+            this.function = function;
+            this.counter = 0;
+            initTable();
+        }
+
+        private void initTable() {
+            top();
+            VisTextButton functionName = new VisTextButton(function.getName());
+            functionName.addListener(new ChangeListener() {
+                @Override
+                public void changed(ChangeEvent event, Actor actor) {
+
+                    float w = getStage().getWidth() / 2;
+                    float h = getStage().getHeight() / 2;
+                    InputForm inputForm =
+                            new InputForm("function name", function::getName, function::setName);
+                    inputForm.setPosition(w - inputForm.getWidth() / 2, h);
+                    getStage().addActor(inputForm);
+                    inputForm.focus();
+                }
+            });
+
+            function.addListener(functionName::setText);
+
+            final VisImageButton deleteFunction = new VisImageButton("close");
+
+            deleteFunction.addListener(new ChangeListener() {
+                @Override
+                public void changed(ChangeEvent event, Actor actor) {
+                    SceneUi.getFunctionManager().removeFunction(function);
+                }
+            });
+
+            VisTable header = new VisTable();
+            header.add(new VisLabel("name: ")).growY();
+            header.add(functionName).grow();
+            header.add(deleteFunction).row();
 
 
+            add(header).growX().row();
+            addSeparator();
+
+
+            VisTable container = new VisTable();
+            initCollapsible(Connection.INPUT, container, input);
+            container.addSeparator();
+            initCollapsible(Connection.OUTPUT, container, output);
+
+
+            Array<VisTable> array = new Array<>();
+            array.add(container);
+
+            ArrayAdapter<VisTable, VisTable> adapter = new ArrayAdapter<VisTable, VisTable>(array) {
+                @Override
+                protected VisTable createView(VisTable item) {
+                    return item;
+                }
+            };
+
+            ListView<VisTable> view = new ListView<>(adapter);
+            add(view.getMainTable()).grow();
+        }
+
+        private void initCollapsible(final Connection connection,
+                                     final VisTable container,
+                                     final VerticalGroup widget) {
+
+            final String title = connection == Connection.INPUT ? "inputs" : "outputs";
+            VisTextButton label = new VisTextButton(title, "toggle");
+
+            final VisTextButton addParameter = new VisTextButton("add");
+            label.toggle();
+
+            final VisTable widgetContainer = new VisTable();
+            widgetContainer.add(widget).grow();
+
+            OneColumnTableBuilder builder = new OneColumnTableBuilder();
+
+            final CollapsibleWidget collapsible = new CollapsibleWidget(widgetContainer);
+
+            builder
+                    .append(
+                            CellWidget.of(label).expandX().fillX().wrap(),
+                            CellWidget.of(addParameter).wrap())
+                    .row()
+                    .append(
+                            CellWidget.of(collapsible).expandX().fillX().wrap());
+
+            container.add(builder.build()).growX().row();
+
+            addParameter.addListener(new ChangeListener() {
+                @Override
+                public void changed(ChangeEvent event, Actor actor) {
+                    widget.addActor(new ParameterTable("newParam" + counter++, connection, function));
+                }
+            });
+
+            label.addListener(new ChangeListener() {
+                @Override
+                public void changed(ChangeEvent event, Actor actor) {
+                    collapsible.setCollapsed(!collapsible.isCollapsed());
+                }
+            });
+        }
+
+        @Override
+        public String getName() {
+            return function.getName();
+        }
+    }
+
+    private static class ParameterTable extends VisTable {
+
+        private Function function;
+        private FunctionParameter parameter;
+
+        ParameterTable(String name, Connection connection, Function function) {
+            this.function = function;
+            this.parameter = function.addParameter(name, DataType.BOOL, connection, false);
+
+            initTable();
+        }
+
+        private void initTable() {
+            final VisValidatableTextField parameterName = new VisValidatableTextField(parameter.getName());
+            parameterName.addValidator(new InputValidator() {
+                List<FunctionParameter> parameters = function.getParameters();
+
+                @Override
+                public boolean validateInput(String input) {
+
+                    for (FunctionParameter par : parameters)
+                        if (par.getName().equals(input) && par != parameter)
+                            return false;
+
+                    return input.matches("([_A-Za-z][_A-Za-z0-9]*)");
+                }
+            });
+
+            parameterName.addListener(new ChangeListener() {
+                @Override
+                public void changed(ChangeEvent event, Actor actor) {
+                    if (parameterName.isInputValid()) {
+                        parameter.setName(parameterName.getText());
+                    }
+                }
+            });
+
+
+            final DataSelectBox parameterType = new DataSelectBox();
+
+            parameterType.addListener(new ChangeListener() {
+                @Override
+                public void changed(ChangeEvent event, Actor actor) {
+                    parameter.setDataType(parameterType.getSelected());
+                }
+            });
+
+
+            VisImageButton.VisImageButtonStyle style =
+                    VisUI.getSkin().get("toggle", VisImageButton.VisImageButtonStyle.class);
+
+            Drawable drawable = (Main.scale == VisUI.SkinScale.X1) ?
+                    Main.skin.getDrawable("array-X1") :
+                    Main.skin.getDrawable("array-X2");
+
+            style.imageChecked = drawable;
+            style.imageUp = drawable;
+
+
+            final VisImageButton isArray = new VisImageButton(style);
+            isArray.addListener(new ChangeListener() {
+                @Override
+                public void changed(ChangeEvent event, Actor actor) {
+                    parameter.setArray(isArray.isChecked());
+                }
+            });
+
+            VisImageButton delete = new VisImageButton("close");
+            delete.addListener(new ChangeListener() {
+                @Override
+                public void changed(ChangeEvent event, Actor actor) {
+                    function.removeParameter(parameter);
+                    getParent().removeActor(ParameterTable.this, true);
+                }
+            });
+
+            add(parameterName).grow();
+            add(parameterType).grow();
+            add(isArray);
+            add(delete);
+        }
+    }
+
+    public interface GenerateListener {
+        String gen(CodeBuilder builder);
+    }
 
 }
