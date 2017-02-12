@@ -14,7 +14,7 @@ public class ControlTable extends VisTable {
 
     static private ConsoleTable consoleTable;
 
-    public ControlTable(SceneUi sceneUi) {
+    public ControlTable(Scenetmp sceneUi) {
         setTouchable(Touchable.enabled);
 
         final VisTable nodeTable = new NodeTable(sceneUi);

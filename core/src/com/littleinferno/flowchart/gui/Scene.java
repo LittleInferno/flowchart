@@ -16,10 +16,10 @@ public class Scene extends Stage {
     private UiTab uiTab;
     private GestureDetector gesture;
     private WireManager wireManager;
-    private SceneUi sceneUi;
+    private Scenetmp sceneUi;
     private String name;
 
-    Scene(String name, boolean closeable, SceneUi sceneUi) {
+    Scene(String name, boolean closeable, Scenetmp sceneUi) {
         this.sceneUi = sceneUi;
 
         this.name = name;
@@ -71,7 +71,7 @@ public class Scene extends Stage {
         return name;
     }
 
-    public SceneUi getSceneUi() {
+    public Scenetmp getSceneUi() {
         return sceneUi;
     }
 

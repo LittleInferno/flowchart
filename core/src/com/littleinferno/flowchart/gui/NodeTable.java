@@ -31,9 +31,9 @@ import java.util.List;
 
 class NodeTable extends VisTable {
 
-    private SceneUi sceneUi;
+    private Scenetmp sceneUi;
 
-    NodeTable(SceneUi sceneUi) {
+    NodeTable(Scenetmp sceneUi) {
         super(true);
         this.sceneUi = sceneUi;
         String[] items = new String[]{

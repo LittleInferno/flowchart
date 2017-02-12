@@ -11,7 +11,7 @@ import com.kotcrab.vis.ui.widget.VisLabel;
 import com.kotcrab.vis.ui.widget.VisTable;
 import com.littleinferno.flowchart.codegen.CodeBuilder;
 import com.littleinferno.flowchart.gui.FunctionItem;
-import com.littleinferno.flowchart.gui.SceneUi;
+import com.littleinferno.flowchart.gui.Scenetmp;
 
 import java.util.ArrayList;
 
@@ -23,9 +23,9 @@ public class FunctionManager {
 
     private int counter;
 
-    private SceneUi sceneUi;
+    private Scenetmp sceneUi;
 
-    public FunctionManager(SceneUi sceneUi) {
+    public FunctionManager(Scenetmp sceneUi) {
         this.sceneUi = sceneUi;
         functions = new FunctionManager.FunctionListAdapter(new ArrayList<>());
         detailsTable = new VisTable(true);
