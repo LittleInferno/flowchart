@@ -64,7 +64,8 @@ public class FunctionCallNode extends Node {
             ArrayList<String> params = new ArrayList<>();
 
             Stream.of(pins)
-                    .filter(i -> i.getType() != DataType.EXECUTION)
+                    .filter(i -> i.getType() != DataType.EXECUTION &&
+                            i.getConnection() == Connection.INPUT)
                     .forEach(i -> {
                         Pin.Connector data = i.getConnector();
                         params.add(data.parent.gen(builder, data.pin));
