@@ -1,14 +1,14 @@
 package com.littleinferno.flowchart.node;
 
 import com.littleinferno.flowchart.codegen.CodeBuilder;
-import com.littleinferno.flowchart.gui.Scenetmp;
+import com.littleinferno.flowchart.gui.SceneUi;
 import com.littleinferno.flowchart.pin.Pin;
 
 public class BeginNode extends Node {
 
     private Pin start;
 
-    public BeginNode(Scenetmp sceneUi) {
+    public BeginNode(SceneUi sceneUi) {
         super("Begin", false);
 
         start = addExecutionOutputPin("start");

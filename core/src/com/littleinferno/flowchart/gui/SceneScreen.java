@@ -6,10 +6,10 @@ import com.badlogic.gdx.graphics.GL20;
 
 public class SceneScreen extends ScreenAdapter {
 
-    Scenetmp sceneUi;
+    SceneUi sceneUi;
 
     public SceneScreen() {
-        sceneUi = new Scenetmp();
+        sceneUi = new SceneUi();
 
     }
 

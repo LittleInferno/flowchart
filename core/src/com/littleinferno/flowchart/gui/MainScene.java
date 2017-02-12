@@ -5,7 +5,7 @@ import com.littleinferno.flowchart.node.BeginNode;
 
 public class MainScene extends Scene {
 
-    MainScene(Scenetmp sceneUi) {
+    MainScene(SceneUi sceneUi) {
         super("main", false, sceneUi);
 
         BeginNode node = new BeginNode(sceneUi);

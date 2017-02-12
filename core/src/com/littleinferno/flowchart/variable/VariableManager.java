@@ -11,7 +11,7 @@ import com.kotcrab.vis.ui.widget.VisLabel;
 import com.kotcrab.vis.ui.widget.VisTable;
 import com.littleinferno.flowchart.DataType;
 import com.littleinferno.flowchart.codegen.CodeBuilder;
-import com.littleinferno.flowchart.gui.Scenetmp;
+import com.littleinferno.flowchart.gui.SceneUi;
 import com.littleinferno.flowchart.gui.VariableItem;
 
 import java.util.ArrayList;
@@ -24,9 +24,9 @@ public class VariableManager {
 
     private int counter;
 
-    private Scenetmp sceneUi;
+    private SceneUi sceneUi;
 
-    public VariableManager(Scenetmp sceneUi) {
+    public VariableManager(SceneUi sceneUi) {
         this.sceneUi = sceneUi;
         variables = new VariableListAdapter(new ArrayList<>());
         detailsTable = new VisTable(true);

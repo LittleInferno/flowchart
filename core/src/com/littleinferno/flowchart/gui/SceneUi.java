@@ -18,7 +18,7 @@ import com.littleinferno.flowchart.codegen.JSBackend;
 import com.littleinferno.flowchart.function.FunctionManager;
 import com.littleinferno.flowchart.variable.VariableManager;
 
-public class Scenetmp extends Stage {
+public class SceneUi extends Stage {
 
     private final TabbedPane tabbedPane;
     private InputMultiplexer inputMultiplexer;
@@ -35,7 +35,7 @@ public class Scenetmp extends Stage {
     private Begin begin;
     private CodeBuilder builder;
 
-    public Scenetmp() {
+    public SceneUi() {
 
         inputMultiplexer = new InputMultiplexer();
         inputMultiplexer.addProcessor(this);

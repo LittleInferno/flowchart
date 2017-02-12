@@ -22,7 +22,7 @@ import com.littleinferno.flowchart.Connection;
 import com.littleinferno.flowchart.DataType;
 import com.littleinferno.flowchart.codegen.CodeBuilder;
 import com.littleinferno.flowchart.gui.FunctionScene;
-import com.littleinferno.flowchart.gui.Scenetmp;
+import com.littleinferno.flowchart.gui.SceneUi;
 import com.littleinferno.flowchart.node.FunctionBeginNode;
 import com.littleinferno.flowchart.node.FunctionReturnNode;
 import com.littleinferno.flowchart.ui.Main;
@@ -54,7 +54,7 @@ public class Function {
 
     private FunctionScene scene;
 
-    public Function(String name, Scenetmp sceneUi) {
+    public Function(String name, SceneUi sceneUi) {
         this.name = name;
 
         parameters = new ArrayList<>();
@@ -219,7 +219,7 @@ public class Function {
             deleteFunction.addListener(new ChangeListener() {
                 @Override
                 public void changed(ChangeEvent event, Actor actor) {
-                    Scenetmp.getFunctionManager().removeFunction(function);
+                    SceneUi.getFunctionManager().removeFunction(function);
                 }
             });
 

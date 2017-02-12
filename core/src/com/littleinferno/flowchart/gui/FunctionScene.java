@@ -5,7 +5,7 @@ import com.kotcrab.vis.ui.widget.tabbedpane.TabbedPane;
 import com.littleinferno.flowchart.function.Function;
 
 public class FunctionScene extends Scene {
-    public FunctionScene(Function function, Scenetmp sceneUi) {
+    public FunctionScene(Function function, SceneUi sceneUi) {
         super(function.getName(), true, sceneUi);
 
         function.addListener(newName -> {
