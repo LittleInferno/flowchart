@@ -126,11 +126,11 @@ public class SceneUi extends Stage {
         dragAndDrop.addSource(source);
     }
 
-    public static FunctionManager getFunctionManager() {
+    public FunctionManager getFunctionManager() {
         return functionManager;
     }
 
-    public static VariableManager getVariableManager() {
+    public VariableManager getVariableManager() {
         return variableManager;
     }
 

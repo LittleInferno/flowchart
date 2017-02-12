@@ -1,5 +1,6 @@
 package com.littleinferno.flowchart.node.array;
 
+import com.annimon.stream.Stream;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.ui.Button;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
@@ -7,7 +8,6 @@ import com.littleinferno.flowchart.DataType;
 import com.littleinferno.flowchart.codegen.CodeBuilder;
 import com.littleinferno.flowchart.node.Node;
 import com.littleinferno.flowchart.pin.Pin;
-import com.littleinferno.flowchart.pin.PinListener;
 import com.littleinferno.flowchart.ui.Main;
 
 import java.util.ArrayList;
@@ -15,28 +15,27 @@ import java.util.List;
 
 public class MakeArrayNode extends Node {
 
+    private final Pin.PinListener listener;
     private Pin array;
     private List<Pin> values;
     private int counter = 0;
     private DataType[] converts = {DataType.BOOL, DataType.INT, DataType.FLOAT, DataType.STRING};
-
-    PinListener defaultListener = new PinListener() {
-        @Override
-        public void typeChanged(DataType newType) {
-            array.setType(newType);
-
-            for (Pin p : values)
-                p.setType(newType);
-        }
-    };
 
     public MakeArrayNode() {
         super("make array", true);
 
         array = addDataOutputPin("array", converts);
         array.setArray(true);
-        array.addListener(defaultListener);
-        values = new ArrayList<Pin>();
+
+        listener = t -> {
+            array.setType(t);
+            Stream.of(values).forEach(v -> v.setType(t));
+        };
+
+        array.addListener(listener);
+
+
+        values = new ArrayList<>();
 
         Button add = new Button(Main.skin);
         right.addActor(add);
@@ -51,7 +50,8 @@ public class MakeArrayNode extends Node {
                     values.add(addDataInputPin(values.get(0).getType(), "value" + counter++));
                 else {
                     Pin pin = addDataInputPin("value" + counter++, converts);
-                    pin.addListener(defaultListener);
+                    pin.addListener(listener);
+
                     values.add(pin);
                 }
             }

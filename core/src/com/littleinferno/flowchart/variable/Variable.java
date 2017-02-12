@@ -27,6 +27,7 @@ public class Variable {
     private DataType dataType;
     private String name;
     private boolean isArray;
+    private SceneUi sceneUi;
 
     private List<NameChangedListener> nameChangedListeners;
     private List<TypeChangedListener> typeChangedListeners;
@@ -35,10 +36,11 @@ public class Variable {
 
     private VariableDetailsTable variableDetailsTable;
 
-    Variable(String name, DataType type, boolean isArray) {
+    Variable(String name, DataType type, boolean isArray, SceneUi sceneUi) {
         this.name = name;
         this.dataType = type;
         this.isArray = isArray;
+        this.sceneUi = sceneUi;
 
         this.nameChangedListeners = new ArrayList<>();
         this.typeChangedListeners = new ArrayList<>();
@@ -159,7 +161,7 @@ public class Variable {
             deleteVariable.addListener(new ChangeListener() {
                 @Override
                 public void changed(ChangeEvent event, Actor actor) {
-                    SceneUi.getVariableManager().removeVariable(variable);
+                    variable.sceneUi.getVariableManager().removeVariable(variable);
                 }
             });
 

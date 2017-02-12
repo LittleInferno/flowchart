@@ -10,14 +10,15 @@ import java.util.Map;
 
 public class WireManager extends Actor {
 
+    public static final int NULL_ID = 0;
+
     public WireManager() {
         renderer = new ShapeRenderer();
         wires = new HashMap<>();
-        counter = 0;
+        counter = 1;
     }
 
     public int add(Pin begin, Pin end) {
-
         wires.put(counter, new Wire(begin, end));
         return counter++;
     }
@@ -26,7 +27,7 @@ public class WireManager extends Actor {
 
         wires.remove(i);
 
-        return -1;
+        return NULL_ID;
     }
 
     @Override
@@ -39,14 +40,13 @@ public class WireManager extends Actor {
         renderer.begin(ShapeRenderer.ShapeType.Line);
         for (Map.Entry<Integer, Wire> entry : wires.entrySet()) {
             entry.getValue().draw(renderer);
-
         }
 
         renderer.end();
         batch.begin();
     }
 
-    public static void add(Pin pin) {
+    public void add(Pin pin) {
 
         if (first == null)
             first = pin;
@@ -60,7 +60,7 @@ public class WireManager extends Actor {
 
     private int counter;
 
-    private static Pin first;
+    private Pin first;
 
     private ShapeRenderer renderer;
 }

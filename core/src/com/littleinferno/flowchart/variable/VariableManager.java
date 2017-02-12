@@ -45,7 +45,7 @@ public class VariableManager {
     }
 
     public Variable createVariable() {
-        Variable variable = new Variable("newVar" + counter++, DataType.BOOL, false);
+        Variable variable = new Variable("newVar" + counter++, DataType.BOOL, false, sceneUi);
 
         variables.add(variable);
 

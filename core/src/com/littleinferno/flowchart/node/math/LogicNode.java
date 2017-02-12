@@ -4,7 +4,6 @@ package com.littleinferno.flowchart.node.math;
 import com.littleinferno.flowchart.DataType;
 import com.littleinferno.flowchart.node.Node;
 import com.littleinferno.flowchart.pin.Pin;
-import com.littleinferno.flowchart.pin.PinListener;
 
 public abstract class LogicNode extends Node {
 
@@ -18,15 +17,12 @@ public abstract class LogicNode extends Node {
         b = addDataInputPin("B", possibleConvert);
         addDataOutputPin(DataType.BOOL, "result");
 
-        PinListener defaultListener = new PinListener() {
-            @Override
-            public void typeChanged(DataType newType) {
-                a.setType(newType);
-                b.setType(newType);
-            }
+        Pin.PinListener listener = t -> {
+            a.setType(t);
+            b.setType(t);
         };
 
-        a.addListener(defaultListener);
-        b.addListener(defaultListener);
+        a.addListener(listener);
+        b.addListener(listener);
     }
 }

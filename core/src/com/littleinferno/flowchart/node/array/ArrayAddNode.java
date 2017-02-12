@@ -4,7 +4,6 @@ import com.littleinferno.flowchart.DataType;
 import com.littleinferno.flowchart.codegen.CodeBuilder;
 import com.littleinferno.flowchart.node.Node;
 import com.littleinferno.flowchart.pin.Pin;
-import com.littleinferno.flowchart.pin.PinListener;
 
 public class ArrayAddNode extends Node {
 
@@ -25,16 +24,13 @@ public class ArrayAddNode extends Node {
         item = addDataInputPin("item", converts);
         length = addDataOutputPin(DataType.INT, "length");
 
-        PinListener defaultListener = new PinListener() {
-            @Override
-            public void typeChanged(DataType newType) {
-                array.setType(newType);
-                item.setType(newType);
-            }
+        Pin.PinListener listener = t -> {
+            array.setType(t);
+            item.setType(t);
         };
 
-        array.addListener(defaultListener);
-        item.addListener(defaultListener);
+        array.addListener(listener);
+        item.addListener(listener);
     }
 
     @Override

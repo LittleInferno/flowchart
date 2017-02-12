@@ -219,7 +219,7 @@ public class Function {
             deleteFunction.addListener(new ChangeListener() {
                 @Override
                 public void changed(ChangeEvent event, Actor actor) {
-                    SceneUi.getFunctionManager().removeFunction(function);
+                    scene.getSceneUi().getFunctionManager().removeFunction(function);
                 }
             });
 

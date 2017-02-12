@@ -24,52 +24,60 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
+import java.util.Set;
 
 public class Pin extends VisTable {
     private PinStyle style;
-
-    private Pin connectedPin;
-    private ArrayList<Pin> connectedPins = new ArrayList<Pin>();
 
     private Connection connection;
     private DataType type;
     private boolean isConnect;
     private boolean isArray;
     private boolean isUniversal;
-    private int pinId = -1;
-
     private VisLabel label;
     private VisImage image;
+    private List<PinListener> listeners;
 
     private Node parent;
 
-    private ArrayList<PinListener> listeners = new ArrayList<PinListener>();
+    private Pin connectedPin;
+    private List<Pin> connectedPins;
+    private Set<DataType> possibleConvert;
 
-    private HashSet<DataType> possibleConvert = new HashSet<DataType>();
+    private int wireId = WireManager.NULL_ID;
 
     public Pin(Node parent, String name, Connection connection, DataType... convert) {
+        possibleConvert = new HashSet<>();
         Collections.addAll(possibleConvert, convert);
         possibleConvert.add(DataType.UNIVERSAL);
-        init(parent, name, connection, DataType.UNIVERSAL);
+
+        init(parent, name, connection, DataType.UNIVERSAL, Main.skin.get(Main.scale == VisUI.SkinScale.X1 ? "X1" : "X2", PinStyle.class));
     }
 
     public Pin(Node parent, String name, DataType type, Connection connection) {
+        possibleConvert = new HashSet<>();
         possibleConvert.addAll(Arrays.asList(
                 DataType.BOOL, DataType.INT, DataType.FLOAT, DataType.STRING, DataType.EXECUTION));
-        init(parent, name, connection, type);
+
+        init(parent, name, connection, type, Main.skin.get(Main.scale == VisUI.SkinScale.X1 ? "X1" : "X2", PinStyle.class));
     }
 
-    private void init(Node parent, String name, Connection connection, DataType type) {
+    private void init(final Node parent, String name, final Connection connection, final DataType type, PinStyle style) {
         this.parent = parent;
         this.connection = connection;
-        this.style = Main.skin.get(Main.scale == VisUI.SkinScale.X1 ? "X1" : "X2", PinStyle.class);
+        this.isUniversal = type == DataType.UNIVERSAL;
+        this.listeners = new ArrayList<>();
+        this.connectedPins = new ArrayList<>();
 
-        label = new VisLabel(name);
-        label.setEllipsis(true);
-        label.setAlignment(Align.center);
+        this.label = new VisLabel();
+        this.label.setEllipsis(true);
+        this.label.setAlignment(Align.center);
 
-        image = new VisImage();
+        this.image = new VisImage();
 
+        setName(name);
+        setStyle(style);
         setArray(false);
         setType(type);
 
@@ -81,27 +89,19 @@ public class Pin extends VisTable {
             add(image);
         }
 
-        setName(name);
-
-        isUniversal = type == DataType.UNIVERSAL;
-
         addListener(new InputListener() {
             @Override
             public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
-                WireManager.add(Pin.this);
+                getStage().getWireManager().add(Pin.this);
                 return true;
             }
         });
     }
 
-    public void setStyle(PinStyle style) {
+    private void setStyle(PinStyle style) {
         if (style == null) throw new IllegalArgumentException("style cannot be null.");
         this.style = style;
         label.setStyle(new Label.LabelStyle(style.font, style.fontColor));
-    }
-
-    public PinStyle getStyle() {
-        return style;
     }
 
     @Override
@@ -199,7 +199,7 @@ public class Pin extends VisTable {
                 return false;
         }
 
-        if (isExecutionOutput(this) || isDataInput(this))
+        if (isSingle())
             connectPin(pin);
         else
             connectPins(pin);
@@ -208,8 +208,8 @@ public class Pin extends VisTable {
     }
 
     public void disconnect(final Pin pin) {
-        if (isExecutionOutput(this) || isDataInput(this)) {
-            disconnectPin(pin);
+        if (isSingle()) {
+            disconnectPin();
         } else {
             disconnectPins(pin);
         }
@@ -222,7 +222,7 @@ public class Pin extends VisTable {
         connectedPin = pin;
         connectedPin.connectedPins.add(this);
 
-        pinId = getStage().getWireManager().add(this, pin);
+        wireId = getStage().getWireManager().add(this, pin);
         isConnect = true;
     }
 
@@ -231,11 +231,11 @@ public class Pin extends VisTable {
         isConnect = true;
     }
 
-    private void disconnectPin(final Pin pin) {
+    private void disconnectPin() {
         isConnect = false;
         connectedPin.connectedPins.remove(this);
         connectedPin = null;
-        pinId = getStage().getWireManager().remove(pinId);
+        wireId = getStage().getWireManager().remove(wireId);
     }
 
     @Override
@@ -256,8 +256,8 @@ public class Pin extends VisTable {
 
     public void disconnect() {
         if (isConnect()) {
-            if (isExecutionOutput(this) || isDataInput(this)) {
-                disconnectPin(connectedPin);
+            if (isSingle()) {
+                disconnectPin();
             } else {
                 for (int i = 0; i < connectedPins.size(); ++i)
                     connectedPins.get(i).disconnect(this);
@@ -281,12 +281,14 @@ public class Pin extends VisTable {
                 || pin.isArray() != isArray());
     }
 
-    private boolean isExecutionOutput(Pin pin) {
-        return pin.getType() == DataType.EXECUTION && pin.getConnection() == Connection.OUTPUT;
+    private boolean isMultiple() {
+        return (getType() == DataType.EXECUTION && getConnection() == Connection.INPUT) ||
+                (getType() != DataType.EXECUTION && getConnection() == Connection.OUTPUT);
     }
 
-    private boolean isDataInput(Pin pin) {
-        return pin.getType() != DataType.EXECUTION && pin.getConnection() == Connection.INPUT;
+    private boolean isSingle() {
+        return (getType() == DataType.EXECUTION && getConnection() == Connection.INPUT) ||
+                (getType() != DataType.EXECUTION && getConnection() == Connection.INPUT);
     }
 
 //    private void createConverter(Pin first, Pin second) {
@@ -321,6 +323,10 @@ public class Pin extends VisTable {
         }
     }
 
+    public interface PinListener {
+        void typeChanged(DataType newType);
+    }
+
     static public class Connector {
 
         public final Node parent;
@@ -333,7 +339,6 @@ public class Pin extends VisTable {
         }
 
     }
-
 
     public static class PinStyle {
         Drawable array, arrayConnected, pin, pinConnected;
