@@ -2,7 +2,7 @@ package com.littleinferno.flowchart.node.math;
 
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.littleinferno.flowchart.DataType;
-import com.littleinferno.flowchart.codegen.CodeBuilder;
+import com.littleinferno.flowchart.codegen.BaseCodeGenerator;
 import com.littleinferno.flowchart.node.Node;
 import com.littleinferno.flowchart.pin.Pin;
 
@@ -52,7 +52,7 @@ public class CompareNode extends Node {
 //    }
 
     @Override
-    public String gen(CodeBuilder builder, Pin with) {
+    public String gen(BaseCodeGenerator builder, Pin with) {
         return null;
     }
 }

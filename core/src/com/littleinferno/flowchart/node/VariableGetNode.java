@@ -1,7 +1,7 @@
 package com.littleinferno.flowchart.node;
 
 
-import com.littleinferno.flowchart.codegen.CodeBuilder;
+import com.littleinferno.flowchart.codegen.BaseCodeGenerator;
 import com.littleinferno.flowchart.pin.Pin;
 import com.littleinferno.flowchart.variable.Variable;
 
@@ -24,7 +24,7 @@ public class VariableGetNode extends Node {
     }
 
     @Override
-    public String gen(CodeBuilder builder, Pin with) {
+    public String gen(BaseCodeGenerator builder, Pin with) {
         return variable.getName();
     }
 }

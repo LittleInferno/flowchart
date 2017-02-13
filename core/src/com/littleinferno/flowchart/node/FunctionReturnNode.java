@@ -3,7 +3,7 @@ package com.littleinferno.flowchart.node;
 import com.annimon.stream.Stream;
 import com.littleinferno.flowchart.Connection;
 import com.littleinferno.flowchart.DataType;
-import com.littleinferno.flowchart.codegen.CodeBuilder;
+import com.littleinferno.flowchart.codegen.BaseCodeGenerator;
 import com.littleinferno.flowchart.function.Function;
 import com.littleinferno.flowchart.pin.Pin;
 
@@ -57,19 +57,28 @@ public class FunctionReturnNode extends Node {
     }
 
     @Override
-    public String gen(CodeBuilder builder, Pin with) {
-        Map<String, String> returnPack = new HashMap<>();
+    public String gen(BaseCodeGenerator builder, Pin with) {
 
+        if (pins.isEmpty())
+            return "";
+
+        if (pins.size() == 1) {
+            Pin p = pins.get(0);
+            Pin.Connector node = p.getConnector();
+
+            return builder.makeReturn(node.parent.gen(builder, node.pin));
+        }
+
+        Map<String, String> returnPack = new HashMap<>();
         Stream.of(pins)
                 .filter(i -> i.getType() != DataType.EXECUTION)
                 .forEach(i -> {
                     Pin.Connector node = i.getConnector();
 
-                    String p = node.parent.gen(builder, node.pin);
-                    returnPack.put(i.getName(), p);
+                    returnPack.put(i.getName(), node.parent.gen(builder, node.pin));
                 });
 
-        return builder.createReturn(returnPack);
+        return builder.makeReturn(returnPack);
     }
 
     @Override

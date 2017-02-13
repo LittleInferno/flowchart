@@ -1,6 +1,6 @@
 package com.littleinferno.flowchart.node;
 
-import com.littleinferno.flowchart.codegen.CodeBuilder;
+import com.littleinferno.flowchart.codegen.BaseCodeGenerator;
 import com.littleinferno.flowchart.gui.SceneUi;
 import com.littleinferno.flowchart.pin.Pin;
 
@@ -17,7 +17,7 @@ public class BeginNode extends Node {
     }
 
     @Override
-    public String gen(CodeBuilder builder, Pin with) {
+    public String gen(BaseCodeGenerator builder, Pin with) {
         Pin.Connector next = start.getConnector();
 
         return next == null ? "" : next.parent.gen(builder, next.pin);

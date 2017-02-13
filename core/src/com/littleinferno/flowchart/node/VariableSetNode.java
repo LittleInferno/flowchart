@@ -1,6 +1,6 @@
 package com.littleinferno.flowchart.node;
 
-import com.littleinferno.flowchart.codegen.CodeBuilder;
+import com.littleinferno.flowchart.codegen.BaseCodeGenerator;
 import com.littleinferno.flowchart.pin.Pin;
 import com.littleinferno.flowchart.variable.Variable;
 
@@ -30,7 +30,7 @@ public class VariableSetNode extends Node {
     }
 
     @Override
-    public String gen(CodeBuilder builder, Pin with) {
+    public String gen(BaseCodeGenerator builder, Pin with) {
 
         Pin.Connector data = pin.getConnector();
         String dataStr = data.parent.gen(builder, data.pin);
@@ -38,6 +38,8 @@ public class VariableSetNode extends Node {
         Pin.Connector n = next.getConnector();
         String nextStr = n == null ? "" : n.parent.gen(builder, n.pin);
 
-        return String.format("%s = %s\n%s", variable.getName(), dataStr, nextStr);
+        String s = builder.makeStatement(builder.makeAssign(variable.getName(), dataStr));
+
+        return String.format("%s%s", s, nextStr);
     }
 }

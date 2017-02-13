@@ -5,7 +5,7 @@ import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.ui.Button;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.littleinferno.flowchart.DataType;
-import com.littleinferno.flowchart.codegen.CodeBuilder;
+import com.littleinferno.flowchart.codegen.BaseCodeGenerator;
 import com.littleinferno.flowchart.node.Node;
 import com.littleinferno.flowchart.pin.Pin;
 import com.littleinferno.flowchart.ui.Main;
@@ -60,7 +60,7 @@ public class MakeArrayNode extends Node {
     }
 
     @Override
-    public String gen(CodeBuilder builder, Pin with) {
+    public String gen(BaseCodeGenerator builder, Pin with) {
 
         ArrayList<String> val = new ArrayList<String>();
 
@@ -70,6 +70,6 @@ public class MakeArrayNode extends Node {
                 val.add(data.parent.gen(builder, data.pin));
         }
 
-        return builder.createArray(val);
+        return builder.makeArray(val);
     }
 }

@@ -13,9 +13,9 @@ import com.kotcrab.vis.ui.widget.VisTextButton;
 import com.kotcrab.vis.ui.widget.tabbedpane.Tab;
 import com.kotcrab.vis.ui.widget.tabbedpane.TabbedPane;
 import com.kotcrab.vis.ui.widget.tabbedpane.TabbedPaneAdapter;
-import com.littleinferno.flowchart.codegen.CodeBuilder;
+import com.littleinferno.flowchart.codegen.BaseCodeGenerator;
 import com.littleinferno.flowchart.codegen.CodeExecution;
-import com.littleinferno.flowchart.codegen.JSBackend;
+import com.littleinferno.flowchart.codegen.JSCodeGenerator;
 import com.littleinferno.flowchart.function.FunctionManager;
 import com.littleinferno.flowchart.variable.VariableManager;
 
@@ -34,7 +34,7 @@ public class SceneUi extends Stage {
 
     private CodeExecution codeExecution;
     private Begin begin;
-    private CodeBuilder builder;
+    private BaseCodeGenerator builder;
 
     public SceneUi() {
         super(new ScreenViewport());
@@ -49,9 +49,7 @@ public class SceneUi extends Stage {
         variableManager = new VariableManager(this);
         functionManager = new FunctionManager(this);
 
-        builder = new CodeBuilder(new JSBackend());
-        builder.setGenVariables(variableManager::gen);
-        builder.setGenFunctions(functionManager::gen);
+        builder = new JSCodeGenerator();
 
         dragAndDrop = new DragAndDrop();
 
@@ -66,8 +64,8 @@ public class SceneUi extends Stage {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
 
-                String code = builder.genVar() + builder.genFun() + begin.gen(builder);
-
+                String code = variableManager.gen(builder) + functionManager.gen(builder) + begin.gen(builder);
+                System.out.println(code);
                 codeExecution.run(code);
             }
         });
@@ -171,6 +169,6 @@ public class SceneUi extends Stage {
     }
 
     public interface Begin {
-        String gen(CodeBuilder builder);
+        String gen(BaseCodeGenerator builder);
     }
 }

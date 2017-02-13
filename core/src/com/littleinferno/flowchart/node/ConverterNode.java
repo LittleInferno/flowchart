@@ -2,7 +2,7 @@ package com.littleinferno.flowchart.node;
 
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.littleinferno.flowchart.DataType;
-import com.littleinferno.flowchart.codegen.CodeBuilder;
+import com.littleinferno.flowchart.codegen.BaseCodeGenerator;
 import com.littleinferno.flowchart.pin.Pin;
 
 public class ConverterNode extends Node {
@@ -14,7 +14,7 @@ public class ConverterNode extends Node {
     }
 
     @Override
-    public String gen(CodeBuilder builder, Pin with) {
+    public String gen(BaseCodeGenerator builder, Pin with) {
       //  Pin.Connector from = getPin("from").getConnector();
 
       //  return from.parent.gen(builder, from.pin);

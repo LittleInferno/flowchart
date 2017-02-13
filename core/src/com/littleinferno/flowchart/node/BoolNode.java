@@ -3,7 +3,7 @@ package com.littleinferno.flowchart.node;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.kotcrab.vis.ui.widget.VisSelectBox;
 import com.littleinferno.flowchart.DataType;
-import com.littleinferno.flowchart.codegen.CodeBuilder;
+import com.littleinferno.flowchart.codegen.BaseCodeGenerator;
 import com.littleinferno.flowchart.pin.Pin;
 
 public class BoolNode extends Node {
@@ -21,7 +21,7 @@ public class BoolNode extends Node {
     }
 
     @Override
-    public String gen(CodeBuilder builder, Pin with) {
+    public String gen(BaseCodeGenerator builder, Pin with) {
         return box.getSelectedIndex() == 0 ? "true" : "false";
     }
 }

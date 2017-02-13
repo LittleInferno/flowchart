@@ -3,7 +3,7 @@ package com.littleinferno.flowchart.node;
 import com.annimon.stream.Stream;
 import com.littleinferno.flowchart.Connection;
 import com.littleinferno.flowchart.DataType;
-import com.littleinferno.flowchart.codegen.CodeBuilder;
+import com.littleinferno.flowchart.codegen.BaseCodeGenerator;
 import com.littleinferno.flowchart.function.Function;
 import com.littleinferno.flowchart.pin.Pin;
 
@@ -17,6 +17,7 @@ public class FunctionCallNode extends Node {
     private String currentCall;
 
     private List<Pin> pins;
+    private int outParametrsSize;
 
     public FunctionCallNode(Function function) {
         super(function.getName(), true);
@@ -57,28 +58,36 @@ public class FunctionCallNode extends Node {
     }
 
     @Override
-    public String gen(CodeBuilder builder, Pin with) {
+    public String gen(BaseCodeGenerator builder, Pin with) {
 
         if (with.getType() == DataType.EXECUTION) {
 
             ArrayList<String> params = new ArrayList<>();
 
+            final int[] inParametrsSize = {0};
             Stream.of(pins)
                     .filter(i -> i.getType() != DataType.EXECUTION &&
                             i.getConnection() == Connection.INPUT)
                     .forEach(i -> {
                         Pin.Connector data = i.getConnector();
                         params.add(data.parent.gen(builder, data.pin));
+                        ++inParametrsSize[0];
                     });
 
-            currentCall = builder.createNamedValue("tmpcall");
+            outParametrsSize = pins.size() - inParametrsSize[0];
+
+            currentCall = builder.makeNamedValue("tmpcall");
 
             Pin.Connector n = next.getConnector();
             String nextStr = n == null ? "" : n.parent.gen(builder, n.pin);
 
+
             return String.format("%s%s",
-                    builder.createCall(function.getName(), params, currentCall), nextStr);
+                    builder.makeCall(function.getName(), params, currentCall), nextStr);
         }
+
+        if (outParametrsSize == 1)
+            return currentCall;
 
         return String.format("%s.%s", currentCall, with.getName());
     }

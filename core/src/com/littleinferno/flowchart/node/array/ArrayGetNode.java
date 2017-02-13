@@ -1,7 +1,7 @@
 package com.littleinferno.flowchart.node.array;
 
 import com.littleinferno.flowchart.DataType;
-import com.littleinferno.flowchart.codegen.CodeBuilder;
+import com.littleinferno.flowchart.codegen.BaseCodeGenerator;
 import com.littleinferno.flowchart.node.Node;
 import com.littleinferno.flowchart.pin.Pin;
 
@@ -29,11 +29,11 @@ public class ArrayGetNode extends Node {
     }
 
     @Override
-    public String gen(CodeBuilder builder, Pin with) {
+    public String gen(BaseCodeGenerator builder, Pin with) {
 
         Pin.Connector a = array.getConnector();
         Pin.Connector i = item.getConnector();
-        return builder.createGetArrayItem(a.parent.gen(builder, a.pin),
+        return builder.makeGetArrayItem(a.parent.gen(builder, a.pin),
                 i.parent.gen(builder, i.pin));
     }
 }

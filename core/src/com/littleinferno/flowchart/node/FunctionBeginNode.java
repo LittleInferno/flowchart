@@ -2,10 +2,9 @@ package com.littleinferno.flowchart.node;
 
 
 import com.annimon.stream.Stream;
-import com.badlogic.gdx.utils.Array;
 import com.littleinferno.flowchart.Connection;
 import com.littleinferno.flowchart.DataType;
-import com.littleinferno.flowchart.codegen.CodeBuilder;
+import com.littleinferno.flowchart.codegen.BaseCodeGenerator;
 import com.littleinferno.flowchart.function.Function;
 import com.littleinferno.flowchart.pin.Pin;
 
@@ -57,7 +56,7 @@ public class FunctionBeginNode extends Node {
     }
 
     @Override
-    public String gen(CodeBuilder builder, Pin with) {
+    public String gen(BaseCodeGenerator builder, Pin with) {
 
         if (with.getType() == DataType.EXECUTION) {
 
@@ -67,12 +66,12 @@ public class FunctionBeginNode extends Node {
                     .filter(i -> i.getType() != DataType.EXECUTION)
                     .forEach(i -> params.add(i.getName()));
 
-            String parameters = builder.createParams(params);
+            String parameters = builder.makeParams(params);
 
             Pin.Connector n = next.getConnector();
             String nextStr = n == null ? "" : n.parent.gen(builder, n.pin);
 
-            return builder.createFunction(function.getName(), parameters, nextStr);
+            return builder.makeFunction(function.getName(), parameters, builder.makeBlock(nextStr));
         }
 
         return with.getName();

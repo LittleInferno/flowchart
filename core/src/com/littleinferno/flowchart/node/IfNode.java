@@ -1,7 +1,7 @@
 package com.littleinferno.flowchart.node;
 
 import com.littleinferno.flowchart.DataType;
-import com.littleinferno.flowchart.codegen.CodeBuilder;
+import com.littleinferno.flowchart.codegen.BaseCodeGenerator;
 import com.littleinferno.flowchart.pin.Pin;
 
 public class IfNode extends Node {
@@ -20,7 +20,7 @@ public class IfNode extends Node {
     }
 
     @Override
-    public String gen(CodeBuilder builder, Pin with) {
+    public String gen(BaseCodeGenerator builder, Pin with) {
 
         Pin.Connector cond = condition.getConnector();
 
@@ -31,6 +31,13 @@ public class IfNode extends Node {
         String trueString = tr.parent.gen(builder, tr.pin);
         String falseString = fl == null ? "" : fl.parent.gen(builder, fl.pin);
 
-        return String.format("if (%s) {\n%s}%s", conditionStr, trueString, falseString);
+        String string;
+        if (fl != null)
+            string = builder.makeIfElse(conditionStr,
+                    builder.makeBlock(trueString), builder.makeBlock(falseString));
+        else
+            string = builder.makeIf(conditionStr, builder.makeBlock(trueString));
+
+        return string;
     }
 }

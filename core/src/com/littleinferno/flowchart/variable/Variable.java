@@ -10,6 +10,7 @@ import com.kotcrab.vis.ui.widget.VisLabel;
 import com.kotcrab.vis.ui.widget.VisTable;
 import com.kotcrab.vis.ui.widget.VisTextButton;
 import com.littleinferno.flowchart.DataType;
+import com.littleinferno.flowchart.codegen.BaseCodeGenerator;
 import com.littleinferno.flowchart.gui.SceneUi;
 import com.littleinferno.flowchart.util.ArrayChangedListener;
 import com.littleinferno.flowchart.util.DataSelectBox;
@@ -79,11 +80,8 @@ public class Variable {
         notifyListenersIsArrayChanged(isArray);
     }
 
-    public String gen() {
-        if (isArray)
-            return String.format("var %s=[];\n", name);
-        else
-            return String.format("var %s;\n", name);
+    public String gen(BaseCodeGenerator builder) {
+        return builder.makeVariable(getName(), getDataType(), isArray());
     }
 
     public void addListener(NameChangedListener listener) {

@@ -20,7 +20,7 @@ import com.kotcrab.vis.ui.widget.VisTextButton;
 import com.kotcrab.vis.ui.widget.VisValidatableTextField;
 import com.littleinferno.flowchart.Connection;
 import com.littleinferno.flowchart.DataType;
-import com.littleinferno.flowchart.codegen.CodeBuilder;
+import com.littleinferno.flowchart.codegen.BaseCodeGenerator;
 import com.littleinferno.flowchart.gui.FunctionScene;
 import com.littleinferno.flowchart.gui.SceneUi;
 import com.littleinferno.flowchart.node.FunctionBeginNode;
@@ -162,7 +162,7 @@ public class Function {
         }
     }
 
-    public String gen(CodeBuilder builder) {
+    public String gen(BaseCodeGenerator builder) {
         return generateListener.gen(builder);
     }
 
@@ -381,7 +381,7 @@ public class Function {
     }
 
     public interface GenerateListener {
-        String gen(CodeBuilder builder);
+        String gen(BaseCodeGenerator builder);
     }
 
 }

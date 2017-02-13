@@ -10,7 +10,7 @@ import com.kotcrab.vis.ui.widget.ListView;
 import com.kotcrab.vis.ui.widget.VisLabel;
 import com.kotcrab.vis.ui.widget.VisTable;
 import com.littleinferno.flowchart.DataType;
-import com.littleinferno.flowchart.codegen.CodeBuilder;
+import com.littleinferno.flowchart.codegen.BaseCodeGenerator;
 import com.littleinferno.flowchart.gui.SceneUi;
 import com.littleinferno.flowchart.gui.VariableItem;
 
@@ -58,10 +58,10 @@ public class VariableManager {
         variables.remove(variable);
     }
 
-    public String gen(CodeBuilder builder) {
+    public String gen(BaseCodeGenerator builder) {
         final StringBuilder stringBuilder = new StringBuilder();
 
-        Stream.of(variables.iterable()).forEach(variable -> stringBuilder.append(variable.gen()));
+        Stream.of(variables.iterable()).forEach(variable -> stringBuilder.append(variable.gen(builder)));
 
         return stringBuilder.toString();
     }

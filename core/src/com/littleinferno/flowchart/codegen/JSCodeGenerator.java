@@ -1,14 +1,36 @@
 package com.littleinferno.flowchart.codegen;
 
 import com.badlogic.gdx.utils.StringBuilder;
+import com.littleinferno.flowchart.DataType;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class JSBackend implements BaseBackendGenerator {
+public class JSCodeGenerator implements BaseCodeGenerator {
 
-    private static int valueCounter = 0;
+    private Map<String, Integer> values;
+
+    public JSCodeGenerator() {
+        values = new HashMap<>();
+    }
+
+    @Override
+    public String makeString(String str) {
+        return new StringBuilder().append("\n").append(str).append("\"").toString();
+    }
+
+    @Override
+    public String makeVariable(String variableName, DataType type, boolean isArray) {
+        return makeStatement("var " + makeAssign(variableName,
+                isArray ? "[]" : type.getDefaultValue()));
+    }
+
+    @Override
+    public String makeVariable(final String name, final String value) {
+        return makeStatement("var " + makeAssign(name, value));
+    }
 
     @Override
     public String makeAdd(final String left, final String right) {
@@ -56,8 +78,13 @@ public class JSBackend implements BaseBackendGenerator {
     }
 
     @Override
-    public String makeFunction(final String name, final String params, final String body) {
-        return String.format("function %s(%s){\n%s\n}", name, params, body);
+    public String makeAssign(String left, String right) {
+        return new StringBuilder().append(left).append(" = ").append(right).toString();
+    }
+
+    @Override
+    public String makeFunction(final String name, final String params, final BaseBlock body) {
+        return String.format("function %s(%s)%s", name, params, body);
     }
 
     @Override
@@ -75,7 +102,7 @@ public class JSBackend implements BaseBackendGenerator {
     public String makeReturn(final Map<String, String> ret) {
 
         StringBuilder returnBuilder = new StringBuilder();
-        List<String> packBuild = new ArrayList<String>(ret.size());
+        List<String> packBuild = new ArrayList<>(ret.size());
 
         for (Map.Entry<String, String> i : ret.entrySet()) {
 
@@ -88,6 +115,15 @@ public class JSBackend implements BaseBackendGenerator {
     }
 
     @Override
+    public String makeReturn(String ret) {
+        return makeStatement("return " + ret);
+    }
+
+    private String makeReturn(BaseBlock block) {
+        return makeReturn(block.toString());
+    }
+
+    @Override
     public String makeCall(final String function, final List<String> params, final String result) {
         String parameters = makeParams(params);
         String funCall = String.format("%s(%s)", function, parameters);
@@ -96,13 +132,15 @@ public class JSBackend implements BaseBackendGenerator {
     }
 
     @Override
-    public String makeVariable(final String name, final String defaultValue) {
-        return String.format("var %s = %s;\n", name, defaultValue);
-    }
-
-    @Override
     public String makeNamedValue(final String name) {
-        return name + valueCounter++;
+        if (values.containsKey(name)) {
+            Integer integer = values.get(name);
+            values.put(name, ++integer);
+            return name + integer;
+        }
+
+        values.put(name, 0);
+        return name + "0";
     }
 
     @Override
@@ -138,16 +176,69 @@ public class JSBackend implements BaseBackendGenerator {
         return String.format("%s[%s]", array, item);
     }
 
+    @Override
+    public String makeStatement(String expression) {
+        return new StringBuilder().append(expression).append(";\n").toString();
+    }
+
+    @Override
+    public String makeIf(String condition, BaseBlock block) {
+        return new StringBuilder()
+                .append("if(").append(condition).append(')').append(block).toString();
+    }
+
+    @Override
+    public String makeElse(BaseBlock block) {
+        return new StringBuilder().append("else ").append(block).toString();
+    }
+
+    @Override
+    public String makeElseIf(String condition, BaseBlock block) {
+        return new StringBuilder().append("else ").append(makeIf(condition, block)).toString();
+    }
+
+    @Override
+    public String makeIfElse(String condition, BaseBlock ifBlock, BaseBlock elseBlock) {
+        return new StringBuilder()
+                .append(makeIf(condition, ifBlock)).append(makeElse(elseBlock)).toString();
+    }
+
     private String createBinary(final String left, final String right, final String operator) {
-        return String.format("(%s %s %s)", left, operator, right);
+        return new StringBuilder()
+                .append("(").append(left).append(operator).append(right).append(")").toString();
     }
 
     private String packParameters(final List<String> parameters) {
         StringBuilder parameterPack = new StringBuilder();
-        parameterPack.append("return {");
 
-        for (String i : parameters) parameterPack.append(i).append(':').append(i);
+        for (int i = 0; i < parameters.size() - 1; i++) {
+            String str = parameters.get(i);
+            parameterPack.append(str).append(':').append(str).append(',');
+        }
 
-        return parameterPack.append("};\n").toString();
+        String str = parameters.get(parameters.size() - 1);
+        parameterPack.append(str).append(':').append(str);
+
+
+        return makeReturn(makeBlock(parameterPack.toString()));
     }
+
+    public JSBlock makeBlock(String body) {
+        return new JSBlock(body);
+    }
+
+    private static class JSBlock extends BaseBlock {
+
+        private final String body;
+
+        JSBlock(String body) {
+            this.body = "{\n" + body + "}\n";
+        }
+
+        @Override
+        public String getBody() {
+            return body;
+        }
+    }
+
 }

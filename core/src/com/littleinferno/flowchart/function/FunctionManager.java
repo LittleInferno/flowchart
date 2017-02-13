@@ -9,7 +9,7 @@ import com.kotcrab.vis.ui.util.adapter.ArrayListAdapter;
 import com.kotcrab.vis.ui.widget.ListView;
 import com.kotcrab.vis.ui.widget.VisLabel;
 import com.kotcrab.vis.ui.widget.VisTable;
-import com.littleinferno.flowchart.codegen.CodeBuilder;
+import com.littleinferno.flowchart.codegen.BaseCodeGenerator;
 import com.littleinferno.flowchart.gui.FunctionItem;
 import com.littleinferno.flowchart.gui.SceneUi;
 
@@ -69,7 +69,7 @@ public class FunctionManager {
         return detailsTable;
     }
 
-    public String gen(CodeBuilder builder) {
+    public String gen(BaseCodeGenerator builder) {
         final StringBuilder stringBuilder = new StringBuilder();
 
         Stream.of(functions.iterable()).forEach(function -> stringBuilder.append(function.gen(builder)));
