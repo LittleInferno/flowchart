@@ -284,7 +284,7 @@ public class Pin extends VisTable {
     }
 
     private boolean isSingle() {
-        return (getType() == DataType.EXECUTION && getConnection() == Connection.INPUT) ||
+        return (getType() == DataType.EXECUTION && getConnection() == Connection.OUTPUT) ||
                 (getType() != DataType.EXECUTION && getConnection() == Connection.INPUT);
     }
 
