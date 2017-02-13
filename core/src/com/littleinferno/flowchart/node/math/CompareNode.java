@@ -9,7 +9,7 @@ import com.littleinferno.flowchart.pin.Pin;
 
 public class CompareNode extends Node {
     public CompareNode(DataType type, Skin skin) {
-        super("compare", true, skin);
+        super("compare", true);
 
         addExecutionInputPin();
 

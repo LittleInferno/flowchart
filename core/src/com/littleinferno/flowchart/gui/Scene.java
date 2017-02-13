@@ -7,6 +7,7 @@ import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.DragAndDrop;
+import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.kotcrab.vis.ui.widget.VisTable;
 import com.kotcrab.vis.ui.widget.tabbedpane.Tab;
 import com.littleinferno.flowchart.wire.WireManager;
@@ -20,6 +21,8 @@ public class Scene extends Stage {
     private String name;
 
     Scene(String name, boolean closeable, SceneUi sceneUi) {
+        super(new ScreenViewport());
+
         this.sceneUi = sceneUi;
 
         this.name = name;

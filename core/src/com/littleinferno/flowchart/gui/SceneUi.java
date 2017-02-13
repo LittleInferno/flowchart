@@ -6,6 +6,7 @@ import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.DragAndDrop;
+import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.kotcrab.vis.ui.widget.ButtonBar;
 import com.kotcrab.vis.ui.widget.VisTable;
 import com.kotcrab.vis.ui.widget.VisTextButton;
@@ -36,6 +37,7 @@ public class SceneUi extends Stage {
     private CodeBuilder builder;
 
     public SceneUi() {
+        super(new ScreenViewport());
 
         inputMultiplexer = new InputMultiplexer();
         inputMultiplexer.addProcessor(this);
@@ -107,7 +109,8 @@ public class SceneUi extends Stage {
         show = (new MainScene(this));
 
         pinToTabbedPane(show.getUiTab());
-        container.add(controlTable).width(310).growY();
+        controlTable.pack();
+        container.add(controlTable).growY();
 
         activityContainer.add(tabbedPane.getTable()).expandX().fillX().row();
         activityContainer.addSeparator();

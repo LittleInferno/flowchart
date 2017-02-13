@@ -1,11 +1,9 @@
 package com.littleinferno.flowchart.pin;
 
 import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
-import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
 import com.badlogic.gdx.utils.Align;
 import com.kotcrab.vis.ui.VisUI;
@@ -16,7 +14,6 @@ import com.littleinferno.flowchart.Connection;
 import com.littleinferno.flowchart.DataType;
 import com.littleinferno.flowchart.gui.Scene;
 import com.littleinferno.flowchart.node.Node;
-import com.littleinferno.flowchart.ui.Main;
 import com.littleinferno.flowchart.wire.WireManager;
 
 import java.util.ArrayList;
@@ -52,7 +49,7 @@ public class Pin extends VisTable {
         Collections.addAll(possibleConvert, convert);
         possibleConvert.add(DataType.UNIVERSAL);
 
-        init(parent, name, connection, DataType.UNIVERSAL, Main.skin.get(Main.scale == VisUI.SkinScale.X1 ? "X1" : "X2", PinStyle.class));
+        init(parent, name, connection, DataType.UNIVERSAL, VisUI.getSkin().get(PinStyle.class));
     }
 
     public Pin(Node parent, String name, DataType type, Connection connection) {
@@ -60,7 +57,7 @@ public class Pin extends VisTable {
         possibleConvert.addAll(Arrays.asList(
                 DataType.BOOL, DataType.INT, DataType.FLOAT, DataType.STRING, DataType.EXECUTION));
 
-        init(parent, name, connection, type, Main.skin.get(Main.scale == VisUI.SkinScale.X1 ? "X1" : "X2", PinStyle.class));
+        init(parent, name, connection, type, VisUI.getSkin().get(PinStyle.class));
     }
 
     private void init(final Node parent, String name, final Connection connection, final DataType type, PinStyle style) {
@@ -101,7 +98,6 @@ public class Pin extends VisTable {
     private void setStyle(PinStyle style) {
         if (style == null) throw new IllegalArgumentException("style cannot be null.");
         this.style = style;
-        label.setStyle(new Label.LabelStyle(style.font, style.fontColor));
     }
 
     @Override
@@ -124,6 +120,7 @@ public class Pin extends VisTable {
 
         switch (newType) {
             case EXECUTION:
+
                 image.setColor(style.execution);
                 break;
             case BOOL:
@@ -347,18 +344,15 @@ public class Pin extends VisTable {
         Color integer;
         Color floating;
         Color string;
-
         Color universal;
-        BitmapFont font;
-        Color fontColor;
+
 
         public PinStyle() {
         }
 
         public PinStyle(Drawable array, Drawable arrayConnected, Drawable pin,
                         Drawable pinConnected, Color execution, Color bool,
-                        Color integer, Color floating, Color string, Color universal,
-                        BitmapFont font, Color fontColor) {
+                        Color integer, Color floating, Color string, Color universal) {
             this.array = array;
             this.arrayConnected = arrayConnected;
             this.pin = pin;
@@ -369,8 +363,6 @@ public class Pin extends VisTable {
             this.floating = floating;
             this.string = string;
             this.universal = universal;
-            this.font = font;
-            this.fontColor = fontColor;
         }
     }
 }

@@ -1,6 +1,5 @@
 package com.littleinferno.flowchart.node;
 
-import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.littleinferno.flowchart.codegen.CodeBuilder;
 import com.littleinferno.flowchart.pin.Pin;
 import com.littleinferno.flowchart.variable.Variable;
@@ -13,7 +12,7 @@ public class VariableSetNode extends Node {
     private final Pin pin;
     private final Pin next;
 
-    public VariableSetNode(Variable variable, Skin skin) {
+    public VariableSetNode(Variable variable) {
         super(String.format("Set %s", variable.getName()), true);
 
         addExecutionInputPin();

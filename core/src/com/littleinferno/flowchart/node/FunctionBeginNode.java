@@ -1,6 +1,7 @@
 package com.littleinferno.flowchart.node;
 
 
+import com.annimon.stream.Stream;
 import com.badlogic.gdx.utils.Array;
 import com.littleinferno.flowchart.Connection;
 import com.littleinferno.flowchart.DataType;
@@ -60,13 +61,11 @@ public class FunctionBeginNode extends Node {
 
         if (with.getType() == DataType.EXECUTION) {
 
-            Array<Pin> output = getOutput();
-
             ArrayList<String> params = new ArrayList<>();
 
-            for (Pin i : output) {
-                if (i.getType() != DataType.EXECUTION) params.add(i.getName());
-            }
+            Stream.of(pins)
+                    .filter(i -> i.getType() != DataType.EXECUTION)
+                    .forEach(i -> params.add(i.getName()));
 
             String parameters = builder.createParams(params);
 

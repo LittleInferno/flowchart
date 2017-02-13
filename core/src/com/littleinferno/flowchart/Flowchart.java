@@ -1,6 +1,8 @@
 package com.littleinferno.flowchart;
 
+import com.badlogic.gdx.Application;
 import com.badlogic.gdx.Game;
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.kotcrab.vis.ui.VisUI;
 import com.littleinferno.flowchart.gui.SceneScreen;
@@ -10,15 +12,13 @@ public class Flowchart extends Game {
     private Screen scene;
     private static boolean change;
 
-//    @Override
-//    public void resize(int width, int height) {
-//        super.resize(width, height);
-//        main.getViewport().update(width, height, true);
-//    }
-
     @Override
     public void create() {
-        VisUI.load();
+
+        if (Gdx.app.getType() == Application.ApplicationType.Android)
+            VisUI.load("X2/uiskin.json");
+        else
+            VisUI.load("X1/uiskin.json");
 
         scene = new SceneScreen();
         setScreen(scene);
@@ -26,17 +26,10 @@ public class Flowchart extends Game {
     }
 
     @Override
-    public void render() {
-        // Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
-        // main.act();
-        //  main.draw();
+    public void dispose() {
 
-        super.render();
+        scene.dispose();
+
+        VisUI.dispose();
     }
-
-//    @Override
-//    public void dispose() {
-//
-//        main.dispose();
-//    }
 }

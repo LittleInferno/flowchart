@@ -2,9 +2,7 @@ package com.littleinferno.flowchart.node;
 
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.ui.Cell;
-import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.VerticalGroup;
-import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.SnapshotArray;
 import com.kotcrab.vis.ui.widget.VisTable;
@@ -13,27 +11,18 @@ import com.littleinferno.flowchart.Connection;
 import com.littleinferno.flowchart.DataType;
 import com.littleinferno.flowchart.codegen.CodeGen;
 import com.littleinferno.flowchart.pin.Pin;
-import com.littleinferno.flowchart.ui.Main;
 
 public abstract class Node extends VisWindow implements CodeGen {
 
     protected final VerticalGroup left;
     protected final VerticalGroup right;
-    final NodeStyle style;
-    Skin skin;
 
     public Node(final String name, final boolean closable) {
-        this(name, closable, Main.skin);
-    }
-
-    public Node(final String name, final boolean closable, Skin skin) {
         super(name);
         setKeepWithinStage(false);
         setKeepWithinParent(false);
 
 
-        style = skin.get(NodeStyle.class);
-        this.skin = skin;
         setWidth(200);
 
         if (closable) {
@@ -54,9 +43,9 @@ public abstract class Node extends VisWindow implements CodeGen {
         right = new VerticalGroup();
         right.top().right().fill();
         right.space(10);
-        container.add(right).grow().width(100);
+        container.add(right).grow().width(100).row();
 
-        main.add(container).grow();
+        main.add(container).grow().row();
 
         add(main).grow();
         top();
@@ -114,39 +103,9 @@ public abstract class Node extends VisWindow implements CodeGen {
         return pin;
     }
 
-    public void removePin(final String name) {
-        left.removeActor(left.findActor(name));
-        right.removeActor(right.findActor(name));
-    }
-
     public void removePin(final Pin pin) {
         left.removeActor(pin);
         right.removeActor(pin);
-    }
-
-    @Deprecated
-    public Pin getPin(String name) {
-        return (Pin) findActor(name);
-    }
-
-    public Array<Pin> getInput() {
-        Array<Actor> children = left.getChildren();
-
-        Array<Pin> result = new Array<Pin>(children.size);
-
-        for (Actor i : children) result.add((Pin) i);
-
-        return result;
-    }
-
-    public Array<Pin> getOutput() {
-        Array<Actor> children = right.getChildren();
-
-        Array<Pin> result = new Array<Pin>(children.size);
-
-        for (Actor i : children) result.add((Pin) i);
-
-        return result;
     }
 
     public void setTitle(String text) {
@@ -181,17 +140,17 @@ public abstract class Node extends VisWindow implements CodeGen {
         super.close();
     }
 
-    static public class NodeStyle {
-
-        public Drawable normal, select;
-
-        public NodeStyle() {
-        }
-
-        public NodeStyle(Drawable normal, Drawable select) {
-            this.normal = normal;
-            this.select = select;
-
-        }
-    }
+//    static public class NodeStyle {
+//
+//        public Drawable normal, select;
+//
+//        public NodeStyle() {
+//        }
+//
+//        public NodeStyle(Drawable normal, Drawable select) {
+//            this.normal = normal;
+//            this.select = select;
+//
+//        }
+//    }
 }

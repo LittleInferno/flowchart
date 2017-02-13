@@ -25,7 +25,6 @@ import com.littleinferno.flowchart.gui.FunctionScene;
 import com.littleinferno.flowchart.gui.SceneUi;
 import com.littleinferno.flowchart.node.FunctionBeginNode;
 import com.littleinferno.flowchart.node.FunctionReturnNode;
-import com.littleinferno.flowchart.ui.Main;
 import com.littleinferno.flowchart.util.DataSelectBox;
 import com.littleinferno.flowchart.util.DestroyListener;
 import com.littleinferno.flowchart.util.InputForm;
@@ -352,13 +351,10 @@ public class Function {
             VisImageButton.VisImageButtonStyle style =
                     VisUI.getSkin().get("toggle", VisImageButton.VisImageButtonStyle.class);
 
-            Drawable drawable = (Main.scale == VisUI.SkinScale.X1) ?
-                    Main.skin.getDrawable("array-X1") :
-                    Main.skin.getDrawable("array-X2");
+            Drawable drawable = VisUI.getSkin().getDrawable("array");
 
             style.imageChecked = drawable;
             style.imageUp = drawable;
-
 
             final VisImageButton isArray = new VisImageButton(style);
             isArray.addListener(new ChangeListener() {

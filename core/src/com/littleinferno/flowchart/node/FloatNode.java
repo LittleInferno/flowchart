@@ -1,28 +1,25 @@
 package com.littleinferno.flowchart.node;
 
-import com.badlogic.gdx.scenes.scene2d.ui.Skin;
-import com.badlogic.gdx.scenes.scene2d.ui.TextField;
+import com.badlogic.gdx.scenes.scene2d.ui.Table;
+import com.kotcrab.vis.ui.widget.VisTextField;
 import com.littleinferno.flowchart.DataType;
 import com.littleinferno.flowchart.codegen.CodeBuilder;
 import com.littleinferno.flowchart.pin.Pin;
 
 public class FloatNode extends Node {
 
-    private final TextField field;
+    private final VisTextField field;
 
     public FloatNode() {
         super("Float", true);
 
         addDataOutputPin(DataType.FLOAT, "data");
 
-        field = new TextField("", skin);
-        field.setTextFieldFilter(new TextField.TextFieldFilter() {
-            @Override
-            public boolean acceptChar(TextField textField, char c) {
-                return c >= '0' && c <= '9' || c == '.' || c == '+' || c == '-';
-            }
-        });
-        left.addActor(field);//.expandX().fillX().minWidth(0);
+        field = new VisTextField("");
+        field.setTextFieldFilter((textField, c) ->
+                c >= '0' && c <= '9' || c == '.' || c == '+' || c == '-');
+        ((Table) left.getParent().getParent()).add(field).growX();
+        pack();
     }
 
     @Override

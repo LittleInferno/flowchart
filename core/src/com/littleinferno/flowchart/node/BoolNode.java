@@ -1,21 +1,23 @@
 package com.littleinferno.flowchart.node;
 
-import com.badlogic.gdx.scenes.scene2d.ui.SelectBox;
+import com.badlogic.gdx.scenes.scene2d.ui.Table;
+import com.kotcrab.vis.ui.widget.VisSelectBox;
 import com.littleinferno.flowchart.DataType;
 import com.littleinferno.flowchart.codegen.CodeBuilder;
 import com.littleinferno.flowchart.pin.Pin;
 
 public class BoolNode extends Node {
-    private final SelectBox box;
+    private final VisSelectBox<String> box;
 
     public BoolNode() {
         super("Bool", true);
 
         addDataOutputPin(DataType.BOOL, "data");
 
-        box = new SelectBox(skin);
+        box = new VisSelectBox<>();
         box.setItems("True", "False");
-        left.addActor(box);//.expandX().fillX().minWidth(0);
+        ((Table) left.getParent().getParent()).add(box).growX();
+        pack();
     }
 
     @Override

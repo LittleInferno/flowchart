@@ -11,7 +11,6 @@ import com.kotcrab.vis.ui.widget.VisTable;
 import com.kotcrab.vis.ui.widget.VisTextButton;
 import com.littleinferno.flowchart.DataType;
 import com.littleinferno.flowchart.gui.SceneUi;
-import com.littleinferno.flowchart.ui.Main;
 import com.littleinferno.flowchart.util.ArrayChangedListener;
 import com.littleinferno.flowchart.util.DataSelectBox;
 import com.littleinferno.flowchart.util.DestroyListener;
@@ -177,9 +176,7 @@ public class Variable {
             VisImageButton.VisImageButtonStyle style =
                     VisUI.getSkin().get("toggle", VisImageButton.VisImageButtonStyle.class);
 
-            Drawable drawable = (Main.scale == VisUI.SkinScale.X1) ?
-                    Main.skin.getDrawable("array-X1") :
-                    Main.skin.getDrawable("array-X2");
+            Drawable drawable = VisUI.getSkin().getDrawable("array");
 
             style.imageChecked = drawable;
             style.imageUp = drawable;
