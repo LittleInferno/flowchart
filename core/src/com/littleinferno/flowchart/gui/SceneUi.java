@@ -7,6 +7,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.DragAndDrop;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
+import com.kotcrab.vis.ui.VisUI;
 import com.kotcrab.vis.ui.widget.ButtonBar;
 import com.kotcrab.vis.ui.widget.VisTable;
 import com.kotcrab.vis.ui.widget.VisTextButton;
@@ -74,6 +75,8 @@ public class SceneUi extends Stage {
         VisTable tmp = new VisTable();
         tmp.add(buttonBar.createTable()).grow().row();
         tmp.addSeparator();
+        tmp.setBackground(VisUI.getSkin().getDrawable("window-bg"));
+
         container.add(tmp).growX().colspan(3).row();
 
         ControlTable controlTable = new ControlTable(this);
