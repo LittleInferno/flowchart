@@ -7,7 +7,6 @@ import com.littleinferno.flowchart.pin.Pin;
 
 public class ArrayAddNode extends Node {
 
-    private DataType[] converts = {DataType.BOOL, DataType.INT, DataType.FLOAT, DataType.STRING};
     private final Pin next;
     private final Pin array;
     private final Pin item;
@@ -18,10 +17,10 @@ public class ArrayAddNode extends Node {
 
         next = addExecutionOutputPin();
         addExecutionInputPin();
-        array = addDataInputPin("array", converts);
+        array = addDataInputPin("array", Pin.DEFAULT_CONVERT);
         array.setArray(true);
 
-        item = addDataInputPin("item", converts);
+        item = addDataInputPin("item", Pin.DEFAULT_CONVERT);
         length = addDataOutputPin(DataType.INT, "length");
 
         Pin.PinListener listener = t -> {

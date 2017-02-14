@@ -25,6 +25,9 @@ import java.util.List;
 import java.util.Set;
 
 public class Pin extends VisTable {
+    public static final DataType[] DEFAULT_CONVERT =
+            {DataType.BOOL, DataType.INT, DataType.FLOAT, DataType.STRING};
+
     private PinStyle style;
 
     private Connection connection;
@@ -54,8 +57,7 @@ public class Pin extends VisTable {
 
     public Pin(Node parent, String name, DataType type, Connection connection) {
         possibleConvert = new HashSet<>();
-        possibleConvert.addAll(Arrays.asList(
-                DataType.BOOL, DataType.INT, DataType.FLOAT, DataType.STRING, DataType.EXECUTION));
+        possibleConvert.addAll(Arrays.asList(DEFAULT_CONVERT));
 
         init(parent, name, connection, type, VisUI.getSkin().get(PinStyle.class));
     }
@@ -113,14 +115,13 @@ public class Pin extends VisTable {
     public boolean setType(DataType newType) {
         if (newType == type) return true;
 
-        if (!possibleConvert.contains(newType))
+        if (!possibleConvert.contains(newType) && newType != DataType.EXECUTION)
             return false;
 
         type = newType;
 
         switch (newType) {
             case EXECUTION:
-
                 image.setColor(style.execution);
                 break;
             case BOOL:

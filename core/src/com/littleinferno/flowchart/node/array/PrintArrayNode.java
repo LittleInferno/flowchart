@@ -1,20 +1,22 @@
-package com.littleinferno.flowchart.node;
+package com.littleinferno.flowchart.node.array;
 
 import com.littleinferno.flowchart.codegen.BaseCodeGenerator;
+import com.littleinferno.flowchart.node.Node;
 import com.littleinferno.flowchart.pin.Pin;
 
-public class PrintNode extends Node {
+public class PrintArrayNode extends Node {
 
     private final Pin next;
     private final Pin value;
 
-    public PrintNode() {
-        super("Print", true);
+    public PrintArrayNode() {
+        super("print array", true);
 
         next = addExecutionOutputPin();
         addExecutionInputPin();
 
-        value = addDataInputPin("item", Pin.DEFAULT_CONVERT);
+        value = addDataInputPin("items", Pin.DEFAULT_CONVERT);
+        value.setArray(true);
     }
 
     @Override
@@ -26,8 +28,8 @@ public class PrintNode extends Node {
         Pin.Connector n = next.getConnector();
         String nextStr = n != null ? n.parent.gen(builder, n.pin) : "";
 
-        String format = String.format("com.littleinferno.flowchart.jsutil.IO.print(%s)", valStr);
+        String format = String.format("com.littleinferno.flowchart.jsutil.IO.printArray(%s)", valStr);
 
         return String.format("%s%s", builder.makeStatement(format), nextStr);
-    }
+}
 }

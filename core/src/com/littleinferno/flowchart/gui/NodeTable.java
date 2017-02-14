@@ -17,6 +17,7 @@ import com.littleinferno.flowchart.node.StringNode;
 import com.littleinferno.flowchart.node.array.ArrayAddNode;
 import com.littleinferno.flowchart.node.array.ArrayGetNode;
 import com.littleinferno.flowchart.node.array.MakeArrayNode;
+import com.littleinferno.flowchart.node.array.PrintArrayNode;
 import com.littleinferno.flowchart.node.math.AddNode;
 import com.littleinferno.flowchart.node.math.DivNode;
 import com.littleinferno.flowchart.node.math.EqualNode;
@@ -57,6 +58,7 @@ class NodeTable extends VisTable {
                 ArrayAddNode.class.getName(),
                 ArrayGetNode.class.getName(),
                 PrintNode.class.getName(),
+                PrintArrayNode.class.getName()
         };
 
         List<String> tmp = Arrays.asList(items);

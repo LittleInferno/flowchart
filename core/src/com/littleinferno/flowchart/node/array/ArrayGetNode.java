@@ -7,15 +7,16 @@ import com.littleinferno.flowchart.pin.Pin;
 
 public class ArrayGetNode extends Node {
 
-    private DataType[] converts = {DataType.BOOL, DataType.INT, DataType.FLOAT, DataType.STRING};
-    private final Pin array = addDataInputPin("array", converts);
-    private final Pin item = addDataOutputPin("item", converts);
-
+    private final Pin array;
+    private final Pin index;
+    private final Pin item;
 
     public ArrayGetNode() {
         super("Get", true);
 
-        addDataInputPin(DataType.INT, "index");
+        array = addDataInputPin("array", Pin.DEFAULT_CONVERT);
+        index = addDataInputPin(DataType.INT, "index");
+        item = addDataOutputPin("item", Pin.DEFAULT_CONVERT);
 
         Pin.PinListener listener = t -> {
             array.setType(t);
@@ -32,7 +33,7 @@ public class ArrayGetNode extends Node {
     public String gen(BaseCodeGenerator builder, Pin with) {
 
         Pin.Connector a = array.getConnector();
-        Pin.Connector i = item.getConnector();
+        Pin.Connector i = index.getConnector();
         return builder.makeGetArrayItem(a.parent.gen(builder, a.pin),
                 i.parent.gen(builder, i.pin));
     }
