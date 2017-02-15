@@ -58,15 +58,6 @@ public class MakeArrayNode extends Node {
 
     @Override
     public String gen(BaseCodeGenerator builder, Pin with) {
-
-        ArrayList<String> val = new ArrayList<>();
-
-        for (Pin i : values) {
-            Pin.Connector data = i.getConnector();
-            if (i.getType() != DataType.EXECUTION)
-                val.add(data.parent.gen(builder, data.pin));
-        }
-
-        return builder.makeArray(val);
+        return builder.makeArray((ArrayList<Pin>) values);//TODO remove it
     }
 }

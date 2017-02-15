@@ -314,6 +314,13 @@ public class Pin extends VisTable {
         listeners.add(listener);
     }
 
+    public Pin getConnectedPin() {
+        return connectedPin;
+    }
+
+    public Node getNode() {
+        return parent;
+    }
 
     private void notifyListenersTypeChanged(DataType newType) {
         for (PinListener listener : listeners) {

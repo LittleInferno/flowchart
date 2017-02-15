@@ -1,7 +1,9 @@
 package com.littleinferno.flowchart.codegen;
 
 import com.littleinferno.flowchart.DataType;
+import com.littleinferno.flowchart.pin.Pin;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -9,9 +11,13 @@ public interface BaseCodeGenerator {
 
     String makeString(String str);
 
+    String makeExpr(String str);
+
     String makeVariable(String variableName, DataType type, boolean isArray);
 
     String makeVariable(final String name, String value);
+
+    String makeAdd(final Pin left, final Pin right);
 
     String makeAdd(final String left, final String right);
 
@@ -45,7 +51,11 @@ public interface BaseCodeGenerator {
 
     String makeNamedValue(final String name);
 
+    String makeArray(final ArrayList<Pin> values);
+
     String makeArray(final List<String> values);
+
+    String makeAddArrayItem(final Pin array, final Pin value);
 
     String makeAddArrayItem(final String array, final String value);
 

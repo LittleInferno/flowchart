@@ -23,6 +23,6 @@ public class IntegerNode extends Node {
 
     @Override
     public String gen(BaseCodeGenerator builder, Pin with) {
-        return field.getText();
+        return builder.makeExpr(field.getText());
     }
 }
