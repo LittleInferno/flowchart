@@ -22,7 +22,7 @@ public class MakeArrayNode extends Node {
     public MakeArrayNode() {
         super("make array", true);
 
-        array = addDataOutputPin("array",  Pin.DEFAULT_CONVERT);
+        array = addDataOutputPin("array", Pin.DEFAULT_CONVERT);
         array.setArray(true);
 
         listener = t -> {
@@ -46,7 +46,7 @@ public class MakeArrayNode extends Node {
                 if (!values.isEmpty() && values.get(0).getType() != DataType.UNIVERSAL)
                     values.add(addDataInputPin(values.get(0).getType(), "value" + counter++));
                 else {
-                    Pin pin = addDataInputPin("value" + counter++,  Pin.DEFAULT_CONVERT);
+                    Pin pin = addDataInputPin("value" + counter++, Pin.DEFAULT_CONVERT);
                     pin.addListener(listener);
 
                     values.add(pin);

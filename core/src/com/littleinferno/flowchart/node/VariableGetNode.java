@@ -25,6 +25,6 @@ public class VariableGetNode extends Node {
 
     @Override
     public String gen(BaseCodeGenerator builder, Pin with) {
-        return variable.getName();
+        return builder.makeExpr(variable.getName());
     }
 }

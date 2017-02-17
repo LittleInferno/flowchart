@@ -11,12 +11,6 @@ public class SubNode extends ArithmeticNode {
 
     @Override
     public String gen(BaseCodeGenerator builder, Pin with) {
-        Pin.Connector aConnector = a.getConnector();
-        Pin.Connector bConnector = b.getConnector();
-
-        String aStr = aConnector.parent.gen(builder, aConnector.pin);
-        String bStr = bConnector.parent.gen(builder, bConnector.pin);
-
-        return builder.makeSub(aStr, bStr);
+        return builder.makeSub(a, b);
     }
 }

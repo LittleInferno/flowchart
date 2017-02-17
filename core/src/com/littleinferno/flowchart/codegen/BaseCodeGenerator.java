@@ -5,9 +5,10 @@ import com.littleinferno.flowchart.pin.Pin;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 public interface BaseCodeGenerator {
+
+    String EMPTY_EXPRESSION = "";
 
     String makeString(String str);
 
@@ -17,25 +18,27 @@ public interface BaseCodeGenerator {
 
     String makeVariable(final String name, String value);
 
+    String makeVariable(final String variable, final Pin value);
+
     String makeAdd(final Pin left, final Pin right);
 
-    String makeAdd(final String left, final String right);
+    String makeSub(final Pin left, final Pin right);
 
-    String makeSub(final String left, final String right);
+    String makeMul(final Pin left, final Pin right);
 
-    String makeMul(final String left, final String right);
+    String makeDiv(final Pin left, final Pin right);
 
-    String makeDiv(final String left, final String right);
+    String makeEq(final Pin left, final Pin right);
 
-    String makeEq(final String left, final String right);
+    String makeLt(final Pin left, final Pin right);
 
-    String makeLt(final String left, final String right);
+    String makeGt(final Pin left, final Pin right);
 
-    String makeGt(final String left, final String right);
+    String makeLtEq(final Pin left, final Pin right);
 
-    String makeLtEq(final String left, final String right);
+    String makeGtEq(final Pin left, final Pin right);
 
-    String makeGtEq(final String left, final String right);
+    String makeAssign(final Pin left, final Pin right);
 
     String makeAssign(String left, String right);
 
@@ -43,9 +46,9 @@ public interface BaseCodeGenerator {
 
     String makeParams(final List<String> params);
 
-    String makeReturn(final Map<String, String> ret);
+    String makeReturn(List<Pin> pins);
 
-    String makeReturn(final String ret);
+    String makeReturn(final Pin ret);
 
     String makeCall(final String function, final List<String> params, final String result);
 
@@ -53,17 +56,15 @@ public interface BaseCodeGenerator {
 
     String makeArray(final ArrayList<Pin> values);
 
-    String makeArray(final List<String> values);
-
     String makeAddArrayItem(final Pin array, final Pin value);
-
-    String makeAddArrayItem(final String array, final String value);
 
     String makeGetArrayLength(final String array);
 
     String makeGetArrayItem(final String array, final String item);
 
     String makeStatement(String expression);
+
+    String makeIf(Pin condition, Pin block, Pin next);
 
     String makeIf(String condition, BaseBlock block);
 

@@ -1,5 +1,6 @@
 package com.littleinferno.flowchart.node;
 
+import com.annimon.stream.Collectors;
 import com.annimon.stream.Stream;
 import com.littleinferno.flowchart.Connection;
 import com.littleinferno.flowchart.DataType;
@@ -8,9 +9,7 @@ import com.littleinferno.flowchart.function.Function;
 import com.littleinferno.flowchart.pin.Pin;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 public class FunctionReturnNode extends Node {
 
@@ -60,25 +59,16 @@ public class FunctionReturnNode extends Node {
     public String gen(BaseCodeGenerator builder, Pin with) {
 
         if (pins.isEmpty())
-            return "";
+            return BaseCodeGenerator.EMPTY_EXPRESSION;
 
-        if (pins.size() == 1) {
-            Pin p = pins.get(0);
-            Pin.Connector node = p.getConnector();
+        if (pins.size() == 1)
+            return builder.makeReturn(pins.get(0));
 
-            return builder.makeReturn(node.parent.gen(builder, node.pin));
-        }
 
-        Map<String, String> returnPack = new HashMap<>();
-        Stream.of(pins)
-                .filter(i -> i.getType() != DataType.EXECUTION)
-                .forEach(i -> {
-                    Pin.Connector node = i.getConnector();
-
-                    returnPack.put(i.getName(), node.parent.gen(builder, node.pin));
-                });
-
-        return builder.makeReturn(returnPack);
+        return builder.makeReturn(
+                Stream.of(pins)
+                        .filter(i -> i.getType() != DataType.EXECUTION)
+                        .collect(Collectors.toList()));
     }
 
     @Override

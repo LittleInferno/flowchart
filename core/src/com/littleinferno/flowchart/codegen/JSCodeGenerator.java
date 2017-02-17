@@ -1,5 +1,6 @@
 package com.littleinferno.flowchart.codegen;
 
+import com.annimon.stream.Stream;
 import com.littleinferno.flowchart.DataType;
 import com.littleinferno.flowchart.pin.Pin;
 
@@ -22,7 +23,7 @@ public class JSCodeGenerator implements BaseCodeGenerator {
 
     @Override
     public String makeString(String str) {
-        return new StringBuilder().append("\n").append(str).append("\"").toString();
+        return makeExpr("\n" + str + "\"");
     }
 
     @Override
@@ -44,56 +45,90 @@ public class JSCodeGenerator implements BaseCodeGenerator {
     }
 
     @Override
+    public String makeVariable(String variable, Pin value) {
+        generate(value);
+
+        return makeVariable(variable, getPreviousExpression());
+    }
+
+    @Override
     public String makeAdd(Pin left, Pin right) {
-        gen(left);
-        gen(right);
+        generate(left);
+        generate(right);
 
         return createBinary("+");
     }
 
     @Override
-    public String makeAdd(final String left, final String right) {
-        return createBinary(left, right, "+");
+    public String makeSub(Pin left, Pin right) {
+        generate(left);
+        generate(right);
+
+        return createBinary("+");
     }
 
     @Override
-    public String makeSub(final String left, final String right) {
-        return createBinary(left, right, "-");
+    public String makeMul(Pin left, Pin right) {
+        generate(left);
+        generate(right);
+
+        return createBinary("*");
     }
 
     @Override
-    public String makeMul(final String left, final String right) {
-        return createBinary(left, right, "*");
+    public String makeDiv(Pin left, Pin right) {
+        generate(left);
+        generate(right);
+
+        return createBinary("/");
     }
 
     @Override
-    public String makeDiv(final String left, final String right) {
-        return createBinary(left, right, "/");
+    public String makeEq(Pin left, Pin right) {
+        generate(left);
+        generate(right);
+
+        return createBinary("==");
     }
 
     @Override
-    public String makeEq(final String left, final String right) {
-        return createBinary(left, right, "==");
+    public String makeLt(Pin left, Pin right) {
+        generate(left);
+        generate(right);
+
+        return createBinary("<");
     }
 
     @Override
-    public String makeLt(final String left, final String right) {
-        return createBinary(left, right, "<");
+    public String makeGt(Pin left, Pin right) {
+        generate(left);
+        generate(right);
+
+        return createBinary(">");
     }
 
     @Override
-    public String makeGt(final String left, final String right) {
-        return createBinary(left, right, ">");
+    public String makeLtEq(Pin left, Pin right) {
+        generate(left);
+        generate(right);
+
+        return createBinary("<=");
     }
 
     @Override
-    public String makeLtEq(final String left, final String right) {
-        return createBinary(left, right, "<=");
+    public String makeGtEq(Pin left, Pin right) {
+        generate(left);
+        generate(right);
+
+        return createBinary(">=");
     }
 
     @Override
-    public String makeGtEq(final String left, final String right) {
-        return createBinary(left, right, ">=");
+    public String makeAssign(Pin left, Pin right) {
+        generate(left);
+        generate(right);
+
+        return createBinary("=");
     }
 
     @Override
@@ -118,28 +153,22 @@ public class JSCodeGenerator implements BaseCodeGenerator {
     }
 
     @Override
-    public String makeReturn(final Map<String, String> ret) {
+    public String makeReturn(List<Pin> pins) {
 
-        StringBuilder returnBuilder = new StringBuilder();
-        List<String> packBuild = new ArrayList<>(ret.size());
+        Stream.of(pins).forEach(pin -> makeVariable(pin.getName(), pin));
 
-        for (Map.Entry<String, String> i : ret.entrySet()) {
-
-            returnBuilder.append(makeVariable(i.getKey(), i.getValue()));
-
-            packBuild.add(i.getKey());
-        }
-
-        return returnBuilder.append(packParameters(packBuild)).toString();
+        return packReturn(pins);
     }
 
     @Override
-    public String makeReturn(String ret) {
-        return makeStatement("return " + ret);
+    public String makeReturn(Pin ret) {
+        generate(ret);
+
+        return makeStatement("return " + getPreviousExpression());
     }
 
-    private String makeReturn(BaseBlock block) {
-        return makeReturn(block.toString());
+    private String makeReturn() {
+        return makeStatement("return " + getPreviousExpression());
     }
 
     @Override
@@ -168,10 +197,13 @@ public class JSCodeGenerator implements BaseCodeGenerator {
         StringBuilder arrayBuilder = new StringBuilder();
         arrayBuilder.append('[');
 
-        for (int i = 0; i < values.size() - 1; i++)
-            arrayBuilder.append(values.get(i)).append(',');
+        for (int i = 0; i < values.size() - 1; i++) {
+            generate(values.get(i));
+            arrayBuilder.append(getPreviousExpression()).append(',');
+        }
 
-        arrayBuilder.append(values.get(values.size() - 1));
+        generate(values.get(values.size() - 1));
+        arrayBuilder.append(getPreviousExpression());
 
         arrayBuilder.append(']');
 
@@ -179,34 +211,11 @@ public class JSCodeGenerator implements BaseCodeGenerator {
     }
 
     @Override
-    public String makeArray(List<String> values) {
-
-        StringBuilder arrayBuilder = new StringBuilder();
-        arrayBuilder.append('[');
-
-        for (int i = 0, valuesSize = values.size(); i < valuesSize; i++) {
-
-            arrayBuilder.append(values.get(i));
-
-            if (i != valuesSize - 1) arrayBuilder.append(',');
-        }
-
-        arrayBuilder.append(']');
-
-        return arrayBuilder.toString();
-    }
-
-    @Override
     public String makeAddArrayItem(Pin array, Pin value) {
-        gen(value);
-        gen(array);
+        generate(value);
+        generate(array);
 
-        return previousExpressions.pop() + ".push(" + previousExpressions.pop() + ")";
-    }
-
-    @Override
-    public String makeAddArrayItem(final String array, final String value) {
-        return String.format("%s.push(%s);\n", array, value);
+        return makeStatement(getPreviousExpression() + ".push(" + getPreviousExpression() + ")");
     }
 
     @Override
@@ -222,6 +231,14 @@ public class JSCodeGenerator implements BaseCodeGenerator {
     @Override
     public String makeStatement(String expression) {
         return expression + ";\n";
+    }
+
+    @Override
+    public String makeIf(Pin condition, Pin block, Pin next) {
+        generate(condition);
+        generate(block);
+
+        return null;
     }
 
     @Override
@@ -244,41 +261,43 @@ public class JSCodeGenerator implements BaseCodeGenerator {
         return makeIf(condition, ifBlock) + makeElse(elseBlock);
     }
 
-    private String createBinary(final String left, final String right, final String operator) {
-        String s = "(" + left + operator + right + ")";
-
-        previousExpressions.push(s);
-
-        return s;
-    }
-
     private String createBinary(final String operator) {
-        String s = "(" + previousExpressions.pop() +
-                operator + previousExpressions.pop() + ")";
+        String s = "(" + getPreviousExpression() +
+                operator + getPreviousExpression() + ")";
 
         previousExpressions.push(s);
 
         return s;
     }
 
-    private String packParameters(final List<String> parameters) {
-        StringBuilder parameterPack = new StringBuilder();
+    private String packReturn(List<Pin> pins) {
 
-        for (int i = 0; i < parameters.size() - 1; i++) {
-            String str = parameters.get(i);
-            parameterPack.append(str).append(':').append(str).append(',');
+        ReturnBlock returnBlock = new ReturnBlock();
+
+        for (Pin pin : pins) {
+            generate(pin);
+            returnBlock.addParameter(pin.getName(), getPreviousExpression());
         }
 
-        String str = parameters.get(parameters.size() - 1);
-        parameterPack.append(str).append(':').append(str);
+        makeExpr(returnBlock.getBody());
 
-
-        return makeReturn(makeBlock(parameterPack.toString()));
+        return makeReturn();
     }
 
     public JSBlock makeBlock(String body) {
         return new JSBlock(body);
     }
+
+
+    private void generate(final Pin pin) {
+        Pin connectedPin = pin.getConnectedPin();
+        connectedPin.getNode().gen(this, connectedPin);
+    }
+
+    private String getPreviousExpression() {
+        return previousExpressions.pop();
+    }
+
 
     private static class JSBlock extends BaseBlock {
 
@@ -294,9 +313,24 @@ public class JSCodeGenerator implements BaseCodeGenerator {
         }
     }
 
+    private static class ReturnBlock extends BaseBlock {
 
-    private void gen(final Pin pin) {
-        Pin connectedPin = pin.getConnectedPin();
-        connectedPin.getNode().gen(this, connectedPin);
+        StringBuilder builder;
+
+        ReturnBlock() {
+            builder = new StringBuilder();
+            builder.append("{");
+        }
+
+        void addParameter(String name, String value) {
+            if (builder.length() != 1) builder.append(',');
+
+            builder.append(name).append(":").append(value);
+        }
+
+        @Override
+        String getBody() {
+            return builder.append('}').toString();
+        }
     }
 }

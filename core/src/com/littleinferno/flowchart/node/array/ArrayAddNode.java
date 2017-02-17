@@ -35,19 +35,15 @@ public class ArrayAddNode extends Node {
     @Override
     public String gen(BaseCodeGenerator builder, Pin with) {
         if (with == length) {
-            Pin.Connector len = length.getConnector();
-            return builder.makeGetArrayLength(len.parent.gen(builder, len.pin));
+            Pin.Connector arr = array.getConnector();
+            return builder.makeGetArrayLength(arr.parent.gen(builder, arr.pin));
         }
 
-        Pin.Connector arr = array.getConnector();
-        Pin.Connector val = item.getConnector();
-
-        String add = builder.makeAddArrayItem(arr.parent.gen(builder, arr.pin),
-                val.parent.gen(builder, val.pin));
+        String s = builder.makeAddArrayItem(array, item);
 
         Pin.Connector n = next.getConnector();
         String nextStr = n != null ? n.parent.gen(builder, n.pin) : "";
 
-        return String.format("%s%s", add, nextStr);
+        return String.format("%s%s", s, nextStr);
     }
 }
