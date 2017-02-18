@@ -3,7 +3,6 @@ package com.littleinferno.flowchart.gui;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.input.GestureDetector;
 import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.DragAndDrop;
@@ -39,15 +38,16 @@ public class Scene extends Stage {
 
             @Override
             public void drop(DragAndDrop.Source source, DragAndDrop.Payload payload, float x, float y, int pointer) {
-                Actor node = (Actor) payload.getObject();
+                DropItem item = (DropItem) payload.getObject();
 
                 Vector2 vec = uiTab.getContentTable().localToStageCoordinates(new Vector2(x, y));
                 vec = uiTab.getContentTable().getStage().stageToScreenCoordinates(vec);
 
                 screenToStageCoordinates(vec);
 
-                node.setPosition(vec.x, vec.y);
-                addActor(node);
+                item.setPosition(vec.x, vec.y);
+
+                item.init(Scene.this);
             }
         });
 
