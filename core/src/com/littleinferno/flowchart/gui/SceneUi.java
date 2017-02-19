@@ -14,8 +14,9 @@ import com.kotcrab.vis.ui.widget.VisTextButton;
 import com.kotcrab.vis.ui.widget.tabbedpane.Tab;
 import com.kotcrab.vis.ui.widget.tabbedpane.TabbedPane;
 import com.kotcrab.vis.ui.widget.tabbedpane.TabbedPaneAdapter;
+import com.littleinferno.flowchart.codegen.BaseCodeExecution;
 import com.littleinferno.flowchart.codegen.BaseCodeGenerator;
-import com.littleinferno.flowchart.codegen.CodeExecution;
+import com.littleinferno.flowchart.codegen.JSCodeExecution;
 import com.littleinferno.flowchart.codegen.JSCodeGenerator;
 import com.littleinferno.flowchart.function.FunctionManager;
 import com.littleinferno.flowchart.variable.VariableManager;
@@ -33,7 +34,7 @@ public class SceneUi extends Stage {
 
     private static DragAndDrop dragAndDrop;
 
-    private CodeExecution codeExecution;
+    private BaseCodeExecution codeExecution;
     private Begin begin;
     private BaseCodeGenerator builder;
 
@@ -45,7 +46,8 @@ public class SceneUi extends Stage {
 
         show = null;
 
-        codeExecution = new CodeExecution();
+        codeExecution = new JSCodeExecution();
+        codeExecution.init();
 
         variableManager = new VariableManager(this);
         functionManager = new FunctionManager(this);
@@ -67,7 +69,8 @@ public class SceneUi extends Stage {
 
                 String code = variableManager.gen(builder) + functionManager.gen(builder) + begin.gen(builder);
                 System.out.println(code);
-                codeExecution.run(code);
+                codeExecution.setCode(code);
+                codeExecution.run();
             }
         });
 
@@ -173,5 +176,11 @@ public class SceneUi extends Stage {
 
     public interface Begin {
         String gen(BaseCodeGenerator builder);
+    }
+
+    @Override
+    public void dispose() {
+        super.dispose();
+        codeExecution.stop();
     }
 }
