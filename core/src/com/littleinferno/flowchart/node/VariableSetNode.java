@@ -18,7 +18,7 @@ public class VariableSetNode extends Node {
         addExecutionInputPin();
         next = addExecutionOutputPin();
 
-        this.pin = addDataInputPin(variable.getDataType(), "data");
+        this.pin = addDataInputPin("data", variable.getDataType());
         this.pin.setArray(variable.isArray());
 
         this.variable = variable;

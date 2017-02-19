@@ -32,7 +32,7 @@ public class FunctionReturnNode extends Node {
         function.addPareameterListener(
                 parameter -> {
                     if (parameter.getConnection() == Connection.OUTPUT) {
-                        final Pin pin = addDataInputPin(parameter.getDataType(), parameter.getName());
+                        final Pin pin = addDataInputPin(parameter.getName(), parameter.getDataType());
 
                         pin.setArray(parameter.isArray());
 

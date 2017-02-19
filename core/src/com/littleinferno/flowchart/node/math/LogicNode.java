@@ -15,7 +15,7 @@ public abstract class LogicNode extends Node {
 
         a = addDataInputPin("A", possibleConvert);
         b = addDataInputPin("B", possibleConvert);
-        addDataOutputPin(DataType.BOOL, "result");
+        addDataOutputPin("result", DataType.BOOL);
 
         Pin.PinListener listener = t -> {
             a.setType(t);

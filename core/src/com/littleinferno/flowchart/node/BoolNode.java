@@ -12,7 +12,7 @@ public class BoolNode extends Node {
     public BoolNode() {
         super("Bool", true);
 
-        addDataOutputPin(DataType.BOOL, "data");
+        addDataOutputPin("data", DataType.BOOL);
 
         box = new VisSelectBox<>();
         box.setItems("True", "False");

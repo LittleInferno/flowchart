@@ -44,7 +44,7 @@ public class MakeArrayNode extends Node {
             public void changed(ChangeEvent event, Actor actor) {
 
                 if (!values.isEmpty() && values.get(0).getType() != DataType.UNIVERSAL)
-                    values.add(addDataInputPin(values.get(0).getType(), "value" + counter++));
+                    values.add(addDataInputPin("value" + counter++, values.get(0).getType()));
                 else {
                     Pin pin = addDataInputPin("value" + counter++,  Pin.DEFAULT_CONVERT);
                     pin.addListener(listener);

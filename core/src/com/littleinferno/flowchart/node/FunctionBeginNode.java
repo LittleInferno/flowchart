@@ -33,7 +33,7 @@ public class FunctionBeginNode extends Node {
         function.addPareameterListener(
                 parameter -> {
                     if (parameter.getConnection() == Connection.INPUT) {
-                        final Pin pin = addDataOutputPin(parameter.getDataType(), parameter.getName());
+                        final Pin pin = addDataOutputPin(parameter.getName(), parameter.getDataType());
 
                         pin.setArray(parameter.isArray());
 

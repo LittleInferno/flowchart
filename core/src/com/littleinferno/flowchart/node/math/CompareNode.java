@@ -13,8 +13,8 @@ public class CompareNode extends Node {
 
         addExecutionInputPin();
 
-        addDataInputPin(type, "A");
-        addDataInputPin(type, "B");
+        addDataInputPin("A", type);
+        addDataInputPin("B", type);
 
         addExecutionOutputPin("A > B");
         addExecutionOutputPin("A == B");

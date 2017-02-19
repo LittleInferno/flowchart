@@ -15,7 +15,7 @@ public class ArrayGetNode extends Node {
         super("Get", true);
 
         array = addDataInputPin("array", Pin.DEFAULT_CONVERT);
-        index = addDataInputPin(DataType.INT, "index");
+        index = addDataInputPin("index", DataType.INT);
         item = addDataOutputPin("item", Pin.DEFAULT_CONVERT);
 
         Pin.PinListener listener = t -> {
