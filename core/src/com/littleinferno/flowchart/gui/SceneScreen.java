@@ -35,8 +35,4 @@ public class SceneScreen extends ScreenAdapter {
     public void show() {
         Gdx.input.setInputProcessor(sceneUi.getInputMultiplexer());
     }
-
-
-
-
 }

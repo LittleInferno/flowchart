@@ -13,7 +13,7 @@ public class IfNode extends Node {
         super("if", true);
 
         addExecutionInputPin();
-        condition = addDataInputPin(DataType.BOOL, "Condition");
+        condition = addDataInputPin("Condition", DataType.BOOL);
 
         truePath = addExecutionOutputPin("True");
         falsePath = addExecutionOutputPin("False");

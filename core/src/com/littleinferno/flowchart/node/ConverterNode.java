@@ -9,8 +9,8 @@ public class ConverterNode extends Node {
     public ConverterNode(DataType from, DataType to, Skin skin) {
         super("Converter", true);
 
-        addDataInputPin(from, "from");
-        addDataOutputPin(to, "to");
+        addDataInputPin("from", from);
+        addDataOutputPin("to", to);
     }
 
     @Override

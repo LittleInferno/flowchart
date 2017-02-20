@@ -1,12 +1,17 @@
 package com.littleinferno.flowchart.pin;
 
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.input.GestureDetector;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
+import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
 import com.badlogic.gdx.utils.Align;
 import com.kotcrab.vis.ui.VisUI;
+import com.kotcrab.vis.ui.widget.MenuItem;
+import com.kotcrab.vis.ui.widget.PopupMenu;
 import com.kotcrab.vis.ui.widget.VisImage;
 import com.kotcrab.vis.ui.widget.VisLabel;
 import com.kotcrab.vis.ui.widget.VisTable;
@@ -40,6 +45,7 @@ public class Pin extends VisTable {
     private List<PinListener> listeners;
 
     private Node parent;
+    private GestureDetector gestureDetector;
 
     private Pin connectedPin;
     private List<Pin> connectedPins;
@@ -49,25 +55,26 @@ public class Pin extends VisTable {
 
     public Pin(Node parent, String name, Connection connection, DataType... convert) {
         possibleConvert = new HashSet<>();
-        Collections.addAll(possibleConvert, convert);
-        possibleConvert.add(DataType.UNIVERSAL);
 
-        init(parent, name, connection, DataType.UNIVERSAL, VisUI.getSkin().get(PinStyle.class));
+        setStyle(VisUI.getSkin().get(PinStyle.class));
+
+        if (convert.length == 1) {
+            possibleConvert.addAll(Arrays.asList(DEFAULT_CONVERT));
+            init(parent, name, connection, convert[0]);
+        } else {
+            Collections.addAll(possibleConvert, convert);
+            possibleConvert.add(DataType.UNIVERSAL);
+            init(parent, name, connection, DataType.UNIVERSAL);
+        }
     }
 
-    public Pin(Node parent, String name, DataType type, Connection connection) {
-        possibleConvert = new HashSet<>();
-        possibleConvert.addAll(Arrays.asList(DEFAULT_CONVERT));
-
-        init(parent, name, connection, type, VisUI.getSkin().get(PinStyle.class));
-    }
-
-    private void init(final Node parent, String name, final Connection connection, final DataType type, PinStyle style) {
+    private void init(final Node parent, String name, final Connection connection, final DataType type) {
         this.parent = parent;
         this.connection = connection;
         this.isUniversal = type == DataType.UNIVERSAL;
         this.listeners = new ArrayList<>();
         this.connectedPins = new ArrayList<>();
+        this.gestureDetector = new GestureDetector(new PinGesture());
 
         this.label = new VisLabel();
         this.label.setEllipsis(true);
@@ -76,7 +83,6 @@ public class Pin extends VisTable {
         this.image = new VisImage();
 
         setName(name);
-        setStyle(style);
         setArray(false);
         setType(type);
 
@@ -91,11 +97,22 @@ public class Pin extends VisTable {
         addListener(new InputListener() {
             @Override
             public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
-                getStage().getWireManager().add(Pin.this);
+                gestureDetector.touchDown(x, y, pointer, 0);
                 return true;
+            }
+
+            @Override
+            public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
+                gestureDetector.touchUp(x, y, pointer, 0);
+            }
+
+            @Override
+            public void touchDragged(InputEvent event, float x, float y, int pointer) {
+                gestureDetector.touchDragged(x, y, pointer);
             }
         });
     }
+
 
     private void setStyle(PinStyle style) {
         if (style == null) throw new IllegalArgumentException("style cannot be null.");
@@ -371,6 +388,72 @@ public class Pin extends VisTable {
             this.floating = floating;
             this.string = string;
             this.universal = universal;
+        }
+    }
+
+
+    private class PinGesture implements GestureDetector.GestureListener {
+
+        @Override
+        public boolean touchDown(float x, float y, int pointer, int button) {
+            return false;
+        }
+
+        @Override
+        public boolean tap(float x, float y, int count, int button) {
+            getStage().getWireManager().add(Pin.this);
+            return true;
+        }
+
+        @Override
+        public boolean longPress(float x, float y) {
+            PinPopumMenu pinPopumMenu = new PinPopumMenu();
+
+            Vector2 vec = localToStageCoordinates(new Vector2());
+            pinPopumMenu.setPosition(vec.x, vec.y);
+            getStage().addActor(pinPopumMenu);
+
+            return true;
+        }
+
+        @Override
+        public boolean fling(float velocityX, float velocityY, int button) {
+            return false;
+        }
+
+        @Override
+        public boolean pan(float x, float y, float deltaX, float deltaY) {
+            return false;
+        }
+
+        @Override
+        public boolean panStop(float x, float y, int pointer, int button) {
+            return false;
+        }
+
+        @Override
+        public boolean zoom(float initialDistance, float distance) {
+            return false;
+        }
+
+        @Override
+        public boolean pinch(Vector2 initialPointer1, Vector2 initialPointer2, Vector2 pointer1, Vector2 pointer2) {
+            return false;
+        }
+
+        @Override
+        public void pinchStop() {
+        }
+    }
+
+    private class PinPopumMenu extends PopupMenu {
+        PinPopumMenu() {
+            addItem(new MenuItem("break connection", new ChangeListener() {
+                @Override
+                public void changed(ChangeEvent event, Actor actor) {
+                    Pin.this.disconnect();
+                }
+            }));
         }
     }
 }

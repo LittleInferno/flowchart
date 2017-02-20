@@ -36,9 +36,9 @@ public class FunctionCallNode extends Node {
                 parameter -> {
                     final Pin pin;
                     if (parameter.getConnection() == Connection.INPUT)
-                        pin = addDataInputPin(parameter.getDataType(), parameter.getName());
+                        pin = addDataInputPin(parameter.getName(), parameter.getDataType());
                     else
-                        pin = addDataOutputPin(parameter.getDataType(), parameter.getName());
+                        pin = addDataOutputPin(parameter.getName(), parameter.getDataType());
 
                     pin.setArray(parameter.isArray());
 

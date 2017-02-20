@@ -13,7 +13,7 @@ public class FloatNode extends Node {
     public FloatNode() {
         super("Float", true);
 
-        addDataOutputPin(DataType.FLOAT, "data");
+        addDataOutputPin("data", DataType.FLOAT);
 
         field = new VisTextField("");
         field.setTextFieldFilter((textField, c) ->

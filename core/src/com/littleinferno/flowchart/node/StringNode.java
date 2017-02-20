@@ -13,7 +13,7 @@ public class StringNode extends Node {
     public StringNode() {
         super("String", true);
 
-        addDataOutputPin(DataType.STRING, "data");
+        addDataOutputPin("data", DataType.STRING);
 
         field = new VisTextField("");
         field.setWidth(100);

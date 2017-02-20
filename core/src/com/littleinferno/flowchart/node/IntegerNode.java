@@ -13,7 +13,7 @@ public class IntegerNode extends Node {
     public IntegerNode() {
         super("Integer", true);
 
-        addDataOutputPin(DataType.INT, "data");
+        addDataOutputPin("data", DataType.INT);
 
         field = new VisTextField("");
         field.setTextFieldFilter((textField, c) -> c >= '0' && c <= '9' || c == '+' || c == '-');

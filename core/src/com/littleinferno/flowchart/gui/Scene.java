@@ -39,15 +39,20 @@ public class Scene extends Stage {
 
             @Override
             public void drop(DragAndDrop.Source source, DragAndDrop.Payload payload, float x, float y, int pointer) {
-                Actor node = (Actor) payload.getObject();
+
+                Actor object = (Actor) payload.getObject();
 
                 Vector2 vec = uiTab.getContentTable().localToStageCoordinates(new Vector2(x, y));
                 vec = uiTab.getContentTable().getStage().stageToScreenCoordinates(vec);
 
                 screenToStageCoordinates(vec);
 
-                node.setPosition(vec.x, vec.y);
-                addActor(node);
+                object.setPosition(vec.x, vec.y);
+
+                if (object instanceof DropItem)
+                    ((DropItem) object).init(Scene.this);
+                else
+                    Scene.this.addActor(object);
             }
         });
 

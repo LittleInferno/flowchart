@@ -12,7 +12,7 @@ public class VariableGetNode extends Node {
     public VariableGetNode(Variable variable) {
         super(String.format("Get %s", variable.getName()), true);
 
-        final Pin pin = addDataOutputPin(variable.getDataType(), "data");
+        final Pin pin = addDataOutputPin("data", variable.getDataType());
         pin.setArray(variable.isArray());
 
         this.variable = variable;

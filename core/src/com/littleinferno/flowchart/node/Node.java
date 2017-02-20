@@ -59,13 +59,6 @@ public abstract class Node extends VisWindow implements CodeGen {
         return pin;
     }
 
-    public Pin addDataInputPin(final DataType type, final String name) {
-        Pin pin = new Pin(this, name, type, Connection.INPUT);
-        left.addActor(pin);
-        pack();
-        return pin;
-    }
-
     public Pin addDataOutputPin(final String name, DataType... possibleConvert) {
         Pin pin = new Pin(this, name, Connection.OUTPUT, possibleConvert);
         right.addActor(pin);
@@ -73,20 +66,12 @@ public abstract class Node extends VisWindow implements CodeGen {
         return pin;
     }
 
-    public Pin addDataOutputPin(final DataType type, final String name) {
-        Pin pin = new Pin(this, name, type, Connection.OUTPUT);
-        right.addActor(pin);
-        pack();
-        return pin;
-    }
-
-
     public Pin addExecutionInputPin() {
         return addExecutionInputPin("exec in");
     }
 
     public Pin addExecutionInputPin(final String name) {
-        Pin pin = new Pin(this, name, DataType.EXECUTION, Connection.INPUT);
+        Pin pin = new Pin(this, name, Connection.INPUT, DataType.EXECUTION);
         left.addActor(pin);
         pack();
         return pin;
@@ -97,7 +82,7 @@ public abstract class Node extends VisWindow implements CodeGen {
     }
 
     public Pin addExecutionOutputPin(final String name) {
-        Pin pin = new Pin(this, name, DataType.EXECUTION, Connection.OUTPUT);
+        Pin pin = new Pin(this, name, Connection.OUTPUT, DataType.EXECUTION);
         right.addActor(pin);
         pack();
         return pin;
