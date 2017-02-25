@@ -1,11 +1,12 @@
 package com.littleinferno.flowchart;
 
-import com.badlogic.gdx.Application;
 import com.badlogic.gdx.Game;
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.kotcrab.vis.ui.VisUI;
-import com.littleinferno.flowchart.gui.SceneScreen;
+import com.littleinferno.flowchart.codegen.JSCodeExecution;
+import com.littleinferno.flowchart.codegen.JSCodeGenerator;
+import com.littleinferno.flowchart.project.Project;
+
 
 public class Flowchart extends Game {
 
@@ -15,14 +16,10 @@ public class Flowchart extends Game {
     @Override
     public void create() {
 
-        if (Gdx.app.getType() == Application.ApplicationType.Android)
-            VisUI.load("X2/uiskin.json");
-        else
-            VisUI.load("X1/uiskin.json");
+        Project project = Project.createProject("test", "test/", new JSCodeGenerator(), new JSCodeExecution());
 
-        scene = new SceneScreen();
+        scene = project.getProjectScreen();
         setScreen(scene);
-
     }
 
     @Override

@@ -14,11 +14,14 @@ public class FunctionParameter {
     private String name;
     private DataType dataType;
     private boolean isArray;
-    private final Connection connection;
+    private Connection connection;
 
     private List<NameChangedListener> nameChangedListeners;
     private List<TypeChangedListener> typeChangedListeners;
     private List<ArrayChangedListener> arrayChangedListeners;
+
+    public FunctionParameter() {
+    }
 
     public FunctionParameter(String name, DataType type, Connection connection, boolean isArray) {
         this.name = name;

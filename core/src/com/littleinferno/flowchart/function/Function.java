@@ -6,6 +6,8 @@ import com.badlogic.gdx.scenes.scene2d.ui.VerticalGroup;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
 import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.Json;
+import com.badlogic.gdx.utils.JsonValue;
 import com.kotcrab.vis.ui.VisUI;
 import com.kotcrab.vis.ui.building.OneColumnTableBuilder;
 import com.kotcrab.vis.ui.building.utilities.CellWidget;
@@ -22,9 +24,9 @@ import com.littleinferno.flowchart.Connection;
 import com.littleinferno.flowchart.DataType;
 import com.littleinferno.flowchart.codegen.BaseCodeGenerator;
 import com.littleinferno.flowchart.gui.FunctionScene;
-import com.littleinferno.flowchart.gui.SceneUi;
 import com.littleinferno.flowchart.node.FunctionBeginNode;
 import com.littleinferno.flowchart.node.FunctionReturnNode;
+import com.littleinferno.flowchart.project.Project;
 import com.littleinferno.flowchart.util.DataSelectBox;
 import com.littleinferno.flowchart.util.DestroyListener;
 import com.littleinferno.flowchart.util.InputForm;
@@ -34,7 +36,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 
-public class Function {
+public class Function implements Json.Serializable {
 
     private String name;
 
@@ -53,7 +55,10 @@ public class Function {
 
     private FunctionScene scene;
 
-    public Function(String name, SceneUi sceneUi) {
+    Function() {
+    }
+
+    public Function(String name) {
         this.name = name;
 
         parameters = new ArrayList<>();
@@ -68,7 +73,7 @@ public class Function {
 
         returnNodes = new ArrayList<>();
 
-        scene = new FunctionScene(this, sceneUi);
+        scene = new FunctionScene(this);
 
         FunctionBeginNode beginNode = new FunctionBeginNode(this);
         beginNode.setPosition(350, 250);
@@ -178,6 +183,38 @@ public class Function {
         return scene;
     }
 
+    @Override
+    public void write(Json json) {
+
+        json.writeObjectStart();
+        json.writeValue("name", name);
+        json.writeArrayStart("parameters");
+
+        for (FunctionParameter fp : parameters) {
+            json.writeObjectStart();
+            json.writeField(fp, "name", "name");
+            json.writeValue("type", fp.getDataType());
+            json.writeField(fp, "isArray", "isArray");
+            json.writeValue("connection", fp.getConnection());
+            json.writeObjectEnd();
+        }
+
+        json.writeArrayEnd();
+        json.writeObjectEnd();
+    }
+
+    @Override
+    public void read(Json json, JsonValue jsonData) {
+
+        name = jsonData.get("name").asString();
+
+        JsonValue vars = jsonData.get("parameters");
+        for (JsonValue element : vars) {
+            parameters.add(json.readValue(FunctionParameter.class, element));
+        }
+
+    }
+
     private class FunctionDetailsTable extends VisTable {
 
         Function function;
@@ -218,7 +255,7 @@ public class Function {
             deleteFunction.addListener(new ChangeListener() {
                 @Override
                 public void changed(ChangeEvent event, Actor actor) {
-                    scene.getSceneUi().getFunctionManager().removeFunction(function);
+                    Project.instance().getFunctionManager().removeFunction(function);
                 }
             });
 

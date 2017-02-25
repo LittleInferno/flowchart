@@ -8,13 +8,14 @@ import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.kotcrab.vis.ui.VisUI;
 import com.kotcrab.vis.ui.widget.VisTable;
 import com.kotcrab.vis.ui.widget.VisTextButton;
+import com.littleinferno.flowchart.project.Project;
 
 
 public class ControlTable extends VisTable {
 
     static private ConsoleTable consoleTable;
 
-    public ControlTable(SceneUi sceneUi) {
+    public ControlTable(UIScene sceneUi) {
         setTouchable(Touchable.enabled);
 
         final VisTable nodeTable = new NodeTable(sceneUi);
@@ -26,13 +27,14 @@ public class ControlTable extends VisTable {
         createVariable.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
-                sceneUi.getVariableManager().createVariable();
+                Project.instance().getVariableManager().createVariable();
             }
         });
         variableTable.add(createVariable).growX().row();
-        variableTable.add(sceneUi.getVariableManager().getVarTable()).grow().row();
+
+        variableTable.add(Project.instance().getVariableManager().getUi().getVarTable()).grow().row();
         variableTable.addSeparator();
-        variableTable.add(sceneUi.getVariableManager().getDetailsTable()).growX().row();
+        variableTable.add(Project.instance().getVariableManager().getUi().getDetailsTable()).growX().row();
         variableTable.addSeparator();
 
 
@@ -42,13 +44,13 @@ public class ControlTable extends VisTable {
         createFunction.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
-                sceneUi.getFunctionManager().createFunction();
+                Project.instance().getFunctionManager().createFunction();
             }
         });
         functionTable.add(createFunction).growX().row();
-        functionTable.add(sceneUi.getFunctionManager().getFunTable()).grow().row();
+        functionTable.add(Project.instance().getFunctionManager().getFunTable()).grow().row();
         functionTable.addSeparator();
-        functionTable.add(sceneUi.getFunctionManager().getDetailsTable()).growX().height(250).row();
+        functionTable.add(Project.instance().getFunctionManager().getDetailsTable()).growX().height(250).row();
         functionTable.addSeparator();
 
         consoleTable = new ConsoleTable();

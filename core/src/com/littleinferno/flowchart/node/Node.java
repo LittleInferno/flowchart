@@ -125,17 +125,15 @@ public abstract class Node extends VisWindow implements CodeGen {
         super.close();
     }
 
-//    static public class NodeStyle {
-//
-//        public Drawable normal, select;
-//
-//        public NodeStyle() {
-//        }
-//
-//        public NodeStyle(Drawable normal, Drawable select) {
-//            this.normal = normal;
-//            this.select = select;
-//
-//        }
-//    }
+    static public class NodeStyle {
+
+        int width;
+
+        public NodeStyle() {
+        }
+
+        public NodeStyle(int width) {
+            this.width = width;
+        }
+    }
 }

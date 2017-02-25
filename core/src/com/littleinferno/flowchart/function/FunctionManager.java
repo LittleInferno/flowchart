@@ -4,6 +4,8 @@ import com.annimon.stream.Stream;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.utils.DragAndDrop;
 import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
+import com.badlogic.gdx.utils.Json;
+import com.badlogic.gdx.utils.JsonValue;
 import com.kotcrab.vis.ui.VisUI;
 import com.kotcrab.vis.ui.util.adapter.ArrayListAdapter;
 import com.kotcrab.vis.ui.widget.ListView;
@@ -11,11 +13,11 @@ import com.kotcrab.vis.ui.widget.VisLabel;
 import com.kotcrab.vis.ui.widget.VisTable;
 import com.littleinferno.flowchart.codegen.BaseCodeGenerator;
 import com.littleinferno.flowchart.gui.FunctionItem;
-import com.littleinferno.flowchart.gui.SceneUi;
+import com.littleinferno.flowchart.project.Project;
 
 import java.util.ArrayList;
 
-public class FunctionManager {
+public class FunctionManager implements Json.Serializable{
 
     private ArrayListAdapter<Function, VisTable> functions;
     private final VisTable detailsTable;
@@ -23,10 +25,7 @@ public class FunctionManager {
 
     private int counter;
 
-    private SceneUi sceneUi;
-
-    public FunctionManager(SceneUi sceneUi) {
-        this.sceneUi = sceneUi;
+    public FunctionManager() {
         functions = new FunctionManager.FunctionListAdapter(new ArrayList<>());
         detailsTable = new VisTable(true);
         funTable = new VisTable(true);
@@ -37,18 +36,18 @@ public class FunctionManager {
         view.setItemClickListener(item -> {
             detailsTable.clearChildren();
             detailsTable.add(item.getTable()).grow();
-            sceneUi.pinToTabbedPane(item.getScene().getUiTab());
+            Project.instance().getUiScene().pinToTabbedPane(item.getScene().getUiTab());
         });
 
         funTable.add(view.getMainTable()).grow().row();
     }
 
     public Function createFunction() {
-        Function function = new Function("newFun" + counter++, sceneUi);
+        Function function = new Function("newFun" + counter++);
 
         functions.add(function);
 
-        sceneUi.pinToTabbedPane(function.getScene().getUiTab());
+        Project.instance().getUiScene().pinToTabbedPane(function.getScene().getUiTab());
 
         return function;
     }
@@ -56,7 +55,7 @@ public class FunctionManager {
     void removeFunction(Function function) {
         function.destroy();
 
-        sceneUi.unpinFromTabbedPane(function.getScene().getUiTab());
+        Project.instance().getUiScene().unpinFromTabbedPane(function.getScene().getUiTab());
         detailsTable.clearChildren();
         functions.remove(function);
     }
@@ -75,6 +74,29 @@ public class FunctionManager {
         Stream.of(functions.iterable()).forEach(function -> stringBuilder.append(function.gen(builder)));
 
         return stringBuilder.toString();
+    }
+
+    @Override
+    public void write(Json json) {
+        json.writeValue("counter", counter);
+        json.writeArrayStart("functions");
+
+        for (Function f : functions.iterable())
+            f.write(json);
+
+        json.writeArrayEnd();
+    }
+
+    @Override
+    public void read(Json json, JsonValue jsonData) {
+        counter = jsonData.get("counter").asInt();
+
+        JsonValue funs = jsonData.get("functions");
+        for (JsonValue element : funs) {
+//            functions.add
+                    json.readValue(Function.class, element);
+        }
+
     }
 
     private class FunctionListAdapter extends ArrayListAdapter<Function, VisTable> {
@@ -104,7 +126,7 @@ public class FunctionManager {
 
             item.addListener(it::setText);
 
-            sceneUi.addDragAndDropSource(new DragAndDrop.Source(table) {
+            Project.instance().getUiScene().addDragAndDropSource(new DragAndDrop.Source(table) {
                 @Override
                 public DragAndDrop.Payload dragStart(InputEvent event, float x, float y, int pointer) {
                     DragAndDrop.Payload payload = new DragAndDrop.Payload();

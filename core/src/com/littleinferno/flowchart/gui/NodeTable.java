@@ -32,9 +32,9 @@ import java.util.List;
 
 class NodeTable extends VisTable {
 
-    private SceneUi sceneUi;
+    private UIScene sceneUi;
 
-    NodeTable(SceneUi sceneUi) {
+    NodeTable(UIScene sceneUi) {
         super(true);
         this.sceneUi = sceneUi;
         String[] items = new String[]{

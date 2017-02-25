@@ -10,6 +10,7 @@ import com.badlogic.gdx.scenes.scene2d.utils.DragAndDrop;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.kotcrab.vis.ui.widget.VisTable;
 import com.kotcrab.vis.ui.widget.tabbedpane.Tab;
+import com.littleinferno.flowchart.project.Project;
 import com.littleinferno.flowchart.wire.WireManager;
 
 public class Scene extends Stage {
@@ -17,13 +18,10 @@ public class Scene extends Stage {
     private UiTab uiTab;
     private GestureDetector gesture;
     private WireManager wireManager;
-    private SceneUi sceneUi;
     private String name;
 
-    Scene(String name, boolean closeable, SceneUi sceneUi) {
+    Scene(String name, boolean closeable) {
         super(new ScreenViewport());
-
-        this.sceneUi = sceneUi;
 
         this.name = name;
 
@@ -31,7 +29,7 @@ public class Scene extends Stage {
         gesture = new GestureDetector(new Gesture());
         wireManager = new WireManager();
 
-        sceneUi.addDragAndDropTarget(new DragAndDrop.Target(uiTab.getContentTable()) {
+        Project.instance().getUiScene().addDragAndDropTarget(new DragAndDrop.Target(uiTab.getContentTable()) {
             @Override
             public boolean drag(DragAndDrop.Source source, DragAndDrop.Payload payload, float x, float y, int pointer) {
                 return true;
@@ -77,10 +75,6 @@ public class Scene extends Stage {
 
     public String getName() {
         return name;
-    }
-
-    public SceneUi getSceneUi() {
-        return sceneUi;
     }
 
     static class UiTab extends Tab {

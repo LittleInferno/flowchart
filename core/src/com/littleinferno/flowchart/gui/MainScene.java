@@ -5,10 +5,10 @@ import com.littleinferno.flowchart.node.BeginNode;
 
 public class MainScene extends Scene {
 
-    MainScene(SceneUi sceneUi) {
-        super("main", false, sceneUi);
+    MainScene() {
+        super("main", false);
 
-        BeginNode node = new BeginNode(sceneUi);
+        BeginNode node = new BeginNode();
         node.setPosition(500, 200);
         addActor(node);
     }

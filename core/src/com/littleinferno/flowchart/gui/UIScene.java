@@ -14,45 +14,27 @@ import com.kotcrab.vis.ui.widget.VisTextButton;
 import com.kotcrab.vis.ui.widget.tabbedpane.Tab;
 import com.kotcrab.vis.ui.widget.tabbedpane.TabbedPane;
 import com.kotcrab.vis.ui.widget.tabbedpane.TabbedPaneAdapter;
-import com.littleinferno.flowchart.codegen.BaseCodeExecution;
 import com.littleinferno.flowchart.codegen.BaseCodeGenerator;
-import com.littleinferno.flowchart.codegen.JSCodeExecution;
-import com.littleinferno.flowchart.codegen.JSCodeGenerator;
-import com.littleinferno.flowchart.function.FunctionManager;
-import com.littleinferno.flowchart.variable.VariableManager;
+import com.littleinferno.flowchart.project.Project;
 
-public class SceneUi extends Stage {
+public class UIScene extends Stage {
 
-    private final TabbedPane tabbedPane;
+    private TabbedPane tabbedPane;
     private InputMultiplexer inputMultiplexer;
     private Scene show;
 
-
-    private static VariableManager variableManager;
-    private static FunctionManager functionManager;
-
-
     private static DragAndDrop dragAndDrop;
 
-    private BaseCodeExecution codeExecution;
-    private Begin begin;
-    private BaseCodeGenerator builder;
-
-    public SceneUi() {
+    public UIScene() {
         super(new ScreenViewport());
+    }
+
+    public void init() {
 
         inputMultiplexer = new InputMultiplexer();
         inputMultiplexer.addProcessor(this);
 
         show = null;
-
-        codeExecution = new JSCodeExecution();
-        codeExecution.init();
-
-        variableManager = new VariableManager(this);
-        functionManager = new FunctionManager(this);
-
-        builder = new JSCodeGenerator();
 
         dragAndDrop = new DragAndDrop();
 
@@ -66,15 +48,33 @@ public class SceneUi extends Stage {
         run.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
+                Project.instance().runProgram();
+            }
+        });
 
-                String code = variableManager.gen(builder) + functionManager.gen(builder) + begin.gen(builder);
-                System.out.println(code);
-                codeExecution.setCode(code);
-                codeExecution.run();
+        VisTextButton save = new VisTextButton("save");
+
+        save.addListener(new ChangeListener() {
+            @Override
+            public void changed(ChangeEvent event, Actor actor) {
+                Project.instance().save();
+            }
+        });
+
+        VisTextButton load = new VisTextButton("load");
+
+        load.addListener(new ChangeListener() {
+            @Override
+            public void changed(ChangeEvent event, Actor actor) {
+                Project.loadProject("test", "test/");
             }
         });
 
         buttonBar.setButton(ButtonBar.ButtonType.LEFT, run);
+        buttonBar.setButton(ButtonBar.ButtonType.NEXT, save);
+        buttonBar.setButton(ButtonBar.ButtonType.APPLY, load);
+
+
         VisTable tmp = new VisTable();
         tmp.add(buttonBar.createTable()).grow().row();
         tmp.addSeparator();
@@ -110,7 +110,7 @@ public class SceneUi extends Stage {
             }
         });
 
-        show = (new MainScene(this));
+        show = (new MainScene());
 
         pinToTabbedPane(show.getUiTab());
         controlTable.pack();
@@ -123,6 +123,7 @@ public class SceneUi extends Stage {
         container.add(activityContainer).grow();
 
         addActor(container);
+
     }
 
     public void addDragAndDropTarget(final DragAndDrop.Target target) {
@@ -131,14 +132,6 @@ public class SceneUi extends Stage {
 
     public void addDragAndDropSource(final DragAndDrop.Source source) {
         dragAndDrop.addSource(source);
-    }
-
-    public FunctionManager getFunctionManager() {
-        return functionManager;
-    }
-
-    public VariableManager getVariableManager() {
-        return variableManager;
     }
 
     public void pinToTabbedPane(Scene.UiTab uiTab) {
@@ -152,10 +145,6 @@ public class SceneUi extends Stage {
 
     public void unpinFromTabbedPane(Scene.UiTab uiTab) {
         tabbedPane.remove(uiTab);
-    }
-
-    public void setBegin(Begin begin) {
-        this.begin = begin;
     }
 
     @Override
@@ -181,6 +170,5 @@ public class SceneUi extends Stage {
     @Override
     public void dispose() {
         super.dispose();
-        codeExecution.stop();
     }
 }

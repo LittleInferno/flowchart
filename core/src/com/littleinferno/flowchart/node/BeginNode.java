@@ -1,19 +1,19 @@
 package com.littleinferno.flowchart.node;
 
 import com.littleinferno.flowchart.codegen.BaseCodeGenerator;
-import com.littleinferno.flowchart.gui.SceneUi;
 import com.littleinferno.flowchart.pin.Pin;
+import com.littleinferno.flowchart.project.Project;
 
 public class BeginNode extends Node {
 
     private Pin start;
 
-    public BeginNode(SceneUi sceneUi) {
+    public BeginNode() {
         super("Begin", false);
 
         start = addExecutionOutputPin("start");
 
-        sceneUi.setBegin(builder -> gen(builder, start));
+        Project.instance().setProgramStart(builder -> gen(builder, start));
     }
 
     @Override

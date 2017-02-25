@@ -1,33 +1,21 @@
 package com.littleinferno.flowchart.variable;
 
 import com.annimon.stream.Stream;
-import com.badlogic.gdx.scenes.scene2d.Actor;
-import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
-import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
-import com.kotcrab.vis.ui.VisUI;
-import com.kotcrab.vis.ui.widget.VisImageButton;
-import com.kotcrab.vis.ui.widget.VisLabel;
-import com.kotcrab.vis.ui.widget.VisTable;
-import com.kotcrab.vis.ui.widget.VisTextButton;
 import com.littleinferno.flowchart.DataType;
 import com.littleinferno.flowchart.codegen.BaseCodeGenerator;
-import com.littleinferno.flowchart.gui.SceneUi;
 import com.littleinferno.flowchart.util.ArrayChangedListener;
-import com.littleinferno.flowchart.util.DataSelectBox;
 import com.littleinferno.flowchart.util.DestroyListener;
-import com.littleinferno.flowchart.util.InputForm;
 import com.littleinferno.flowchart.util.NameChangedListener;
 import com.littleinferno.flowchart.util.TypeChangedListener;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class Variable {
+public class Variable{
 
     private DataType dataType;
     private String name;
     private boolean isArray;
-    private SceneUi sceneUi;
 
     private List<NameChangedListener> nameChangedListeners;
     private List<TypeChangedListener> typeChangedListeners;
@@ -36,11 +24,10 @@ public class Variable {
 
     private VariableDetailsTable variableDetailsTable;
 
-    Variable(String name, DataType type, boolean isArray, SceneUi sceneUi) {
+    Variable(String name, DataType type, boolean isArray) {
         this.name = name;
         this.dataType = type;
         this.isArray = isArray;
-        this.sceneUi = sceneUi;
 
         this.nameChangedListeners = new ArrayList<>();
         this.typeChangedListeners = new ArrayList<>();
@@ -48,6 +35,9 @@ public class Variable {
         this.destroyListeners = new ArrayList<>();
 
         this.variableDetailsTable = new VariableDetailsTable(this);
+    }
+
+    public Variable() {
     }
 
     public DataType getDataType() {
@@ -123,78 +113,4 @@ public class Variable {
     void destroy() {
         notifyListenersDestroed();
     }
-
-    private static class VariableDetailsTable extends VisTable {
-
-        private Variable variable;
-
-        VariableDetailsTable(Variable variable) {
-            super(true);
-            this.variable = variable;
-
-            initTable();
-        }
-
-        private void initTable() {
-            VisTextButton variableName = new VisTextButton(variable.getName());
-            variableName.addListener(new ChangeListener() {
-                @Override
-                public void changed(ChangeEvent event, Actor actor) {
-
-                    float w = getStage().getWidth() / 2;
-                    float h = getStage().getHeight() / 2;
-                    InputForm inputForm =
-                            new InputForm("variable name", variable::getName, variable::setName);
-                    inputForm.setPosition(w - inputForm.getWidth() / 2, h);
-                    getStage().addActor(inputForm);
-                    inputForm.focus();
-                }
-            });
-
-            variable.addListener(variableName::setText);
-
-            final VisImageButton deleteVariable = new VisImageButton("close");
-
-            deleteVariable.addListener(new ChangeListener() {
-                @Override
-                public void changed(ChangeEvent event, Actor actor) {
-                    variable.sceneUi.getVariableManager().removeVariable(variable);
-                }
-            });
-
-            final DataSelectBox variableType = new DataSelectBox();
-
-            variableType.addListener(new ChangeListener() {
-                @Override
-                public void changed(ChangeEvent event, Actor actor) {
-                    variable.setDataType(variableType.getSelected());
-                }
-            });
-
-            VisImageButton.VisImageButtonStyle style =
-                    VisUI.getSkin().get("toggle", VisImageButton.VisImageButtonStyle.class);
-
-            Drawable drawable = VisUI.getSkin().getDrawable("array");
-
-            style.imageChecked = drawable;
-            style.imageUp = drawable;
-
-            final VisImageButton isArray = new VisImageButton(style);
-            isArray.addListener(new ChangeListener() {
-                @Override
-                public void changed(ChangeEvent event, Actor actor) {
-                    variable.setArray(isArray.isChecked());
-                }
-            });
-
-            add(new VisLabel("name: "));
-            add(variableName).growX().expandY();
-            add(deleteVariable).row();
-            add(new VisLabel("type: "));
-            add(variableType).growX().expandY();
-            add(isArray);
-        }
-
-    }
-
 }

@@ -1,123 +1,118 @@
 package com.littleinferno.flowchart.variable;
 
 import com.annimon.stream.Stream;
-import com.badlogic.gdx.scenes.scene2d.InputEvent;
-import com.badlogic.gdx.scenes.scene2d.utils.DragAndDrop;
-import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
-import com.kotcrab.vis.ui.VisUI;
+import com.badlogic.gdx.utils.Json;
+import com.badlogic.gdx.utils.JsonValue;
 import com.kotcrab.vis.ui.util.adapter.ArrayListAdapter;
 import com.kotcrab.vis.ui.widget.ListView;
-import com.kotcrab.vis.ui.widget.VisLabel;
 import com.kotcrab.vis.ui.widget.VisTable;
 import com.littleinferno.flowchart.DataType;
 import com.littleinferno.flowchart.codegen.BaseCodeGenerator;
-import com.littleinferno.flowchart.gui.SceneUi;
-import com.littleinferno.flowchart.gui.VariableItem;
 
 import java.util.ArrayList;
 
-public class VariableManager {
+public class VariableManager implements Json.Serializable {
 
-    private ArrayListAdapter<Variable, VisTable> variables;
-    private final VisTable detailsTable;
-    private final VisTable varTable;
-
+    private ArrayList<Variable> variables;
     private int counter;
+    private UI ui;
 
-    private SceneUi sceneUi;
-
-    public VariableManager(SceneUi sceneUi) {
-        this.sceneUi = sceneUi;
-        variables = new VariableListAdapter(new ArrayList<>());
-        detailsTable = new VisTable(true);
-        varTable = new VisTable(true);
+    public VariableManager() {
+        variables = new ArrayList<>();
         counter = 0;
-
-        ListView<Variable> view = new ListView<>(variables);
-
-        view.setItemClickListener(item -> {
-            detailsTable.clearChildren();
-            detailsTable.add(item.getTable()).grow();
-        });
-
-        varTable.add(view.getMainTable()).grow().row();
-
+        ui = new UI(variables);
     }
 
     public Variable createVariable() {
-        Variable variable = new Variable("newVar" + counter++, DataType.BOOL, false, sceneUi);
+        Variable variable = new Variable("newVar" + counter++, DataType.BOOL, false);
 
         variables.add(variable);
+        ui.update();
 
         return variable;
     }
 
     void removeVariable(Variable variable) {
         variable.destroy();
-        detailsTable.clearChildren();
         variables.remove(variable);
+        ui.update();
     }
 
     public String gen(BaseCodeGenerator builder) {
         final StringBuilder stringBuilder = new StringBuilder();
 
-        Stream.of(variables.iterable()).forEach(variable -> stringBuilder.append(variable.gen(builder)));
+        Stream.of(variables)
+                .forEach(variable -> stringBuilder.append(variable.gen(builder)));
 
         return stringBuilder.toString();
     }
 
-    public VisTable getVarTable() {
-        return varTable;
+    @Override
+    public void write(Json json) {
+        json.writeValue("counter", counter);
+        json.writeArrayStart("variables");
+
+        for (Variable v : variables)
+        {
+            json.writeObjectStart();
+            json.writeField(v, "name", "name");
+            json.writeValue("dataType", v.getDataType());
+            json.writeField(v, "isArray", "isArray");
+            json.writeObjectEnd();
+        }
+
+        json.writeArrayEnd();
     }
 
-    public VisTable getDetailsTable() {
-        return detailsTable;
+    @Override
+    public void read(Json json, JsonValue jsonData) {
+
+        counter = jsonData.get("counter").asInt();
+
+        JsonValue vars = jsonData.get("variables");
+        for (JsonValue element : vars) {
+            variables.add(json.readValue(Variable.class, element));
+        }
     }
 
+    public UI getUi() {
+        return ui;
+    }
 
-    private class VariableListAdapter extends ArrayListAdapter<Variable, VisTable> {
-        private final Drawable bg = VisUI.getSkin().getDrawable("window-bg");
-        private final Drawable selection = VisUI.getSkin().getDrawable("list-selection");
+    public static class UI {
 
-        VariableListAdapter(ArrayList<Variable> array) {
-            super(array);
-            setSelectionMode(SelectionMode.SINGLE);
+        private ArrayListAdapter<Variable, VisTable> variableAdapter;
+
+        private final VisTable detailsTable;
+
+        public VisTable getVarTable() {
+            return varTable;
         }
 
-        @Override
-        protected void selectView(VisTable view) {
-            view.setBackground(selection);
+        public VisTable getDetailsTable() {
+            return detailsTable;
         }
 
-        @Override
-        protected void deselectView(VisTable view) {
-            view.setBackground(bg);
+        public void update() {
+            variableAdapter.itemsChanged();
         }
 
-        @Override
-        protected VisTable createView(Variable item) {
+        private final VisTable varTable;
 
-            final VisTable table = new VisTable();
-            final VisLabel it = new VisLabel(item.getName());
+        public UI(ArrayList<Variable> variables) {
+            variableAdapter = new VariableListAdapter(variables);
 
-            item.addListener(it::setText);
+            detailsTable = new VisTable(true);
+            varTable = new VisTable(true);
 
-            sceneUi.addDragAndDropSource(new DragAndDrop.Source(table) {
-                @Override
-                public DragAndDrop.Payload dragStart(InputEvent event, float x, float y, int pointer) {
-                    DragAndDrop.Payload payload = new DragAndDrop.Payload();
+            ListView<Variable> view = new ListView<>(variableAdapter);
 
-                    payload.setObject(new VariableItem(item));
-                    payload.setDragActor(new VisLabel(it.getText()));
-
-                    deselectView(table);
-                    return payload;
-                }
+            view.setItemClickListener(item -> {
+                detailsTable.clearChildren();
+                detailsTable.add(item.getTable()).grow();
             });
 
-            table.add(it).grow();
-            return table;
+            varTable.add(view.getMainTable()).grow().row();
         }
     }
-
 }
