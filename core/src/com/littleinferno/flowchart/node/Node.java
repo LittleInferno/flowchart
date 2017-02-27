@@ -4,6 +4,8 @@ import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.ui.Cell;
 import com.badlogic.gdx.scenes.scene2d.ui.VerticalGroup;
 import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.Json;
+import com.badlogic.gdx.utils.JsonValue;
 import com.badlogic.gdx.utils.SnapshotArray;
 import com.kotcrab.vis.ui.widget.VisTable;
 import com.kotcrab.vis.ui.widget.VisWindow;
@@ -12,13 +14,21 @@ import com.littleinferno.flowchart.DataType;
 import com.littleinferno.flowchart.codegen.CodeGen;
 import com.littleinferno.flowchart.pin.Pin;
 
+import java.util.UUID;
+
 public abstract class Node extends VisWindow implements CodeGen {
 
     protected final VerticalGroup left;
     protected final VerticalGroup right;
 
+    private UUID id;
+
     public Node(final String name, final boolean closable) {
         super(name);
+
+        setId(NodeManager.getID());
+
+        setName(name);
         setKeepWithinStage(false);
         setKeepWithinParent(false);
 
@@ -124,6 +134,50 @@ public abstract class Node extends VisWindow implements CodeGen {
 
         super.close();
     }
+
+    public UUID getId() {
+        return id;
+    }
+
+    public void setId(UUID id) {
+        this.id = id;
+    }
+
+    static public class DefaultNodeSerializer<T extends Node> implements Json.Serializer<T> {
+        @Override
+        public void write(Json json, T object, Class knownType) {
+
+            json.writeObjectStart();
+            json.writeValue("x", object.getX());
+            json.writeValue("y", object.getY());
+            json.writeValue("id", object.getId().toString());
+            json.writeObjectEnd();
+
+        }
+
+        @Override
+        public T read(Json json, JsonValue jsonData, Class type) {
+
+            float x = jsonData.get("x").asFloat();
+            float y = jsonData.get("y").asFloat();
+            UUID id = UUID.fromString(jsonData.get("id").asString());
+
+            T node = null;
+
+            try {
+                //noinspection unchecked
+                node = (T) type.newInstance();
+                node.setPosition(x, y);
+                node.setId(id);
+
+            } catch (InstantiationException | IllegalAccessException e) {
+                e.printStackTrace();
+            }
+
+            return node;
+        }
+    }
+
 
     static public class NodeStyle {
 

@@ -10,6 +10,7 @@ import com.badlogic.gdx.scenes.scene2d.utils.DragAndDrop;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.kotcrab.vis.ui.widget.VisTable;
 import com.kotcrab.vis.ui.widget.tabbedpane.Tab;
+import com.littleinferno.flowchart.node.SceneNodeManager;
 import com.littleinferno.flowchart.project.Project;
 import com.littleinferno.flowchart.wire.WireManager;
 
@@ -18,6 +19,7 @@ public class Scene extends Stage {
     private UiTab uiTab;
     private GestureDetector gesture;
     private WireManager wireManager;
+    private SceneNodeManager nodeManager;
     private String name;
 
     Scene(String name, boolean closeable) {
@@ -27,7 +29,9 @@ public class Scene extends Stage {
 
         uiTab = new UiTab(this, closeable);
         gesture = new GestureDetector(new Gesture());
+
         wireManager = new WireManager();
+        nodeManager = new SceneNodeManager(this);
 
         Project.instance().getUiScene().addDragAndDropTarget(new DragAndDrop.Target(uiTab.getContentTable()) {
             @Override
@@ -75,6 +79,10 @@ public class Scene extends Stage {
 
     public String getName() {
         return name;
+    }
+
+    public SceneNodeManager getNodeManager() {
+        return nodeManager;
     }
 
     static class UiTab extends Tab {
