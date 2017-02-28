@@ -104,15 +104,13 @@ class NodeTable extends VisTable {
                 public DragAndDrop.Payload dragStart(InputEvent event, float x, float y, int pointer) {
                     DragAndDrop.Payload payload = new DragAndDrop.Payload();
 
-                    Object object = null;
                     try {
                         Class<?> node = Class.forName(item);
-                        object = node.newInstance();
-                    } catch (ClassNotFoundException | IllegalAccessException | InstantiationException e) {
+                        payload.setObject(node);
+                    } catch (ClassNotFoundException e) {
                         e.printStackTrace();
                     }
 
-                    payload.setObject(object);
                     payload.setDragActor(new VisLabel(it.getText()));
 
                     deselectView(table);

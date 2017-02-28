@@ -110,7 +110,7 @@ public class UIScene extends Stage {
             }
         });
 
-        show = (new MainScene());
+        show = Project.instance().getSceneManager().createScene(MainScene.class);
 
         pinToTabbedPane(show.getUiTab());
         controlTable.pack();

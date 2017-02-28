@@ -17,4 +17,16 @@ public class FunctionScene extends Scene {
             pane.insert(pos, uiTab);
         });
     }
+
+    void setFunction(Function function) {
+        setName(function.getName());
+        function.addListener(newName -> {
+            setName(newName);
+            UiTab uiTab = getUiTab();
+            TabbedPane pane = uiTab.getPane();
+            int pos = pane.getUIOrderedTabs().indexOf(uiTab, true);
+            pane.remove(uiTab);
+            pane.insert(pos, uiTab);
+        });
+    }
 }

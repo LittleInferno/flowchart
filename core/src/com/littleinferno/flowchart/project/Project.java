@@ -6,16 +6,32 @@ import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonValue;
 import com.kotcrab.vis.ui.VisUI;
+import com.littleinferno.flowchart.JsonManger;
 import com.littleinferno.flowchart.codegen.BaseCodeExecution;
 import com.littleinferno.flowchart.codegen.BaseCodeGenerator;
 import com.littleinferno.flowchart.codegen.JSCodeExecution;
 import com.littleinferno.flowchart.codegen.JSCodeGenerator;
 import com.littleinferno.flowchart.function.FunctionManager;
+import com.littleinferno.flowchart.gui.FunctionScene;
+import com.littleinferno.flowchart.gui.MainScene;
 import com.littleinferno.flowchart.gui.ProjectScreen;
+import com.littleinferno.flowchart.gui.Scene;
+import com.littleinferno.flowchart.gui.SceneManager;
 import com.littleinferno.flowchart.gui.UIScene;
+import com.littleinferno.flowchart.node.BeginNode;
+import com.littleinferno.flowchart.node.BoolNode;
+import com.littleinferno.flowchart.node.FloatNode;
+import com.littleinferno.flowchart.node.IfNode;
+import com.littleinferno.flowchart.node.IntegerNode;
+import com.littleinferno.flowchart.node.Node;
+import com.littleinferno.flowchart.node.NodeManager;
+import com.littleinferno.flowchart.node.StringNode;
+import com.littleinferno.flowchart.node.math.AddNode;
+import com.littleinferno.flowchart.node.math.DivNode;
+import com.littleinferno.flowchart.node.math.MulNode;
+import com.littleinferno.flowchart.node.math.SubNode;
 import com.littleinferno.flowchart.util.ProjectException;
 import com.littleinferno.flowchart.variable.VariableManager;
-
 
 public class Project implements Json.Serializable {
 
@@ -30,11 +46,12 @@ public class Project implements Json.Serializable {
 
     private VariableManager variableManager;
     private FunctionManager functionManager;
+    private SceneManager sceneManager;
+    private JsonManger jsonManger;
 
     private UIScene uiScene;
 
     private ProjectScreen projectScreen;
-
 
     public Project() {
 
@@ -48,9 +65,33 @@ public class Project implements Json.Serializable {
 
         this.variableManager = new VariableManager();
         this.functionManager = new FunctionManager();
+        this.sceneManager = new SceneManager();
+        this.jsonManger = new JsonManger();
+
 
         this.uiScene = new UIScene();
         this.projectScreen = new ProjectScreen(uiScene);
+    }
+
+    private void initJsonManager() {
+        jsonManger.addSerializer(NodeManager.class, new NodeManager.NodeManagerSerializer());
+        jsonManger.addSerializer(FunctionScene.class, new Scene.SceneSerializer<>());
+        jsonManger.addSerializer(MainScene.class, new Scene.SceneSerializer<>());
+        jsonManger.addSerializer(SceneManager.class, new SceneManager.SceneManagerSerializer());
+
+        jsonManger.addSerializer(IntegerNode.class, new Node.DefaultNodeSerializer<>());
+        jsonManger.addSerializer(FloatNode.class, new Node.DefaultNodeSerializer<>());
+        jsonManger.addSerializer(StringNode.class, new Node.DefaultNodeSerializer<>());
+        jsonManger.addSerializer(BoolNode.class, new Node.DefaultNodeSerializer<>());
+        jsonManger.addSerializer(IfNode.class, new Node.DefaultNodeSerializer<>());
+        jsonManger.addSerializer(BeginNode.class, new Node.DefaultNodeSerializer<>());
+
+        jsonManger.addSerializer(AddNode.class, new Node.DefaultNodeSerializer<>());
+        jsonManger.addSerializer(SubNode.class, new Node.DefaultNodeSerializer<>());
+        jsonManger.addSerializer(MulNode.class, new Node.DefaultNodeSerializer<>());
+        jsonManger.addSerializer(DivNode.class, new Node.DefaultNodeSerializer<>());
+
+        // TODO add all nodes
     }
 
     public static Project createProject(String name, String location, BaseCodeGenerator codeGenerator, BaseCodeExecution codeExecution) {
@@ -103,21 +144,22 @@ public class Project implements Json.Serializable {
 
     private void init() {
         uiScene.init();
-
         codeExecution.init();
-
+        initJsonManager();
     }
 
     public void save() {
         Gdx.files.external(location).mkdirs();
         Json json = new Json();
 
-        FileHandle variables = Gdx.files.external(location).child("variables");
+        FileHandle variables = Gdx.files.external(location).child("variables.json");
         variables.writeString(json.prettyPrint(variableManager), false);
 
-        FileHandle functions = Gdx.files.external(location).child("functions");
+        FileHandle functions = Gdx.files.external(location).child("functions.json");
         functions.writeString(json.prettyPrint(functionManager), false);
 
+        FileHandle scenes = Gdx.files.external(location).child("scenes.json");
+        jsonManger.save(sceneManager, scenes);
 
     }
 
@@ -135,6 +177,10 @@ public class Project implements Json.Serializable {
 
     public FunctionManager getFunctionManager() {
         return functionManager;
+    }
+
+    public SceneManager getSceneManager() {
+        return sceneManager;
     }
 
     public String getName() {

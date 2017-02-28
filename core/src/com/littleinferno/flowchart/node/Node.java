@@ -9,8 +9,7 @@ import com.badlogic.gdx.utils.JsonValue;
 import com.badlogic.gdx.utils.SnapshotArray;
 import com.kotcrab.vis.ui.widget.VisTable;
 import com.kotcrab.vis.ui.widget.VisWindow;
-import com.littleinferno.flowchart.Connection;
-import com.littleinferno.flowchart.DataType;
+import com.littleinferno.flowchart.*;
 import com.littleinferno.flowchart.codegen.CodeGen;
 import com.littleinferno.flowchart.pin.Pin;
 
@@ -26,7 +25,7 @@ public abstract class Node extends VisWindow implements CodeGen {
     public Node(final String name, final boolean closable) {
         super(name);
 
-        setId(NodeManager.getID());
+        setId(JsonManger.getID());
 
         setName(name);
         setKeepWithinStage(false);

@@ -1,44 +1,104 @@
 package com.littleinferno.flowchart.node;
 
-import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.utils.Json;
-import com.badlogic.gdx.utils.JsonWriter;
+import com.badlogic.gdx.utils.JsonValue;
+import com.badlogic.gdx.utils.SerializationException;
+import com.badlogic.gdx.utils.reflect.ClassReflection;
+import com.badlogic.gdx.utils.reflect.ReflectionException;
+import com.littleinferno.flowchart.gui.Scene;
 
-import java.util.UUID;
+import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
+import java.util.ArrayList;
+import java.util.List;
 
 public class NodeManager {
 
-    private Json json;
+    private List<Node> nodes;
+
+    private Scene scene;
 
     public NodeManager() {
-        json = new Json();
-        json.setTypeName(null);
-        json.setUsePrototypes(false);
-        json.setOutputType(JsonWriter.OutputType.json);
-        json.setSerializer(SceneNodeManager.class, new SceneNodeManager.SceneNodeManagerSerializer());
+        nodes = new ArrayList<>();
     }
 
-    public <T extends Node> void addSerializer(Class<T> type, Json.Serializer<T> serializer) {
-        json.setSerializer(type, serializer);
+    public NodeManager(Scene scene) {
+        this.scene = scene;
+        nodes = new ArrayList<>();
     }
 
-    public String save(SceneNodeManager sceneNodeManager) {
-        return json.prettyPrint(sceneNodeManager);
+    public void setScene(Scene scene) {
+        this.scene = scene;
     }
 
-    public void save(SceneNodeManager sceneNodeManager, FileHandle fileHandle) {
-        fileHandle.writeString(save(sceneNodeManager), false);
+    public <T extends Node> T createNode(Class<T> nodeClass, Object... args) {
+
+        T node = null;
+        try {
+            node = nodeClass.getConstructor().newInstance(args);
+            nodes.add(node);
+            scene.addActor(node);
+            return node;
+
+        } catch (IllegalAccessException |
+                InstantiationException |
+                NoSuchMethodException |
+                InvocationTargetException e) {
+            e.printStackTrace();
+        }
+        return node;
     }
 
-    public SceneNodeManager load(String string) {
-        return json.fromJson(SceneNodeManager.class, string);
+    public void deleteNode(Node node) {
+        nodes.remove(node);
+        scene.getRoot().removeActor(node);
     }
 
-    public SceneNodeManager load(FileHandle fileHandle) {
-        return load(fileHandle.readString());
-    }
+    public static class NodeManagerSerializer implements Json.Serializer<NodeManager> {
+        NodeManager nodeManager = new NodeManager();
 
-    static UUID getID() {
-        return UUID.randomUUID();
+        @Override
+        public void write(Json json, NodeManager object, Class knownType) {
+
+            json.writeObjectStart();
+
+            try {
+                writeNodes(json, object.nodes);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+            json.writeObjectEnd();
+        }
+
+        @Override
+        public NodeManager read(Json json, JsonValue jsonData, Class type) {
+
+            JsonValue data = jsonData.child;
+            for (JsonValue valueMap = data.child; valueMap != null; valueMap = valueMap.next) {
+                try {
+                    readObjects(json, ClassReflection.forName(valueMap.name()), valueMap);
+                } catch (ReflectionException ex) {
+                    throw new SerializationException(ex);
+                }
+            }
+            return nodeManager;
+        }
+
+        private void readObjects(Json json, Class type, JsonValue valueMap) {
+
+            Node object = (Node) json.readValue(type, valueMap);
+            nodeManager.nodes.add(object);
+        }
+
+        private void writeNodes(Json json, List<Node> nodes) throws IOException {
+            json.writeObjectStart("nodes");
+
+            for (Node node : nodes) {
+                json.getWriter().name(node.getClass().getName());
+                json.writeValue(node);
+            }
+            json.writeObjectEnd();
+        }
     }
 }

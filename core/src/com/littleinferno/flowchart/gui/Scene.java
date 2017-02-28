@@ -7,10 +7,13 @@ import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.DragAndDrop;
+import com.badlogic.gdx.utils.Json;
+import com.badlogic.gdx.utils.JsonValue;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.kotcrab.vis.ui.widget.VisTable;
 import com.kotcrab.vis.ui.widget.tabbedpane.Tab;
-import com.littleinferno.flowchart.node.SceneNodeManager;
+import com.littleinferno.flowchart.node.Node;
+import com.littleinferno.flowchart.node.NodeManager;
 import com.littleinferno.flowchart.project.Project;
 import com.littleinferno.flowchart.wire.WireManager;
 
@@ -19,7 +22,7 @@ public class Scene extends Stage {
     private UiTab uiTab;
     private GestureDetector gesture;
     private WireManager wireManager;
-    private SceneNodeManager nodeManager;
+    private NodeManager nodeManager;
     private String name;
 
     Scene(String name, boolean closeable) {
@@ -31,7 +34,7 @@ public class Scene extends Stage {
         gesture = new GestureDetector(new Gesture());
 
         wireManager = new WireManager();
-        nodeManager = new SceneNodeManager(this);
+        nodeManager = new NodeManager(this);
 
         Project.instance().getUiScene().addDragAndDropTarget(new DragAndDrop.Target(uiTab.getContentTable()) {
             @Override
@@ -42,19 +45,26 @@ public class Scene extends Stage {
             @Override
             public void drop(DragAndDrop.Source source, DragAndDrop.Payload payload, float x, float y, int pointer) {
 
-                Actor object = (Actor) payload.getObject();
+                Object object = payload.getObject();
 
                 Vector2 vec = uiTab.getContentTable().localToStageCoordinates(new Vector2(x, y));
                 vec = uiTab.getContentTable().getStage().stageToScreenCoordinates(vec);
 
                 screenToStageCoordinates(vec);
 
-                object.setPosition(vec.x, vec.y);
+                if (object instanceof Actor) {
+                    Actor target = (Actor) object;
 
-                if (object instanceof DropItem)
-                    ((DropItem) object).init(Scene.this);
-                else
-                    Scene.this.addActor(object);
+                    target.setPosition(vec.x, vec.y);
+
+                    ((DropItem) target).init(Scene.this);
+                } else {
+                    Class type = (Class) object;
+
+                    Node node = Scene.this.getNodeManager().createNode(type);
+
+                    node.setPosition(vec.x, vec.y);
+                }
             }
         });
 
@@ -81,8 +91,13 @@ public class Scene extends Stage {
         return name;
     }
 
-    public SceneNodeManager getNodeManager() {
+    public NodeManager getNodeManager() {
         return nodeManager;
+    }
+
+    public void setNodeManager(NodeManager nodeManager) {
+        this.nodeManager = nodeManager;
+        nodeManager.setScene(this);
     }
 
     static class UiTab extends Tab {
@@ -171,6 +186,36 @@ public class Scene extends Stage {
         @Override
         public void pinchStop() {
 
+        }
+    }
+
+    public static class SceneSerializer<T extends Scene> implements Json.Serializer<T> {
+
+        @Override
+        public void write(Json json, T object, Class knownType) {
+
+            json.writeObjectStart();
+            json.writeValue("name", object.getName());
+            json.writeValue("nodeManager", object.getNodeManager());
+            json.writeObjectEnd();
+        }
+
+        @Override
+        public T read(Json json, JsonValue jsonData, Class type) {
+
+            T scene = null;
+            try {
+                //noinspection unchecked
+                scene = (T) type.newInstance();
+            } catch (InstantiationException | IllegalAccessException e) {
+                e.printStackTrace();
+            }
+
+            if (scene != null) {
+                scene.setNodeManager(json.readValue(NodeManager.class, jsonData.get("nodeManager")));
+            }
+
+            return scene;
         }
     }
 }

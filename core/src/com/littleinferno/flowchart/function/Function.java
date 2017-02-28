@@ -73,7 +73,8 @@ public class Function implements Json.Serializable {
 
         returnNodes = new ArrayList<>();
 
-        scene = new FunctionScene(this);
+        scene = Project.instance().getSceneManager().createScene(FunctionScene.class, this);
+        addListener(() -> Project.instance().getSceneManager().deleteScene(scene));
 
         FunctionBeginNode beginNode = new FunctionBeginNode(this);
         beginNode.setPosition(350, 250);
