@@ -38,6 +38,12 @@ public class Variable{
     }
 
     public Variable() {
+        this.nameChangedListeners = new ArrayList<>();
+        this.typeChangedListeners = new ArrayList<>();
+        this.arrayChangedListeners = new ArrayList<>();
+        this.destroyListeners = new ArrayList<>();
+
+        this.variableDetailsTable = new VariableDetailsTable(this);
     }
 
     public DataType getDataType() {

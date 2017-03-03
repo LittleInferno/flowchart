@@ -21,11 +21,17 @@ import com.littleinferno.flowchart.gui.UIScene;
 import com.littleinferno.flowchart.node.BeginNode;
 import com.littleinferno.flowchart.node.BoolNode;
 import com.littleinferno.flowchart.node.FloatNode;
+import com.littleinferno.flowchart.node.FunctionCallNode;
+import com.littleinferno.flowchart.node.FunctionNode;
+import com.littleinferno.flowchart.node.FunctionReturnNode;
 import com.littleinferno.flowchart.node.IfNode;
 import com.littleinferno.flowchart.node.IntegerNode;
 import com.littleinferno.flowchart.node.Node;
 import com.littleinferno.flowchart.node.NodeManager;
 import com.littleinferno.flowchart.node.StringNode;
+import com.littleinferno.flowchart.node.VariableGetNode;
+import com.littleinferno.flowchart.node.VariableNode;
+import com.littleinferno.flowchart.node.VariableSetNode;
 import com.littleinferno.flowchart.node.math.AddNode;
 import com.littleinferno.flowchart.node.math.DivNode;
 import com.littleinferno.flowchart.node.math.MulNode;
@@ -91,6 +97,12 @@ public class Project implements Json.Serializable {
         jsonManger.addSerializer(MulNode.class, new Node.DefaultNodeSerializer<>());
         jsonManger.addSerializer(DivNode.class, new Node.DefaultNodeSerializer<>());
 
+        jsonManger.addSerializer(VariableSetNode.class, new VariableNode.VariableNodeSerializer<>());
+        jsonManger.addSerializer(VariableGetNode.class, new VariableNode.VariableNodeSerializer<>());
+
+        jsonManger.addSerializer(FunctionCallNode.class, new FunctionNode.FunctionNodeSerializer<>());
+        ;
+
         // TODO add all nodes
     }
 
@@ -128,13 +140,14 @@ public class Project implements Json.Serializable {
         instance = new Project(name, location, new JSCodeGenerator(), new JSCodeExecution());
         instance.init();
 
+        FileHandle variables = Gdx.files.external(location).child("variables.json");
+        instance.variableManager = new Json().fromJson(VariableManager.class, variables);
+
         FileHandle scenes = Gdx.files.external(location).child("scenes.json");
         instance.sceneManager = instance.jsonManger.load(SceneManager.class, scenes);
 
         MainScene scene = instance.getSceneManager().getMainScene();
         instance.uiScene.pinToTabbedPane(scene.getUiTab());
-        //  FileHandle variables = Gdx.files.external(location).child("variables");
-        //  instance.variableManager = new Json().fromJson(VariableManager.class, variables);
 
         //   FileHandle functions = Gdx.files.external(location).child("functions");
         //  instance.functionManager = new Json().fromJson(FunctionManager.class, functions);
@@ -207,6 +220,10 @@ public class Project implements Json.Serializable {
         System.out.println(code);
         codeExecution.setCode(code);
         codeExecution.run();
+    }
+
+    public Scene getCurrentScene() {
+        return uiScene.getShow();
     }
 
     @Override

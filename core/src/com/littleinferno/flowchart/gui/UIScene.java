@@ -161,6 +161,10 @@ public class UIScene extends Stage {
         return inputMultiplexer;
     }
 
+    public Scene getShow() {
+        return show;
+    }
+
     public interface Begin {
         String gen(BaseCodeGenerator builder);
     }

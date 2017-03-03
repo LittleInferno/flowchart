@@ -3,8 +3,6 @@ package com.littleinferno.flowchart;
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Screen;
 import com.kotcrab.vis.ui.VisUI;
-import com.littleinferno.flowchart.codegen.JSCodeExecution;
-import com.littleinferno.flowchart.codegen.JSCodeGenerator;
 import com.littleinferno.flowchart.project.Project;
 
 
@@ -16,8 +14,8 @@ public class Flowchart extends Game {
     @Override
     public void create() {
 
-        Project project = Project.createProject("test", "test/", new JSCodeGenerator(), new JSCodeExecution());
-      //  Project project = Project.loadProject("test", "test/");
+      //  Project project = Project.createProject("test", "test/", new JSCodeGenerator(), new JSCodeExecution());
+        Project project = Project.loadProject("test", "test/");
 
 
         this.scene = project.getProjectScreen();

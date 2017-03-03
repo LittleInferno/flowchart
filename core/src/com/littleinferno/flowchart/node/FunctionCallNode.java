@@ -10,17 +10,16 @@ import com.littleinferno.flowchart.pin.Pin;
 import java.util.ArrayList;
 import java.util.List;
 
-public class FunctionCallNode extends Node {
+public class FunctionCallNode extends FunctionNode {
 
     private final Pin next;
-    private Function function;
     private String currentCall;
 
     private List<Pin> pins;
     private int outParametrsSize;
 
     public FunctionCallNode(Function function) {
-        super(function.getName(), true);
+        super(function, function.getName(), true);
 
         addExecutionInputPin("exec in");
         next = addExecutionOutputPin("exec out");

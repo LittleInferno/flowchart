@@ -99,6 +99,14 @@ public class FunctionManager implements Json.Serializable{
 
     }
 
+    public Function getFunction(String name) {
+        return Stream.of(functions.iterable())
+                .filter(value -> value.getName().equals(name))
+                .findFirst()
+                .orElseThrow(() ->
+                        new RuntimeException("Cannot find function with name:\"" + name + "\""));
+    }
+
     private class FunctionListAdapter extends ArrayListAdapter<Function, VisTable> {
         private final Drawable bg = VisUI.getSkin().getDrawable("window-bg");
         private final Drawable selection = VisUI.getSkin().getDrawable("list-selection");

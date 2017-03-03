@@ -38,11 +38,10 @@ public class SceneManager {
     public <T extends Scene> T createScene(Class<T> type, Object... args) {
         T scene = null;
         try {
-            scene = type.getConstructor().newInstance(args);
+            scene = (T)type.getConstructors()[0].newInstance(args);
         } catch (InstantiationException
                 | IllegalAccessException
-                | InvocationTargetException
-                | NoSuchMethodException e) {
+                | InvocationTargetException e) {
             e.printStackTrace();
         }
 

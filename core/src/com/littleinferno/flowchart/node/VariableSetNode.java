@@ -5,23 +5,19 @@ import com.littleinferno.flowchart.pin.Pin;
 import com.littleinferno.flowchart.variable.Variable;
 
 
-public class VariableSetNode extends Node {
-
-    private Variable variable;
+public class VariableSetNode extends VariableNode {
 
     private final Pin pin;
     private final Pin next;
 
     public VariableSetNode(Variable variable) {
-        super(String.format("Set %s", variable.getName()), true);
+        super(variable, String.format("Set %s", variable.getName()));
 
         addExecutionInputPin();
         next = addExecutionOutputPin();
 
         this.pin = addDataInputPin("data", variable.getDataType());
         this.pin.setArray(variable.isArray());
-
-        this.variable = variable;
 
         this.variable.addListener(this.pin::setArray);
         this.variable.addListener(this::setTitle);

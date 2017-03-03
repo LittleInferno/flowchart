@@ -47,13 +47,20 @@ public class VariableManager implements Json.Serializable {
         return stringBuilder.toString();
     }
 
+    public Variable getVariable(String name) {
+        return Stream.of(variables)
+                .filter(value -> value.getName().equals(name))
+                .findFirst()
+                .orElseThrow(() ->
+                        new RuntimeException("Cannot find varable with name:\"" + name + "\""));
+    }
+
     @Override
     public void write(Json json) {
         json.writeValue("counter", counter);
         json.writeArrayStart("variables");
 
-        for (Variable v : variables)
-        {
+        for (Variable v : variables) {
             json.writeObjectStart();
             json.writeField(v, "name", "name");
             json.writeValue("dataType", v.getDataType());

@@ -4,4 +4,9 @@ import com.kotcrab.vis.ui.widget.PopupMenu;
 
 public abstract class DropItem extends PopupMenu {
     abstract void init(Scene scene);
+
+    @Override
+    public Scene getStage() {
+        return (Scene) super.getStage();
+    }
 }

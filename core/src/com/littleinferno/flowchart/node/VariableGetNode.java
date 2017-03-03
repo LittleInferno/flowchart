@@ -5,17 +5,13 @@ import com.littleinferno.flowchart.codegen.BaseCodeGenerator;
 import com.littleinferno.flowchart.pin.Pin;
 import com.littleinferno.flowchart.variable.Variable;
 
-public class VariableGetNode extends Node {
-
-    private final Variable variable;
+public class VariableGetNode extends VariableNode {
 
     public VariableGetNode(Variable variable) {
-        super(String.format("Get %s", variable.getName()), true);
+        super(variable, String.format("Get %s", variable.getName()));
 
         final Pin pin = addDataOutputPin("data", variable.getDataType());
         pin.setArray(variable.isArray());
-
-        this.variable = variable;
 
         this.variable.addListener(pin::setArray);
         this.variable.addListener(this::setTitle);

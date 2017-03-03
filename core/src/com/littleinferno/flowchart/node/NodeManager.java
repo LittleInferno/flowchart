@@ -37,21 +37,36 @@ public class NodeManager {
         Stream.of(nodes).forEach(node -> scene.addActor(node));
     }
 
-    public <T extends Node> T createNode(Class<T> nodeClass, Object... args) {
+    static public <T> T create(Class type, Object... args) {
 
         T node = null;
         try {
-            node = nodeClass.getConstructor().newInstance(args);
+            //noinspection unchecked
+            node = (T) type.getConstructors()[0].newInstance(args);
+
+        } catch (IllegalAccessException |
+                InstantiationException |
+                InvocationTargetException e) {
+            e.printStackTrace();
+        }
+
+        return node;
+    }
+
+    public <T extends Node> T createNode(Class<T> nodeClass, Object... args) {
+
+        T node;
+        try {
+            node = (T) nodeClass.getConstructors()[0].newInstance(args);
             registerNode(node);
             return node;
 
         } catch (IllegalAccessException |
                 InstantiationException |
-                NoSuchMethodException |
                 InvocationTargetException e) {
             e.printStackTrace();
         }
-        return node;
+        return null;
     }
 
     public void registerNode(Node node) {
