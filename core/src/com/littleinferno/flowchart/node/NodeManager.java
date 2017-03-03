@@ -1,5 +1,6 @@
 package com.littleinferno.flowchart.node;
 
+import com.annimon.stream.Stream;
 import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonValue;
 import com.badlogic.gdx.utils.SerializationException;
@@ -29,6 +30,11 @@ public class NodeManager {
 
     public void setScene(Scene scene) {
         this.scene = scene;
+        registerInScene();
+    }
+
+    private void registerInScene() {
+        Stream.of(nodes).forEach(node -> scene.addActor(node));
     }
 
     public <T extends Node> T createNode(Class<T> nodeClass, Object... args) {
@@ -36,8 +42,7 @@ public class NodeManager {
         T node = null;
         try {
             node = nodeClass.getConstructor().newInstance(args);
-            nodes.add(node);
-            scene.addActor(node);
+            registerNode(node);
             return node;
 
         } catch (IllegalAccessException |
@@ -47,6 +52,12 @@ public class NodeManager {
             e.printStackTrace();
         }
         return node;
+    }
+
+    public void registerNode(Node node) {
+        nodes.add(node);
+        if (scene != null)
+            scene.addActor(node);
     }
 
     public void deleteNode(Node node) {
@@ -88,7 +99,7 @@ public class NodeManager {
         private void readObjects(Json json, Class type, JsonValue valueMap) {
 
             Node object = (Node) json.readValue(type, valueMap);
-            nodeManager.nodes.add(object);
+            nodeManager.registerNode(object);
         }
 
         private void writeNodes(Json json, List<Node> nodes) throws IOException {

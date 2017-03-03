@@ -108,6 +108,9 @@ public class Project implements Json.Serializable {
         instance = new Project(name, location, codeGenerator, codeExecution);
         instance.init();
 
+        MainScene scene = instance.getSceneManager().getMainScene();
+        instance.uiScene.pinToTabbedPane(scene.getUiTab());
+
         return instance;
     }
 
@@ -125,13 +128,18 @@ public class Project implements Json.Serializable {
         instance = new Project(name, location, new JSCodeGenerator(), new JSCodeExecution());
         instance.init();
 
-        FileHandle variables = Gdx.files.external(location).child("variables");
-        instance.variableManager = new Json().fromJson(VariableManager.class, variables);
+        FileHandle scenes = Gdx.files.external(location).child("scenes.json");
+        instance.sceneManager = instance.jsonManger.load(SceneManager.class, scenes);
 
-        FileHandle functions = Gdx.files.external(location).child("functions");
-        instance.functionManager = new Json().fromJson(FunctionManager.class, functions);
+        MainScene scene = instance.getSceneManager().getMainScene();
+        instance.uiScene.pinToTabbedPane(scene.getUiTab());
+        //  FileHandle variables = Gdx.files.external(location).child("variables");
+        //  instance.variableManager = new Json().fromJson(VariableManager.class, variables);
 
-        return null;
+        //   FileHandle functions = Gdx.files.external(location).child("functions");
+        //  instance.functionManager = new Json().fromJson(FunctionManager.class, functions);
+
+        return instance;
     }
 
 

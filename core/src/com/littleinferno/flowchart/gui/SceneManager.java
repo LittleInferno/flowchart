@@ -1,5 +1,6 @@
 package com.littleinferno.flowchart.gui;
 
+import com.annimon.stream.Stream;
 import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonValue;
 import com.badlogic.gdx.utils.SerializationException;
@@ -24,11 +25,20 @@ public class SceneManager {
         scenes = new ArrayList<>();
     }
 
+    public MainScene getMainScene() {
+        return (MainScene) Stream.of(scenes)
+                .filter(scene -> scene.getName().equals("main"))
+                .findFirst().orElseGet(this::createMain);
+    }
+
+    private MainScene createMain() {
+        return createScene(MainScene.class);
+    }
+
     public <T extends Scene> T createScene(Class<T> type, Object... args) {
         T scene = null;
         try {
             scene = type.getConstructor().newInstance(args);
-            scenes.add(scene);
         } catch (InstantiationException
                 | IllegalAccessException
                 | InvocationTargetException
@@ -36,6 +46,7 @@ public class SceneManager {
             e.printStackTrace();
         }
 
+        scenes.add(scene);
         return scene;
     }
 
@@ -81,12 +92,12 @@ public class SceneManager {
             sceneManager.scenes.add(object);
         }
 
-        private void writeScene(Json json, List<Scene> nodes) throws IOException {
+        private void writeScene(Json json, List<Scene> scenes) throws IOException {
             json.writeObjectStart("scenes");
 
-            for (Scene node : nodes) {
-                json.getWriter().name(node.getClass().getName());
-                json.writeValue(node);
+            for (Scene scene : scenes) {
+                json.getWriter().name(scene.getClass().getName());
+                json.writeValue(scene);
             }
             json.writeObjectEnd();
         }

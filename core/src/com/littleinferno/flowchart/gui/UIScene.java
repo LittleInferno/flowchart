@@ -21,6 +21,7 @@ public class UIScene extends Stage {
 
     private TabbedPane tabbedPane;
     private InputMultiplexer inputMultiplexer;
+
     private Scene show;
 
     private static DragAndDrop dragAndDrop;
@@ -110,9 +111,6 @@ public class UIScene extends Stage {
             }
         });
 
-        show = Project.instance().getSceneManager().createScene(MainScene.class);
-
-        pinToTabbedPane(show.getUiTab());
         controlTable.pack();
         container.add(controlTable).growY();
 

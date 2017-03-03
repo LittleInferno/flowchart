@@ -12,7 +12,6 @@ import com.badlogic.gdx.utils.JsonValue;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.kotcrab.vis.ui.widget.VisTable;
 import com.kotcrab.vis.ui.widget.tabbedpane.Tab;
-import com.littleinferno.flowchart.node.Node;
 import com.littleinferno.flowchart.node.NodeManager;
 import com.littleinferno.flowchart.project.Project;
 import com.littleinferno.flowchart.wire.WireManager;
@@ -60,10 +59,7 @@ public class Scene extends Stage {
                     ((DropItem) target).init(Scene.this);
                 } else {
                     Class type = (Class) object;
-
-                    Node node = Scene.this.getNodeManager().createNode(type);
-
-                    node.setPosition(vec.x, vec.y);
+                    getNodeManager().createNode(type).setPosition(vec.x, vec.y);
                 }
             }
         });
