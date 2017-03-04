@@ -20,7 +20,7 @@ public class FunctionBeginNode extends Node {
     private List<Pin> pins;
 
     public FunctionBeginNode(Function function) {
-        super(function.getName(), false);
+        super(new NodeHandle(function.getName(), false));
 
         next = addExecutionOutputPin();
 

@@ -7,10 +7,14 @@ import com.littleinferno.flowchart.codegen.BaseCodeGenerator;
 import com.littleinferno.flowchart.pin.Pin;
 
 public class BoolNode extends Node {
-    private final VisSelectBox<String> box;
+    private VisSelectBox<String> box;
 
     public BoolNode() {
-        super("Bool", true);
+        this(new NodeHandle("Bool", true));
+    }
+
+    public BoolNode(NodeHandle nodeHandle) {
+        super(nodeHandle);
 
         addDataOutputPin("data", DataType.BOOL);
 

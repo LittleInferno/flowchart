@@ -8,10 +8,14 @@ import com.littleinferno.flowchart.pin.Pin;
 
 public class StringNode extends Node {
 
-    private final VisTextField field;
+    private VisTextField field;
 
     public StringNode() {
-        super("String", true);
+        this(new NodeHandle("String", true));
+    }
+
+    public StringNode(NodeHandle nodeHandle) {
+        super(nodeHandle);
 
         addDataOutputPin("data", DataType.STRING);
 

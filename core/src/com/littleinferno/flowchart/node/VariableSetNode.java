@@ -4,15 +4,22 @@ import com.littleinferno.flowchart.codegen.BaseCodeGenerator;
 import com.littleinferno.flowchart.pin.Pin;
 import com.littleinferno.flowchart.variable.Variable;
 
-
 public class VariableSetNode extends VariableNode {
 
-    private final Pin pin;
-    private final Pin next;
+    private Pin pin;
+    private Pin next;
 
     public VariableSetNode(Variable variable) {
-        super(variable, String.format("Set %s", variable.getName()));
+        super(new VariableNodeHandle("Set" + variable.getName(), true, variable.getName()));
+        init();
+    }
 
+    public VariableSetNode(VariableNodeHandle nodeHandle) {
+        super(nodeHandle);
+        init();
+    }
+
+    private void init() {
         addExecutionInputPin();
         next = addExecutionOutputPin();
 

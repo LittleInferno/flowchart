@@ -14,13 +14,18 @@ import java.util.List;
 
 public class MakeArrayNode extends Node {
 
-    private final Pin.PinListener listener;
+    private Pin.PinListener listener;
     private Pin array;
     private List<Pin> values;
     private int counter = 0;
 
+
+    public MakeArrayNode(NodeHandle nodeHandle) {
+        super(nodeHandle);
+    }
+
     public MakeArrayNode() {
-        super("make array", true);
+        this(new NodeHandle("make array", true));
 
         array = addDataOutputPin("array", Pin.DEFAULT_CONVERT);
         array.setArray(true);

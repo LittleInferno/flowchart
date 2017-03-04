@@ -9,12 +9,16 @@ public class BeginNode extends Node {
     private Pin start;
 
     public BeginNode() {
-        super("Begin", false);
+        this(new NodeHandle("Begin", false));
+    }
+
+    public BeginNode(NodeHandle nodeHandle) {
+        super(nodeHandle);
 
         start = addExecutionOutputPin("start");
-
         Project.instance().setProgramStart(builder -> gen(builder, start));
     }
+
 
     @Override
     public String gen(BaseCodeGenerator builder, Pin with) {

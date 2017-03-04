@@ -5,8 +5,13 @@ import com.littleinferno.flowchart.codegen.BaseCodeGenerator;
 import com.littleinferno.flowchart.pin.Pin;
 
 public class SubNode extends ArithmeticNode {
+
+    public SubNode(NodeHandle nodeHandle) {
+        super(nodeHandle, DataType.INT, DataType.FLOAT);
+    }
+
     public SubNode() {
-        super("sub", DataType.INT, DataType.FLOAT);
+        super(new NodeHandle("sub", true), DataType.INT, DataType.FLOAT);
     }
 
     @Override

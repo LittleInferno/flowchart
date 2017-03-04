@@ -5,12 +5,16 @@ import com.littleinferno.flowchart.codegen.BaseCodeGenerator;
 import com.littleinferno.flowchart.pin.Pin;
 
 public class IfNode extends Node {
-    private final Pin condition;
-    private final Pin truePath;
-    private final Pin falsePath;
+    private Pin condition;
+    private Pin truePath;
+    private Pin falsePath;
 
     public IfNode() {
-        super("if", true);
+        this(new NodeHandle("if", true));
+    }
+
+    public IfNode(NodeHandle nodeHandle) {
+        super(nodeHandle);
 
         addExecutionInputPin();
         condition = addDataInputPin("Condition", DataType.BOOL);

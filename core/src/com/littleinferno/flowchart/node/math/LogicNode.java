@@ -10,8 +10,8 @@ public abstract class LogicNode extends Node {
     protected final Pin a;
     protected final Pin b;
 
-    public LogicNode(String name, DataType... possibleConvert) {
-        super(name, true);
+    public LogicNode(NodeHandle nodeHandle, DataType... possibleConvert) {
+        super(nodeHandle);
 
         a = addDataInputPin("A", possibleConvert);
         b = addDataInputPin("B", possibleConvert);

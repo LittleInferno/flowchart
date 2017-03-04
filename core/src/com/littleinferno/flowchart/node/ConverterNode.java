@@ -7,7 +7,7 @@ import com.littleinferno.flowchart.pin.Pin;
 
 public class ConverterNode extends Node {
     public ConverterNode(DataType from, DataType to, Skin skin) {
-        super("Converter", true);
+        super(new NodeHandle("Converter", true));
 
         addDataInputPin("from", from);
         addDataOutputPin("to", to);

@@ -7,12 +7,16 @@ import com.littleinferno.flowchart.pin.Pin;
 
 public class ArrayGetNode extends Node {
 
-    private final Pin array;
-    private final Pin index;
-    private final Pin item;
+    private Pin array;
+    private Pin index;
+    private Pin item;
+
+    public ArrayGetNode(NodeHandle nodeHandle) {
+        super(nodeHandle);
+    }
 
     public ArrayGetNode() {
-        super("Get", true);
+        this(new NodeHandle("Get", true));
 
         array = addDataInputPin("array", Pin.DEFAULT_CONVERT);
         index = addDataInputPin("index", DataType.INT);

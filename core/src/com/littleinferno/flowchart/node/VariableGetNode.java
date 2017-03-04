@@ -8,8 +8,16 @@ import com.littleinferno.flowchart.variable.Variable;
 public class VariableGetNode extends VariableNode {
 
     public VariableGetNode(Variable variable) {
-        super(variable, String.format("Get %s", variable.getName()));
+        super(new VariableNodeHandle("Get " + variable.getName(), true, variable.getName()));
+        init();
+    }
 
+    public VariableGetNode(VariableNodeHandle nodeHandle) {
+        super(nodeHandle);
+        init();
+    }
+
+    private void init() {
         final Pin pin = addDataOutputPin("data", variable.getDataType());
         pin.setArray(variable.isArray());
 

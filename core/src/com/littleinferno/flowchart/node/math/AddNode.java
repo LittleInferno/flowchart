@@ -6,8 +6,12 @@ import com.littleinferno.flowchart.pin.Pin;
 
 public class AddNode extends ArithmeticNode {
 
+    public AddNode(NodeHandle nodeHandle) {
+        super(nodeHandle, DataType.INT, DataType.FLOAT, DataType.STRING);
+    }
+
     public AddNode() {
-        super("add", DataType.INT, DataType.FLOAT, DataType.STRING);
+        super(new NodeHandle("Add", true), DataType.INT, DataType.FLOAT, DataType.STRING);
     }
 
     @Override

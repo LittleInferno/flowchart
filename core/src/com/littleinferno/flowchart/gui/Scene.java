@@ -16,6 +16,8 @@ import com.littleinferno.flowchart.node.NodeManager;
 import com.littleinferno.flowchart.project.Project;
 import com.littleinferno.flowchart.wire.WireManager;
 
+import java.lang.reflect.InvocationTargetException;
+
 public class Scene extends Stage {
 
     private UiTab uiTab;
@@ -24,7 +26,7 @@ public class Scene extends Stage {
     private NodeManager nodeManager;
     private String name;
 
-    Scene(String name, boolean closeable) {
+    Scene(String name, NodeManager nodeManager, boolean closeable) {
         super(new ScreenViewport());
 
         this.name = name;
@@ -33,7 +35,8 @@ public class Scene extends Stage {
         gesture = new GestureDetector(new Gesture());
 
         wireManager = new WireManager();
-        nodeManager = new NodeManager(this);
+        this.nodeManager = nodeManager;
+        this.nodeManager.setScene(this);
 
         Project.instance().getUiScene().addDragAndDropTarget(new DragAndDrop.Target(uiTab.getContentTable()) {
             @Override
@@ -93,7 +96,7 @@ public class Scene extends Stage {
 
     public void setNodeManager(NodeManager nodeManager) {
         this.nodeManager = nodeManager;
-        nodeManager.setScene(this);
+        this.nodeManager.setScene(this);
     }
 
     static class UiTab extends Tab {
@@ -202,15 +205,14 @@ public class Scene extends Stage {
             T scene = null;
             try {
                 //noinspection unchecked
-                scene = (T) type.newInstance();
-            } catch (InstantiationException | IllegalAccessException e) {
+                scene = (T) type.getConstructor(NodeManager.class)
+                        .newInstance(json.readValue(NodeManager.class, jsonData.get("nodeManager")));
+            } catch (InstantiationException
+                    | IllegalAccessException
+                    | NoSuchMethodException
+                    | InvocationTargetException e) {
                 e.printStackTrace();
             }
-
-            if (scene != null) {
-                scene.setNodeManager(json.readValue(NodeManager.class, jsonData.get("nodeManager")));
-            }
-
             return scene;
         }
     }

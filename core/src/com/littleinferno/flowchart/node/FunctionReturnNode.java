@@ -18,7 +18,7 @@ public class FunctionReturnNode extends Node {
     private List<Pin> pins;
 
     public FunctionReturnNode(Function function) {
-        super(function.getName(), false);
+        super(new NodeHandle(function.getName(), false));
 
         addExecutionInputPin();
 

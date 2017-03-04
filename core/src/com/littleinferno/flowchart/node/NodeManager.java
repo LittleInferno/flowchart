@@ -37,33 +37,37 @@ public class NodeManager {
         Stream.of(nodes).forEach(node -> scene.addActor(node));
     }
 
-    static public <T> T create(Class type, Object... args) {
-
-        T node = null;
-        try {
-            //noinspection unchecked
-            node = (T) type.getConstructors()[0].newInstance(args);
-
-        } catch (IllegalAccessException |
-                InstantiationException |
-                InvocationTargetException e) {
-            e.printStackTrace();
-        }
-
-        return node;
+    public BeginNode getBeginNode() {
+        return (BeginNode) Stream.of(nodes)
+                .filter(scene -> scene.getName().equals("main"))
+                .findFirst().orElseGet(() -> createNode(BeginNode.class, (Object[]) null));
     }
 
-    public <T extends Node> T createNode(Class<T> nodeClass, Object... args) {
+    public <T extends Node> T createNode(Class<T> type, Object... args) {
+
+        if (args != null && type.equals(BeginNode.class)) {
+            //noinspection unchecked
+            return (T) getBeginNode();
+        }
 
         T node;
         try {
-            node = (T) nodeClass.getConstructors()[0].newInstance(args);
+            if (args != null && args.length > 0) {
+                Class classes[] = new Class[args.length];
+                for (int i = 0; i < classes.length; ++i)
+                    classes[i] = args[i].getClass();
+
+                node = type.getConstructor(classes).newInstance(args);
+            } else
+                node = type.getConstructor().newInstance();
+
             registerNode(node);
             return node;
 
-        } catch (IllegalAccessException |
+        } catch (InvocationTargetException |
+                IllegalAccessException |
                 InstantiationException |
-                InvocationTargetException e) {
+                NoSuchMethodException e) {
             e.printStackTrace();
         }
         return null;
@@ -103,7 +107,7 @@ public class NodeManager {
             JsonValue data = jsonData.child;
             for (JsonValue valueMap = data.child; valueMap != null; valueMap = valueMap.next) {
                 try {
-                    readObjects(json, ClassReflection.forName(valueMap.name()), valueMap);
+                    readObject(json, ClassReflection.forName(valueMap.name()), valueMap);
                 } catch (ReflectionException ex) {
                     throw new SerializationException(ex);
                 }
@@ -111,18 +115,24 @@ public class NodeManager {
             return nodeManager;
         }
 
-        private void readObjects(Json json, Class type, JsonValue valueMap) {
+        private void readObject(Json json, Class type, JsonValue valueMap) {
 
-            Node object = (Node) json.readValue(type, valueMap);
-            nodeManager.registerNode(object);
+            Node.NodeHandle object = (Node.NodeHandle) json.readValue(type, valueMap);
+            Node node = null;
+            try {
+                node = nodeManager.createNode(ClassReflection.forName(object.className), object);
+            } catch (ReflectionException e) {
+                e.printStackTrace();
+            }
         }
 
         private void writeNodes(Json json, List<Node> nodes) throws IOException {
             json.writeObjectStart("nodes");
 
             for (Node node : nodes) {
-                json.getWriter().name(node.getClass().getName());
-                json.writeValue(node);
+                Node.NodeHandle nodeHandle = node.getHandle();
+                json.getWriter().name(nodeHandle.getClass().getName());
+                json.writeValue(nodeHandle);
             }
             json.writeObjectEnd();
         }

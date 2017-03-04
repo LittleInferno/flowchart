@@ -8,10 +8,14 @@ import com.littleinferno.flowchart.pin.Pin;
 
 public class FloatNode extends Node {
 
-    private final VisTextField field;
+    private VisTextField field;
 
     public FloatNode() {
-        super("Float", true);
+        this(new NodeHandle("Float", true));
+    }
+
+    public FloatNode(NodeHandle nodeHandle) {
+        super(nodeHandle);
 
         addDataOutputPin("data", DataType.FLOAT);
 

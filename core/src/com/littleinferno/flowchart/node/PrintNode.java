@@ -5,11 +5,15 @@ import com.littleinferno.flowchart.pin.Pin;
 
 public class PrintNode extends Node {
 
-    private final Pin next;
-    private final Pin value;
+    private Pin next;
+    private Pin value;
 
     public PrintNode() {
-        super("Print", true);
+        this(new NodeHandle("Print", true));
+    }
+
+    public PrintNode(NodeHandle nodeHandle) {
+        super(nodeHandle);
 
         next = addExecutionOutputPin();
         addExecutionInputPin();

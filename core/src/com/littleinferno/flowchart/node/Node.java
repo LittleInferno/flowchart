@@ -9,8 +9,11 @@ import com.badlogic.gdx.utils.JsonValue;
 import com.badlogic.gdx.utils.SnapshotArray;
 import com.kotcrab.vis.ui.widget.VisTable;
 import com.kotcrab.vis.ui.widget.VisWindow;
-import com.littleinferno.flowchart.*;
+import com.littleinferno.flowchart.Connection;
+import com.littleinferno.flowchart.DataType;
+import com.littleinferno.flowchart.JsonManger;
 import com.littleinferno.flowchart.codegen.CodeGen;
+import com.littleinferno.flowchart.gui.Scene;
 import com.littleinferno.flowchart.pin.Pin;
 
 import java.util.UUID;
@@ -20,21 +23,24 @@ public abstract class Node extends VisWindow implements CodeGen {
     protected final VerticalGroup left;
     protected final VerticalGroup right;
 
-    private UUID id;
+    private NodeHandle nodeHandle;
 
-    public Node(final String name, final boolean closable) {
-        super(name);
+    public Node(NodeHandle nodeHandle) {
+        super(nodeHandle.name);
 
-        setId(JsonManger.getID());
+        this.nodeHandle = nodeHandle;
+        this.nodeHandle.className = this.getClass().getName();
 
-        setName(name);
+        setPosition(nodeHandle.x, nodeHandle.y);
+
+        setName(nodeHandle.name);
         setKeepWithinStage(false);
         setKeepWithinParent(false);
 
 
         setWidth(200);
 
-        if (closable) {
+        if (nodeHandle.closable) {
             addCloseButton();
         }
 
@@ -131,15 +137,24 @@ public abstract class Node extends VisWindow implements CodeGen {
             }
         }
 
+        getStage().getNodeManager().deleteNode(this);
+
         super.close();
     }
 
-    public UUID getId() {
-        return id;
+    public NodeHandle getHandle() {
+        nodeHandle.x = getX();
+        nodeHandle.y = getY();
+        return nodeHandle;
     }
 
-    public void setId(UUID id) {
-        this.id = id;
+    public UUID getId() {
+        return UUID.fromString(nodeHandle.id);
+    }
+
+    @Override
+    public Scene getStage() {
+        return (Scene) super.getStage();
     }
 
     static public class DefaultNodeSerializer<T extends Node> implements Json.Serializer<T> {
@@ -167,7 +182,7 @@ public abstract class Node extends VisWindow implements CodeGen {
                 //noinspection unchecked
                 node = (T) type.newInstance();
                 node.setPosition(x, y);
-                node.setId(id);
+//                node(id);
 
             } catch (InstantiationException | IllegalAccessException e) {
                 e.printStackTrace();
@@ -177,6 +192,28 @@ public abstract class Node extends VisWindow implements CodeGen {
         }
     }
 
+    static public class NodeHandle {
+        public float x, y;
+        public String name, className, id;
+        public boolean closable;
+
+        public NodeHandle(String name, boolean closable) {
+            this(0, 0, name, null, closable);
+        }
+
+        public NodeHandle(float x, float y, String name, String className, boolean closable) {
+            this.x = x;
+            this.y = y;
+            this.name = name;
+            this.className = className;
+            this.id = JsonManger.getID().toString();
+            this.closable = closable;
+        }
+
+        public NodeHandle() {
+        }
+
+    }
 
     static public class NodeStyle {
 

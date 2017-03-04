@@ -6,8 +6,12 @@ import com.littleinferno.flowchart.pin.Pin;
 
 public class DivNode extends ArithmeticNode {
 
+    public DivNode(NodeHandle nodeHandle) {
+        super(nodeHandle, DataType.INT, DataType.FLOAT);
+    }
+
     public DivNode() {
-        super("div", DataType.INT, DataType.FLOAT);
+        super(new NodeHandle("div", true), DataType.INT, DataType.FLOAT);
     }
 
     @Override

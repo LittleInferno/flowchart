@@ -6,11 +6,11 @@ import com.littleinferno.flowchart.pin.Pin;
 
 abstract class ArithmeticNode extends Node {
 
-    protected final Pin a;
-    protected final Pin b;
+    protected Pin a;
+    protected Pin b;
 
-    ArithmeticNode(String name, DataType... possibleConvert) {
-        super(name, true);
+    ArithmeticNode(NodeHandle nodeHandle, DataType... possibleConvert) {
+        super(nodeHandle);
 
         a = addDataInputPin("A", possibleConvert);
         b = addDataInputPin("B", possibleConvert);

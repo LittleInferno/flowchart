@@ -6,11 +6,15 @@ import com.littleinferno.flowchart.pin.Pin;
 
 public class PrintArrayNode extends Node {
 
-    private final Pin next;
-    private final Pin value;
+    private Pin next;
+    private Pin value;
+
+    public PrintArrayNode(NodeHandle nodeHandle) {
+        super(nodeHandle);
+    }
 
     public PrintArrayNode() {
-        super("print array", true);
+        this(new NodeHandle("print array", true));
 
         next = addExecutionOutputPin();
         addExecutionInputPin();
@@ -31,5 +35,5 @@ public class PrintArrayNode extends Node {
         String format = String.format("com.littleinferno.flowchart.jsutil.IO.printArray(%s)", valStr);
 
         return String.format("%s%s", builder.makeStatement(format), nextStr);
-}
+    }
 }

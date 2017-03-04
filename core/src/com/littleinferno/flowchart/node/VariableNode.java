@@ -1,51 +1,31 @@
 package com.littleinferno.flowchart.node;
 
-import com.badlogic.gdx.utils.Json;
-import com.badlogic.gdx.utils.JsonValue;
 import com.littleinferno.flowchart.project.Project;
 import com.littleinferno.flowchart.variable.Variable;
-
-import java.util.UUID;
 
 public abstract class VariableNode extends Node {
 
     protected final Variable variable;
 
-    VariableNode(Variable variable, String name) {
-        super(name, true);
-        this.variable = variable;
+    VariableNode(VariableNodeHandle nodeHandle) {
+        super(nodeHandle);
+        this.variable = Project.instance().getVariableManager().getVariable(nodeHandle.varName);
     }
 
-    public Variable getVariable() {
-        return variable;
-    }
+    static class VariableNodeHandle extends NodeHandle {
+        public String varName;
 
-    static public class VariableNodeSerializer<T extends VariableNode> implements Json.Serializer<T> {
-        @Override
-        public void write(Json json, T object, Class knownType) {
-            json.writeObjectStart();
-            json.writeValue("x", object.getX());
-            json.writeValue("y", object.getY());
-            json.writeValue("variable", object.getVariable().getName());
-            json.writeValue("id", object.getId().toString());
-            json.writeObjectEnd();
+        public VariableNodeHandle() {
         }
 
-        @Override
-        public T read(Json json, JsonValue jsonData, Class type) {
+        public VariableNodeHandle(String name, boolean closable, String varName) {
+            super(name, closable);
+            this.varName = varName;
+        }
 
-            float x = jsonData.get("x").asFloat();
-            float y = jsonData.get("y").asFloat();
-            UUID id = UUID.fromString(jsonData.get("id").asString());
-            String varName = jsonData.get("variable").asString();
-            Variable variable = Project.instance().getVariableManager().getVariable(varName);
-
-            T node = NodeManager.create(type, variable);
-
-            node.setPosition(x, y);
-            node.setId(id);
-
-            return node;
+        public VariableNodeHandle(float x, float y, String className, String id, String varName) {
+            super(x, y, className, id, true);
+            this.varName = varName;
         }
     }
 }

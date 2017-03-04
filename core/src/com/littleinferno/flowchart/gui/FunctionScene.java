@@ -3,10 +3,11 @@ package com.littleinferno.flowchart.gui;
 
 import com.kotcrab.vis.ui.widget.tabbedpane.TabbedPane;
 import com.littleinferno.flowchart.function.Function;
+import com.littleinferno.flowchart.node.NodeManager;
 
 public class FunctionScene extends Scene {
     public FunctionScene(Function function) {
-        super(function.getName(), true);
+        super(function.getName(), new NodeManager(), true);
 
         function.addListener(newName -> {
             setName(newName);

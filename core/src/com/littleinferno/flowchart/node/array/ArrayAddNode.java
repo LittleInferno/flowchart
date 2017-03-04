@@ -7,13 +7,17 @@ import com.littleinferno.flowchart.pin.Pin;
 
 public class ArrayAddNode extends Node {
 
-    private final Pin next;
-    private final Pin array;
-    private final Pin item;
-    private final Pin length;
+    private Pin next;
+    private Pin array;
+    private Pin item;
+    private Pin length;
+
+    public ArrayAddNode(NodeHandle nodeHandle) {
+        super(nodeHandle);
+    }
 
     public ArrayAddNode() {
-        super("Add", true);
+        this(new NodeHandle("Add", true));
 
         next = addExecutionOutputPin();
         addExecutionInputPin();

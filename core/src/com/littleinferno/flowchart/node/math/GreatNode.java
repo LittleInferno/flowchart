@@ -5,8 +5,13 @@ import com.littleinferno.flowchart.codegen.BaseCodeGenerator;
 import com.littleinferno.flowchart.pin.Pin;
 
 public class GreatNode extends LogicNode {
+
+    public GreatNode(NodeHandle nodeHandle) {
+        super(nodeHandle, DataType.FLOAT, DataType.INT, DataType.STRING);
+    }
+
     public GreatNode() {
-        super("great", DataType.FLOAT, DataType.INT, DataType.STRING);
+        super(new NodeHandle("great", true), DataType.FLOAT, DataType.INT, DataType.STRING);
     }
 
     @Override

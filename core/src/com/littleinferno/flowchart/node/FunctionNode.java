@@ -12,7 +12,7 @@ public abstract class FunctionNode extends Node {
     protected Function function;
 
     FunctionNode(Function function, String name, boolean closable) {
-        super(name, closable);
+        super(new NodeHandle(name, closable));
         this.function = function;
     }
 
@@ -40,10 +40,10 @@ public abstract class FunctionNode extends Node {
             String funName = jsonData.get("function").asString();
             Function function = Project.instance().getFunctionManager().getFunction(funName);
 
-            T node = NodeManager.create(type, function);
+            T node =null;// NodeManager.create(type, function);
 
             node.setPosition(x, y);
-            node.setId(id);
+           // node.setId(id);
 
             return node;
         }

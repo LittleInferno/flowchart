@@ -18,24 +18,7 @@ import com.littleinferno.flowchart.gui.ProjectScreen;
 import com.littleinferno.flowchart.gui.Scene;
 import com.littleinferno.flowchart.gui.SceneManager;
 import com.littleinferno.flowchart.gui.UIScene;
-import com.littleinferno.flowchart.node.BeginNode;
-import com.littleinferno.flowchart.node.BoolNode;
-import com.littleinferno.flowchart.node.FloatNode;
-import com.littleinferno.flowchart.node.FunctionCallNode;
-import com.littleinferno.flowchart.node.FunctionNode;
-import com.littleinferno.flowchart.node.FunctionReturnNode;
-import com.littleinferno.flowchart.node.IfNode;
-import com.littleinferno.flowchart.node.IntegerNode;
-import com.littleinferno.flowchart.node.Node;
 import com.littleinferno.flowchart.node.NodeManager;
-import com.littleinferno.flowchart.node.StringNode;
-import com.littleinferno.flowchart.node.VariableGetNode;
-import com.littleinferno.flowchart.node.VariableNode;
-import com.littleinferno.flowchart.node.VariableSetNode;
-import com.littleinferno.flowchart.node.math.AddNode;
-import com.littleinferno.flowchart.node.math.DivNode;
-import com.littleinferno.flowchart.node.math.MulNode;
-import com.littleinferno.flowchart.node.math.SubNode;
 import com.littleinferno.flowchart.util.ProjectException;
 import com.littleinferno.flowchart.variable.VariableManager;
 
@@ -85,25 +68,6 @@ public class Project implements Json.Serializable {
         jsonManger.addSerializer(MainScene.class, new Scene.SceneSerializer<>());
         jsonManger.addSerializer(SceneManager.class, new SceneManager.SceneManagerSerializer());
 
-        jsonManger.addSerializer(IntegerNode.class, new Node.DefaultNodeSerializer<>());
-        jsonManger.addSerializer(FloatNode.class, new Node.DefaultNodeSerializer<>());
-        jsonManger.addSerializer(StringNode.class, new Node.DefaultNodeSerializer<>());
-        jsonManger.addSerializer(BoolNode.class, new Node.DefaultNodeSerializer<>());
-        jsonManger.addSerializer(IfNode.class, new Node.DefaultNodeSerializer<>());
-        jsonManger.addSerializer(BeginNode.class, new Node.DefaultNodeSerializer<>());
-
-        jsonManger.addSerializer(AddNode.class, new Node.DefaultNodeSerializer<>());
-        jsonManger.addSerializer(SubNode.class, new Node.DefaultNodeSerializer<>());
-        jsonManger.addSerializer(MulNode.class, new Node.DefaultNodeSerializer<>());
-        jsonManger.addSerializer(DivNode.class, new Node.DefaultNodeSerializer<>());
-
-        jsonManger.addSerializer(VariableSetNode.class, new VariableNode.VariableNodeSerializer<>());
-        jsonManger.addSerializer(VariableGetNode.class, new VariableNode.VariableNodeSerializer<>());
-
-        jsonManger.addSerializer(FunctionCallNode.class, new FunctionNode.FunctionNodeSerializer<>());
-        ;
-
-        // TODO add all nodes
     }
 
     public static Project createProject(String name, String location, BaseCodeGenerator codeGenerator, BaseCodeExecution codeExecution) {

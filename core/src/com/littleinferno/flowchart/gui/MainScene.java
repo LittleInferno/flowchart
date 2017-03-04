@@ -1,15 +1,13 @@
 package com.littleinferno.flowchart.gui;
 
 
-import com.littleinferno.flowchart.node.BeginNode;
+import com.littleinferno.flowchart.node.NodeManager;
 
 public class MainScene extends Scene {
 
-    public MainScene() {
-        super("main", false);
+    public MainScene(NodeManager nodeManager) {
+        super("main", nodeManager, false);
 
-        BeginNode node = getNodeManager().createNode(BeginNode.class);
-        node.setPosition(500, 200);
-        addActor(node);
+        getNodeManager().getBeginNode().setPosition(500, 200);
     }
 }

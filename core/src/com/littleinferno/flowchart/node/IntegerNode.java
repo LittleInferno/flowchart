@@ -8,10 +8,14 @@ import com.littleinferno.flowchart.pin.Pin;
 
 public class IntegerNode extends Node {
 
-    private final VisTextField field;
+    private VisTextField field;
 
     public IntegerNode() {
-        super("Integer", true);
+        this(new NodeHandle("Integer", true));
+    }
+
+    public IntegerNode(NodeHandle nodeHandle) {
+        super(nodeHandle);
 
         addDataOutputPin("data", DataType.INT);
 
