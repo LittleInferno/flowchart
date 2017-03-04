@@ -14,6 +14,7 @@ import com.littleinferno.flowchart.project.Project;
 public class ControlTable extends VisTable {
 
     static private ConsoleTable consoleTable;
+    private final VisTable variableTable;
 
     public ControlTable(UIScene sceneUi) {
         setTouchable(Touchable.enabled);
@@ -21,7 +22,7 @@ public class ControlTable extends VisTable {
         final VisTable nodeTable = new NodeTable(sceneUi);
 
 
-        final VisTable variableTable = new VisTable();
+        variableTable = new VisTable();
 
         VisTextButton createVariable = new VisTextButton("create");
         createVariable.addListener(new ChangeListener() {
@@ -31,12 +32,6 @@ public class ControlTable extends VisTable {
             }
         });
         variableTable.add(createVariable).growX().row();
-
-        variableTable.add(Project.instance().getVariableManager().getUi().getVarTable()).grow().row();
-        variableTable.addSeparator();
-        variableTable.add(Project.instance().getVariableManager().getUi().getDetailsTable()).growX().row();
-        variableTable.addSeparator();
-
 
         final VisTable functionTable = new VisTable();
 
@@ -100,6 +95,13 @@ public class ControlTable extends VisTable {
         add(container).grow();
 
         setBackground(VisUI.getSkin().getDrawable("window-bg"));
+    }
+
+    public void initVarTable(){
+        variableTable.add(Project.instance().getVariableManager().getUi().getVarTable()).grow().row();
+        variableTable.addSeparator();
+        variableTable.add(Project.instance().getVariableManager().getUi().getDetailsTable()).growX().row();
+        variableTable.addSeparator();
     }
 
     public static ConsoleTable getConsole() {

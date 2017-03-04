@@ -11,7 +11,7 @@ import com.littleinferno.flowchart.util.TypeChangedListener;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Variable{
+public class Variable {
 
     private DataType dataType;
     private String name;
@@ -37,7 +37,12 @@ public class Variable{
         this.variableDetailsTable = new VariableDetailsTable(this);
     }
 
-    public Variable() {
+    public Variable(VariableHandle variableHandle) {
+        this(variableHandle.name, variableHandle.dataType, variableHandle.isArray);
+    }
+
+    @Deprecated
+    Variable(){
         this.nameChangedListeners = new ArrayList<>();
         this.typeChangedListeners = new ArrayList<>();
         this.arrayChangedListeners = new ArrayList<>();
@@ -118,5 +123,25 @@ public class Variable{
 
     void destroy() {
         notifyListenersDestroed();
+    }
+
+    public VariableHandle getHandle() {
+        return new VariableHandle(name, dataType, isArray);
+    }
+
+    public static class VariableHandle {
+        String name;
+        DataType dataType;
+        boolean isArray;
+
+        public VariableHandle() {
+        }
+
+        public VariableHandle(String name, DataType dataType, boolean isArray) {
+            this.name = name;
+            this.dataType = dataType;
+            this.isArray = isArray;
+        }
+
     }
 }

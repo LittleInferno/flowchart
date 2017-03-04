@@ -86,6 +86,7 @@ public class Project implements Json.Serializable {
 
         MainScene scene = instance.getSceneManager().getMainScene();
         instance.uiScene.pinToTabbedPane(scene.getUiTab());
+        instance.uiScene.controlTable.initVarTable();
 
         return instance;
     }
@@ -105,7 +106,8 @@ public class Project implements Json.Serializable {
         instance.init();
 
         FileHandle variables = Gdx.files.external(location).child("variables.json");
-        instance.variableManager = new Json().fromJson(VariableManager.class, variables);
+        instance.variableManager = new VariableManager(
+                instance.jsonManger.loadHandle(VariableManager.VariableManagerHandle.class, variables));
 
         FileHandle scenes = Gdx.files.external(location).child("scenes.json");
         instance.sceneManager = instance.jsonManger.load(SceneManager.class, scenes);
@@ -115,6 +117,7 @@ public class Project implements Json.Serializable {
 
         //   FileHandle functions = Gdx.files.external(location).child("functions");
         //  instance.functionManager = new Json().fromJson(FunctionManager.class, functions);
+        instance.uiScene.controlTable.initVarTable();
 
         return instance;
     }
@@ -138,7 +141,7 @@ public class Project implements Json.Serializable {
         Json json = new Json();
 
         FileHandle variables = Gdx.files.external(location).child("variables.json");
-        variables.writeString(json.prettyPrint(variableManager), false);
+        jsonManger.save(variableManager.getHandle(), variables);
 
         FileHandle functions = Gdx.files.external(location).child("functions.json");
         functions.writeString(json.prettyPrint(functionManager), false);

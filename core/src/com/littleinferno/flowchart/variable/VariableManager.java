@@ -1,8 +1,7 @@
 package com.littleinferno.flowchart.variable;
 
+import com.annimon.stream.Collectors;
 import com.annimon.stream.Stream;
-import com.badlogic.gdx.utils.Json;
-import com.badlogic.gdx.utils.JsonValue;
 import com.kotcrab.vis.ui.util.adapter.ArrayListAdapter;
 import com.kotcrab.vis.ui.widget.ListView;
 import com.kotcrab.vis.ui.widget.VisTable;
@@ -11,16 +10,35 @@ import com.littleinferno.flowchart.codegen.BaseCodeGenerator;
 
 import java.util.ArrayList;
 
-public class VariableManager implements Json.Serializable {
+public class VariableManager {
 
     private ArrayList<Variable> variables;
     private int counter;
     private UI ui;
 
+    public VariableManager(VariableManagerHandle variableManagerHandle) {
+        this();
+        counter = variableManagerHandle.counter;
+
+        Stream.of(variableManagerHandle.variableHandles)
+                .map(Variable.VariableHandle.class::cast)
+                .forEach(this::createVariable);
+    }
+
     public VariableManager() {
         variables = new ArrayList<>();
         counter = 0;
         ui = new UI(variables);
+    }
+
+    public Variable createVariable(Variable.VariableHandle variableHandle) {
+        Variable variable =
+                new Variable(variableHandle.name, variableHandle.dataType, variableHandle.isArray);
+
+        variables.add(variable);
+        ui.update();
+
+        return variable;
     }
 
     public Variable createVariable() {
@@ -55,35 +73,15 @@ public class VariableManager implements Json.Serializable {
                         new RuntimeException("Cannot find varable with name:\"" + name + "\""));
     }
 
-    @Override
-    public void write(Json json) {
-        json.writeValue("counter", counter);
-        json.writeArrayStart("variables");
-
-        for (Variable v : variables) {
-            json.writeObjectStart();
-            json.writeField(v, "name", "name");
-            json.writeValue("dataType", v.getDataType());
-            json.writeField(v, "isArray", "isArray");
-            json.writeObjectEnd();
-        }
-
-        json.writeArrayEnd();
-    }
-
-    @Override
-    public void read(Json json, JsonValue jsonData) {
-
-        counter = jsonData.get("counter").asInt();
-
-        JsonValue vars = jsonData.get("variables");
-        for (JsonValue element : vars) {
-            variables.add(json.readValue(Variable.class, element));
-        }
-    }
-
     public UI getUi() {
         return ui;
+    }
+
+    public VariableManagerHandle getHandle() {
+        return new VariableManagerHandle(counter,
+                Stream.of(variables)
+                        .map(Variable::getHandle)
+                        .collect(Collectors.toCollection(ArrayList::new)));
     }
 
     public static class UI {
@@ -120,6 +118,19 @@ public class VariableManager implements Json.Serializable {
             });
 
             varTable.add(view.getMainTable()).grow().row();
+        }
+    }
+
+    public static class VariableManagerHandle {
+        int counter;
+        ArrayList<Variable.VariableHandle> variableHandles;
+
+        public VariableManagerHandle() {
+        }
+
+        public VariableManagerHandle(int counter, ArrayList<Variable.VariableHandle> variableHandles) {
+            this.counter = counter;
+            this.variableHandles = variableHandles;
         }
     }
 }

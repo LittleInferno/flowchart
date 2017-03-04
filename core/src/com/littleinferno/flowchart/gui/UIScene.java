@@ -25,6 +25,7 @@ public class UIScene extends Stage {
     private Scene show;
 
     private static DragAndDrop dragAndDrop;
+    public ControlTable controlTable;
 
     public UIScene() {
         super(new ScreenViewport());
@@ -83,7 +84,7 @@ public class UIScene extends Stage {
 
         container.add(tmp).growX().colspan(3).row();
 
-        ControlTable controlTable = new ControlTable(this);
+        controlTable = new ControlTable(this);
 
         VisTable activityContainer = new VisTable();
 

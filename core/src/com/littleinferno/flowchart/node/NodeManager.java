@@ -39,7 +39,7 @@ public class NodeManager {
 
     public BeginNode getBeginNode() {
         return (BeginNode) Stream.of(nodes)
-                .filter(scene -> scene.getName().equals("main"))
+                .filter(scene -> scene.getName().equals("Begin"))
                 .findFirst().orElseGet(() -> createNode(BeginNode.class, (Object[]) null));
     }
 

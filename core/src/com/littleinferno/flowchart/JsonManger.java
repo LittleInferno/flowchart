@@ -40,4 +40,8 @@ public class JsonManger {
     public static UUID getID() {
         return UUID.randomUUID();
     }
+
+    public <T> T loadHandle(Class<T> type, FileHandle variables) {
+        return json.fromJson(type, variables.readString());
+    }
 }
