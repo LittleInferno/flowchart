@@ -273,13 +273,11 @@ public class Pin extends VisTable {
     }
 
     public void disconnect() {
-        if (isConnect()) {
-            if (isSingle()) {
-                disconnectPin();
-            } else {
-                for (int i = 0; i < connectedPins.size(); ++i)
-                    connectedPins.get(i).disconnect(this);
-            }
+        if (isSingle() && isConnect()) {
+            disconnectPin();
+        } else {
+            for (int i = 0; i < connectedPins.size(); ++i)
+                connectedPins.get(i).disconnect(this);
         }
     }
 
