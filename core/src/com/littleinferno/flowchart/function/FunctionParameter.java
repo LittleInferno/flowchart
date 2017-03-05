@@ -20,14 +20,11 @@ public class FunctionParameter {
     private List<TypeChangedListener> typeChangedListeners;
     private List<ArrayChangedListener> arrayChangedListeners;
 
-    public FunctionParameter() {
-    }
-
-    public FunctionParameter(String name, DataType type, Connection connection, boolean isArray) {
-        this.name = name;
-        this.dataType = type;
-        this.connection = connection;
-        this.isArray = isArray;
+    public FunctionParameter(FunctionParameterHandle functionParameterHandle) {
+        this.name = functionParameterHandle.name;
+        this.dataType = functionParameterHandle.dataType;
+        this.connection = functionParameterHandle.connection;
+        this.isArray = functionParameterHandle.isArray;
 
         this.nameChangedListeners = new ArrayList<>();
         this.typeChangedListeners = new ArrayList<>();
@@ -99,4 +96,27 @@ public class FunctionParameter {
     public interface Removed {
         void remove(FunctionParameter parameter);
     }
+
+    public FunctionParameterHandle getHandle() {
+        return new FunctionParameterHandle(name, dataType, connection, isArray);
+    }
+
+    static public class FunctionParameterHandle {
+        public String name;
+        public DataType dataType;
+        public Connection connection;
+        public boolean isArray;
+
+        public FunctionParameterHandle() {
+        }
+
+        public FunctionParameterHandle(String name, DataType dataType, Connection connection, boolean isArray) {
+            this.name = name;
+            this.dataType = dataType;
+            this.isArray = isArray;
+            this.connection = connection;
+        }
+    }
+
+
 }

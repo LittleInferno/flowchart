@@ -32,8 +32,7 @@ public class VariableManager {
     }
 
     public Variable createVariable(Variable.VariableHandle variableHandle) {
-        Variable variable =
-                new Variable(variableHandle.name, variableHandle.dataType, variableHandle.isArray);
+        Variable variable = new Variable(variableHandle);
 
         variables.add(variable);
         ui.update();
@@ -87,8 +86,8 @@ public class VariableManager {
     public static class UI {
 
         private ArrayListAdapter<Variable, VisTable> variableAdapter;
-
         private final VisTable detailsTable;
+        private final VisTable varTable;
 
         public VisTable getVarTable() {
             return varTable;
@@ -101,8 +100,6 @@ public class VariableManager {
         public void update() {
             variableAdapter.itemsChanged();
         }
-
-        private final VisTable varTable;
 
         public UI(ArrayList<Variable> variables) {
             variableAdapter = new VariableListAdapter(variables);

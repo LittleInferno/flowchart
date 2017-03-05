@@ -14,7 +14,7 @@ public class Flowchart extends Game {
     @Override
     public void create() {
 
-      //  Project project = Project.createProject("test", "test/", new JSCodeGenerator(), new JSCodeExecution());
+//        Project project = Project.createProject("test", "test/", new JSCodeGenerator(), new JSCodeExecution());
         Project project = Project.loadProject("test", "test/");
 
 

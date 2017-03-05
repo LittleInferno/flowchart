@@ -85,7 +85,7 @@ public class NodeManager {
     }
 
     public static class NodeManagerSerializer implements Json.Serializer<NodeManager> {
-        NodeManager nodeManager = new NodeManager();
+        NodeManager nodeManager;
 
         @Override
         public void write(Json json, NodeManager object, Class knownType) {
@@ -104,6 +104,7 @@ public class NodeManager {
         @Override
         public NodeManager read(Json json, JsonValue jsonData, Class type) {
 
+            nodeManager = new NodeManager();
             JsonValue data = jsonData.child;
             for (JsonValue valueMap = data.child; valueMap != null; valueMap = valueMap.next) {
                 try {
@@ -116,7 +117,6 @@ public class NodeManager {
         }
 
         private void readObject(Json json, Class type, JsonValue valueMap) {
-
             Node.NodeHandle object = (Node.NodeHandle) json.readValue(type, valueMap);
             Node node = null;
             try {

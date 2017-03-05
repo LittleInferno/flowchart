@@ -62,6 +62,12 @@ public class SceneManager {
         scenes.remove(scene);
     }
 
+    public FunctionScene getScene(Class<FunctionScene> functionSceneClass, String name, NodeManager nodeManager) {
+        return (FunctionScene) Stream.of(scenes)
+                .filter(scene -> scene.getName().equals(name))
+                .findFirst().orElseGet(() -> createScene(functionSceneClass, name, nodeManager));
+    }
+
     public static class SceneManagerSerializer implements Json.Serializer<SceneManager> {
         SceneManager sceneManager = new SceneManager();
 
@@ -95,17 +101,22 @@ public class SceneManager {
         }
 
         private void readObjects(Json json, Class type, JsonValue valueMap) {
-
-            Scene object = (Scene) json.readValue(type, valueMap);
-            sceneManager.scenes.add(object);
+            Scene.SceneHandle object = (Scene.SceneHandle) json.readValue(type, valueMap);
+            Scene scene = null;
+            try {
+                scene = sceneManager.createScene(ClassReflection.forName(object.className), object);
+            } catch (ReflectionException e) {
+                e.printStackTrace();
+            }
         }
 
         private void writeScene(Json json, List<Scene> scenes) throws IOException {
             json.writeObjectStart("scenes");
 
             for (Scene scene : scenes) {
-                json.getWriter().name(scene.getClass().getName());
-                json.writeValue(scene);
+                Scene.SceneHandle sceneHandle = scene.getHandle();
+                json.getWriter().name(sceneHandle.getClass().getName());
+                json.writeValue(sceneHandle);
             }
             json.writeObjectEnd();
         }

@@ -11,18 +11,19 @@ import com.littleinferno.flowchart.pin.Pin;
 import java.util.ArrayList;
 import java.util.List;
 
-public class FunctionReturnNode extends Node {
-
-    private Function function;
+public class FunctionReturnNode extends FunctionNode {
 
     private List<Pin> pins;
 
     public FunctionReturnNode(Function function) {
-        super(new NodeHandle(function.getName(), false));
+        this(new FunctionNodeHandle(function.getName(), false, function.getName()));
+    }
+
+    public FunctionReturnNode(FunctionNodeHandle functionNodeHandle) {
+        super(functionNodeHandle);
 
         addExecutionInputPin();
 
-        this.function = function;
         this.function.addListener(this::setTitle);
         this.function.addListener(this::close);
 
@@ -50,9 +51,7 @@ public class FunctionReturnNode extends Node {
         );
 
         this.function.applyParameters();
-
         this.function.addReturnNode(this);
-
     }
 
     @Override

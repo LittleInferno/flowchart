@@ -11,20 +11,21 @@ import com.littleinferno.flowchart.pin.Pin;
 import java.util.ArrayList;
 import java.util.List;
 
-public class FunctionBeginNode extends Node {
-
-    private final Function function;
+public class FunctionBeginNode extends FunctionNode {
 
     private final Pin next;
 
     private List<Pin> pins;
 
     public FunctionBeginNode(Function function) {
-        super(new NodeHandle(function.getName(), false));
+        this(new FunctionNodeHandle(function.getName(), true, function.getName()));
+    }
+
+    public FunctionBeginNode(FunctionNodeHandle functionNodeHandle) {
+        super(functionNodeHandle);
 
         next = addExecutionOutputPin();
 
-        this.function = function;
         this.function.addListener(this::setTitle);
         this.function.addListener(this::close);
         this.function.setGenerateListener(builder -> gen(builder, next));
@@ -52,7 +53,6 @@ public class FunctionBeginNode extends Node {
         );
 
         this.function.applyParameters();
-
     }
 
     @Override

@@ -15,6 +15,7 @@ public class ControlTable extends VisTable {
 
     static private ConsoleTable consoleTable;
     private final VisTable variableTable;
+    private final VisTable functionTable;
 
     public ControlTable(UIScene sceneUi) {
         setTouchable(Touchable.enabled);
@@ -33,7 +34,7 @@ public class ControlTable extends VisTable {
         });
         variableTable.add(createVariable).growX().row();
 
-        final VisTable functionTable = new VisTable();
+        functionTable = new VisTable();
 
         VisTextButton createFunction = new VisTextButton("create");
         createFunction.addListener(new ChangeListener() {
@@ -43,10 +44,7 @@ public class ControlTable extends VisTable {
             }
         });
         functionTable.add(createFunction).growX().row();
-        functionTable.add(Project.instance().getFunctionManager().getFunTable()).grow().row();
-        functionTable.addSeparator();
-        functionTable.add(Project.instance().getFunctionManager().getDetailsTable()).growX().height(250).row();
-        functionTable.addSeparator();
+
 
         consoleTable = new ConsoleTable();
 
@@ -97,11 +95,16 @@ public class ControlTable extends VisTable {
         setBackground(VisUI.getSkin().getDrawable("window-bg"));
     }
 
-    public void initVarTable(){
+    public void init(){
         variableTable.add(Project.instance().getVariableManager().getUi().getVarTable()).grow().row();
         variableTable.addSeparator();
         variableTable.add(Project.instance().getVariableManager().getUi().getDetailsTable()).growX().row();
         variableTable.addSeparator();
+
+        functionTable.add(Project.instance().getFunctionManager().getUi().getFunTable()).grow().row();
+        functionTable.addSeparator();
+        functionTable.add(Project.instance().getFunctionManager().getUi().getDetailsTable()).growX().height(250).row();
+        functionTable.addSeparator();
     }
 
     public static ConsoleTable getConsole() {

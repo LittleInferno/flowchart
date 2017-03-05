@@ -19,7 +19,11 @@ public class FunctionCallNode extends FunctionNode {
     private int outParametrsSize;
 
     public FunctionCallNode(Function function) {
-        super(function, function.getName(), true);
+        this(new FunctionNodeHandle(function.getName(), true, function.getName()));
+    }
+
+    public FunctionCallNode(FunctionNodeHandle functionNodeHandle) {
+        super(functionNodeHandle);
 
         addExecutionInputPin("exec in");
         next = addExecutionOutputPin("exec out");

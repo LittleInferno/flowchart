@@ -6,8 +6,6 @@ import com.badlogic.gdx.scenes.scene2d.ui.VerticalGroup;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
 import com.badlogic.gdx.utils.Array;
-import com.badlogic.gdx.utils.Json;
-import com.badlogic.gdx.utils.JsonValue;
 import com.kotcrab.vis.ui.VisUI;
 import com.kotcrab.vis.ui.building.OneColumnTableBuilder;
 import com.kotcrab.vis.ui.building.utilities.CellWidget;
@@ -36,7 +34,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 
-public class Function implements Json.Serializable {
+public class Function {
 
     private String name;
 
@@ -55,9 +53,6 @@ public class Function implements Json.Serializable {
 
     private FunctionScene scene;
 
-    Function() {
-    }
-
     public Function(String name) {
         this.name = name;
 
@@ -73,20 +68,45 @@ public class Function implements Json.Serializable {
 
         returnNodes = new ArrayList<>();
 
-        scene = Project.instance().getSceneManager().createScene(FunctionScene.class, this);
-        addListener(() -> Project.instance().getSceneManager().deleteScene(scene));
+        addListener(() -> Project.instance()
+                .getSceneManager()
+                .deleteScene(scene)
+        );
 
-        FunctionBeginNode beginNode = new FunctionBeginNode(this);
-        beginNode.setPosition(350, 250);
+        this.scene = Project.instance().getSceneManager().createScene(FunctionScene.class, this);
+    }
 
-        scene.addActor(beginNode);
+    Function(FunctionHandle functionHandle) {
+        this.name = functionHandle.name;
 
-        FunctionReturnNode returnNode = new FunctionReturnNode(this);
-        returnNode.setPosition(600, 250);
-        returnNode.removeCloseButton();
+        parameters = new ArrayList<>();
 
-        scene.addActor(returnNode);
+        nameChangedListeners = new ArrayList<>();
+        destroyListeners = new ArrayList<>();
 
+        parameterAddedListeners = new ArrayList<>();
+        parameterRemovedListeners = new ArrayList<>();
+
+        functionDetailsTable = new FunctionDetailsTable(this);
+
+        returnNodes = new ArrayList<>();
+
+        addListener(() -> Project.instance()
+                .getSceneManager()
+                .deleteScene(scene)
+        );
+
+        Stream.of(functionHandle.parameters).forEach(this::addParameter);
+    }
+
+    public void init() {
+        if (scene != null) {
+            scene.getNodeManager().createNode(FunctionBeginNode.class, this).setPosition(350, 250);
+
+            FunctionBeginNode node = scene.getNodeManager().createNode(FunctionBeginNode.class, this);
+            node.setPosition(600, 250);
+            node.removeCloseButton();
+        }
     }
 
     public List<FunctionParameter> getParameters() {
@@ -109,8 +129,15 @@ public class Function implements Json.Serializable {
             returnNodes.get(0).removeCloseButton();
     }
 
+    private void addParameter(FunctionParameter.FunctionParameterHandle parameterHandle) {
+        addParameter(parameterHandle.name, parameterHandle.dataType,
+                parameterHandle.connection, parameterHandle.isArray);
+    }
+
     public FunctionParameter addParameter(String name, DataType type, Connection connection, boolean isArray) {
-        FunctionParameter parameter = new FunctionParameter(name, type, connection, isArray);
+        FunctionParameter parameter =
+                new FunctionParameter(new FunctionParameter
+                        .FunctionParameterHandle(name, type, connection, isArray));
 
         notifyListenersParameterAdded(parameter);
         parameters.add(parameter);
@@ -184,35 +211,12 @@ public class Function implements Json.Serializable {
         return scene;
     }
 
-    @Override
-    public void write(Json json) {
-
-        json.writeObjectStart();
-        json.writeValue("name", name);
-        json.writeArrayStart("parameters");
-
-        for (FunctionParameter fp : parameters) {
-            json.writeObjectStart();
-            json.writeField(fp, "name", "name");
-            json.writeValue("type", fp.getDataType());
-            json.writeField(fp, "isArray", "isArray");
-            json.writeValue("connection", fp.getConnection());
-            json.writeObjectEnd();
-        }
-
-        json.writeArrayEnd();
-        json.writeObjectEnd();
+    public void setScene(FunctionScene scene) {
+        this.scene = scene;
     }
 
-    @Override
-    public void read(Json json, JsonValue jsonData) {
-
-        name = jsonData.get("name").asString();
-
-        JsonValue vars = jsonData.get("parameters");
-        for (JsonValue element : vars) {
-            parameters.add(json.readValue(FunctionParameter.class, element));
-        }
+    public FunctionHandle getHandle() {
+        return new FunctionHandle(name, parameters, scene.getName());
 
     }
 
@@ -420,6 +424,21 @@ public class Function implements Json.Serializable {
 
     public interface GenerateListener {
         String gen(BaseCodeGenerator builder);
+    }
+
+    public static class FunctionHandle {
+        public String name;
+        public List<FunctionParameter.FunctionParameterHandle> parameters;
+        public String functionSceneId;
+
+        public FunctionHandle() {
+        }
+
+        public FunctionHandle(String name, List<FunctionParameter> parameters, String functionSceneId) {
+            this.name = name;
+            this.parameters = Stream.of(parameters).map(FunctionParameter::getHandle).toList();
+            this.functionSceneId = functionSceneId;
+        }
     }
 
 }

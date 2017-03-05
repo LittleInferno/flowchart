@@ -26,16 +26,22 @@ public class Scene extends Stage {
     private NodeManager nodeManager;
     private String name;
 
-    Scene(String name, NodeManager nodeManager, boolean closeable) {
+    SceneHandle sceneHandle;
+
+    Scene(SceneHandle sceneHandle) {
         super(new ScreenViewport());
 
-        this.name = name;
+        this.name = sceneHandle.name;
 
-        uiTab = new UiTab(this, closeable);
+        uiTab = new UiTab(this, sceneHandle.closable);
+
+        this.sceneHandle = sceneHandle;
+        this.sceneHandle.className = this.getClass().getName();
+
         gesture = new GestureDetector(new Gesture());
 
         wireManager = new WireManager();
-        this.nodeManager = nodeManager;
+        this.nodeManager = sceneHandle.nodeManager;
         this.nodeManager.setScene(this);
 
         Project.instance().getUiScene().addDragAndDropTarget(new DragAndDrop.Target(uiTab.getContentTable()) {
@@ -94,12 +100,12 @@ public class Scene extends Stage {
         return nodeManager;
     }
 
-    public void setNodeManager(NodeManager nodeManager) {
-        this.nodeManager = nodeManager;
-        this.nodeManager.setScene(this);
+    public SceneHandle getHandle() {
+        sceneHandle.name = name;
+        return sceneHandle;
     }
 
-    static class UiTab extends Tab {
+    public static class UiTab extends Tab {
 
         private VisTable uiTable;
         private Scene scene;
@@ -185,6 +191,27 @@ public class Scene extends Stage {
         @Override
         public void pinchStop() {
 
+        }
+    }
+
+    public static class SceneHandle {
+        public NodeManager nodeManager;
+        public String name;
+        public String className;
+        public boolean closable;
+
+        public SceneHandle() {
+        }
+
+        public SceneHandle(NodeManager nodeManager, String name, boolean closeable) {
+            this(nodeManager, name, null, closeable);
+        }
+
+        public SceneHandle(NodeManager nodeManager, String name, String className, boolean closable) {
+            this.nodeManager = nodeManager;
+            this.name = name;
+            this.className = className;
+            this.closable = closable;
         }
     }
 
