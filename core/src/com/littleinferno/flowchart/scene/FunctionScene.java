@@ -1,4 +1,4 @@
-package com.littleinferno.flowchart.gui;
+package com.littleinferno.flowchart.scene;
 
 
 import com.kotcrab.vis.ui.widget.tabbedpane.TabbedPane;
@@ -7,11 +7,13 @@ import com.littleinferno.flowchart.node.NodeManager;
 import com.littleinferno.flowchart.project.Project;
 
 public class FunctionScene extends Scene {
+
+    @SuppressWarnings("unused")
     public FunctionScene(Function function) {
         super(new FunctionSceneHandle(new NodeManager(), function.getName(), function.getName()));
         function.addListener(newName -> {
             setName(newName);
-            Scene.UiTab uiTab = getUiTab();
+            UiTab uiTab = getUiTab();
             TabbedPane pane = uiTab.getPane();
             int pos = pane.getUIOrderedTabs().indexOf(uiTab, true);
             pane.remove(uiTab);
@@ -19,6 +21,7 @@ public class FunctionScene extends Scene {
         });
     }
 
+    @SuppressWarnings("unused")
     public FunctionScene(FunctionSceneHandle functionSceneHandle) {
         super(functionSceneHandle);
 
@@ -29,7 +32,7 @@ public class FunctionScene extends Scene {
         function.setScene(this);
         function.addListener(newName -> {
             setName(newName);
-            Scene.UiTab uiTab = getUiTab();
+            UiTab uiTab = getUiTab();
             TabbedPane pane = uiTab.getPane();
             int pos = pane.getUIOrderedTabs().indexOf(uiTab, true);
             pane.remove(uiTab);
@@ -37,9 +40,12 @@ public class FunctionScene extends Scene {
         });
     }
 
+
+    @SuppressWarnings("WeakerAccess")
     public static class FunctionSceneHandle extends SceneHandle {
         String functionName;
 
+        @SuppressWarnings("unused")
         public FunctionSceneHandle() {
         }
 

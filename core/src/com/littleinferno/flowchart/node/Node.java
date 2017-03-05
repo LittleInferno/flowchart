@@ -11,8 +11,9 @@ import com.littleinferno.flowchart.Connection;
 import com.littleinferno.flowchart.DataType;
 import com.littleinferno.flowchart.JsonManger;
 import com.littleinferno.flowchart.codegen.CodeGen;
-import com.littleinferno.flowchart.gui.Scene;
+import com.littleinferno.flowchart.scene.Scene;
 import com.littleinferno.flowchart.pin.Pin;
+import com.littleinferno.flowchart.util.ClassHandle;
 
 import java.util.UUID;
 
@@ -155,27 +156,27 @@ public abstract class Node extends VisWindow implements CodeGen {
         return (Scene) super.getStage();
     }
 
-    static public class NodeHandle {
+    @SuppressWarnings("WeakerAccess")
+    static public class NodeHandle extends ClassHandle {
         public float x, y;
-        public String name, className, id;
+        public String name, id;
         public boolean closable;
+
+        public NodeHandle() {
+        }
 
         public NodeHandle(String name, boolean closable) {
             this(0, 0, name, null, closable);
         }
 
         public NodeHandle(float x, float y, String name, String className, boolean closable) {
+            super(className);
             this.x = x;
             this.y = y;
             this.name = name;
-            this.className = className;
             this.id = JsonManger.getID().toString();
             this.closable = closable;
         }
-
-        public NodeHandle() {
-        }
-
     }
 
     static public class NodeStyle {

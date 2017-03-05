@@ -17,7 +17,7 @@ import com.kotcrab.vis.ui.widget.VisLabel;
 import com.kotcrab.vis.ui.widget.VisTable;
 import com.littleinferno.flowchart.Connection;
 import com.littleinferno.flowchart.DataType;
-import com.littleinferno.flowchart.gui.Scene;
+import com.littleinferno.flowchart.scene.Scene;
 import com.littleinferno.flowchart.node.Node;
 import com.littleinferno.flowchart.wire.WireManager;
 

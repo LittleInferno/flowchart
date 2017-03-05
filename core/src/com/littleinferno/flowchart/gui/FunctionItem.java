@@ -15,7 +15,7 @@ public class FunctionItem extends DropItem {
     }
 
     @Override
-    void init(Scene scene) {
+    public void init(com.littleinferno.flowchart.scene.Scene scene) {
 
         if (scene != function.getScene()) {
             scene.getNodeManager()

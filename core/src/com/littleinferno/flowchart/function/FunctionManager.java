@@ -1,11 +1,13 @@
 package com.littleinferno.flowchart.function;
 
+import com.annimon.stream.Collectors;
 import com.annimon.stream.Stream;
 import com.kotcrab.vis.ui.util.adapter.ArrayListAdapter;
 import com.kotcrab.vis.ui.widget.ListView;
 import com.kotcrab.vis.ui.widget.VisTable;
 import com.littleinferno.flowchart.codegen.BaseCodeGenerator;
 import com.littleinferno.flowchart.project.Project;
+import com.littleinferno.flowchart.util.BaseHandle;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -16,6 +18,12 @@ public class FunctionManager {
     private int counter;
     private UI ui;
 
+    public FunctionManager() {
+        functions = new ArrayList<>();
+        counter = 0;
+        ui = new UI(functions);
+    }
+
     public FunctionManager(FunctionManagerHandle functionManagerHandle) {
         this();
         counter = functionManagerHandle.counter;
@@ -25,13 +33,7 @@ public class FunctionManager {
                 .forEach(this::createFunction);
     }
 
-    public FunctionManager() {
-        functions = new ArrayList<>();
-        counter = 0;
-        ui = new UI(functions);
-    }
-
-    public Function createFunction(Function.FunctionHandle functionHandle) {
+    private Function createFunction(Function.FunctionHandle functionHandle) {
         Function function = new Function(functionHandle);
 
         functions.add(function);
@@ -42,6 +44,7 @@ public class FunctionManager {
 
     public Function createFunction() {
         Function function = new Function("newFun" + counter++);
+
         functions.add(function);
         ui.update();
 
@@ -55,16 +58,9 @@ public class FunctionManager {
         function.destroy();
 
         Project.instance().getUiScene().unpinFromTabbedPane(function.getScene().getUiTab());
+
         functions.remove(function);
         ui.update();
-    }
-
-    public String gen(BaseCodeGenerator builder) {
-        final StringBuilder stringBuilder = new StringBuilder();
-
-        Stream.of(functions).forEach(function -> stringBuilder.append(function.gen(builder)));
-
-        return stringBuilder.toString();
     }
 
     public Function getFunction(String name) {
@@ -75,16 +71,22 @@ public class FunctionManager {
                         new RuntimeException("Cannot find function with name:\"" + name + "\""));
     }
 
+    public String gen(BaseCodeGenerator builder) {
+        return Stream.of(functions)
+                .map(function -> function.gen(builder))
+                .collect(Collectors.joining());
+    }
+
     public FunctionManager.UI getUi() {
         return ui;
     }
 
     public FunctionManagerHandle getHandle() {
         return new FunctionManagerHandle(counter,
-                Stream.of(functions)
-                        .map(Function::getHandle).toList());
+                Stream.of(functions).map(Function::getHandle).toList());
     }
 
+    @SuppressWarnings("WeakerAccess")
     public static class UI {
 
         private ArrayListAdapter<Function, VisTable> functionalAdapter;
@@ -99,11 +101,11 @@ public class FunctionManager {
             return detailsTable;
         }
 
-        public void update() {
+        void update() {
             functionalAdapter.itemsChanged();
         }
 
-        public UI(ArrayList<Function> functions) {
+        UI(ArrayList<Function> functions) {
             functionalAdapter = new FunctionListAdapter(functions);
 
             detailsTable = new VisTable(true);
@@ -121,10 +123,12 @@ public class FunctionManager {
         }
     }
 
-    public static class FunctionManagerHandle {
+    @SuppressWarnings("WeakerAccess")
+    public static class FunctionManagerHandle implements BaseHandle{
         int counter;
         List<Function.FunctionHandle> functionHandles;
 
+        @SuppressWarnings("unused")
         public FunctionManagerHandle() {
         }
 

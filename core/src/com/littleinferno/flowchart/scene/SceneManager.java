@@ -1,26 +1,18 @@
-package com.littleinferno.flowchart.gui;
+package com.littleinferno.flowchart.scene;
 
 import com.annimon.stream.Stream;
 import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonValue;
-import com.badlogic.gdx.utils.SerializationException;
-import com.badlogic.gdx.utils.reflect.ClassReflection;
-import com.badlogic.gdx.utils.reflect.ReflectionException;
 import com.littleinferno.flowchart.node.NodeManager;
+import com.littleinferno.flowchart.util.SerializeHelper;
 
-import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
 public class SceneManager {
 
     private List<Scene> scenes;
-
-    static UUID getID() {
-        return UUID.randomUUID();
-    }
 
     public SceneManager() {
         scenes = new ArrayList<>();
@@ -62,24 +54,18 @@ public class SceneManager {
         scenes.remove(scene);
     }
 
-    public FunctionScene getScene(Class<FunctionScene> functionSceneClass, String name, NodeManager nodeManager) {
-        return (FunctionScene) Stream.of(scenes)
-                .filter(scene -> scene.getName().equals(name))
-                .findFirst().orElseGet(() -> createScene(functionSceneClass, name, nodeManager));
-    }
-
     public static class SceneManagerSerializer implements Json.Serializer<SceneManager> {
-        SceneManager sceneManager = new SceneManager();
-
         @Override
         public void write(Json json, SceneManager object, Class knownType) {
             json.writeObjectStart();
 
-            try {
-                writeScene(json, object.scenes);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+            json.writeObjectStart("scenes");
+
+            Stream.of(object.scenes)
+                    .map(Scene::getHandle)
+                    .forEach(handle -> SerializeHelper.writeHandle(json, handle));
+
+            json.writeObjectEnd();
 
             json.writeObjectEnd();
         }
@@ -87,40 +73,15 @@ public class SceneManager {
         @Override
         public SceneManager read(Json json, JsonValue jsonData, Class type) {
 
+            SceneManager sceneManager = new SceneManager();
             JsonValue scenes = jsonData.get("scenes");
 
             for (JsonValue valueMap = scenes.child; valueMap != null; valueMap = valueMap.next) {
-                try {
-                    readObjects(json, ClassReflection.forName(valueMap.name()), valueMap);
-                } catch (ReflectionException ex) {
-                    throw new SerializationException(ex);
-                }
+                SerializeHelper.Pair read = SerializeHelper.readHandle(json, valueMap);
+                sceneManager.createScene(read.type, read.classHandle);
             }
 
             return sceneManager;
         }
-
-        private void readObjects(Json json, Class type, JsonValue valueMap) {
-            Scene.SceneHandle object = (Scene.SceneHandle) json.readValue(type, valueMap);
-            Scene scene = null;
-            try {
-                scene = sceneManager.createScene(ClassReflection.forName(object.className), object);
-            } catch (ReflectionException e) {
-                e.printStackTrace();
-            }
-        }
-
-        private void writeScene(Json json, List<Scene> scenes) throws IOException {
-            json.writeObjectStart("scenes");
-
-            for (Scene scene : scenes) {
-                Scene.SceneHandle sceneHandle = scene.getHandle();
-                json.getWriter().name(sceneHandle.getClass().getName());
-                json.writeValue(sceneHandle);
-            }
-            json.writeObjectEnd();
-        }
     }
-
-
 }

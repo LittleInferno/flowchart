@@ -21,7 +21,7 @@ import com.kotcrab.vis.ui.widget.VisValidatableTextField;
 import com.littleinferno.flowchart.Connection;
 import com.littleinferno.flowchart.DataType;
 import com.littleinferno.flowchart.codegen.BaseCodeGenerator;
-import com.littleinferno.flowchart.gui.FunctionScene;
+import com.littleinferno.flowchart.scene.FunctionScene;
 import com.littleinferno.flowchart.node.FunctionBeginNode;
 import com.littleinferno.flowchart.node.FunctionReturnNode;
 import com.littleinferno.flowchart.project.Project;

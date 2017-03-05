@@ -4,6 +4,7 @@ import com.annimon.stream.Stream;
 import com.littleinferno.flowchart.DataType;
 import com.littleinferno.flowchart.codegen.BaseCodeGenerator;
 import com.littleinferno.flowchart.util.ArrayChangedListener;
+import com.littleinferno.flowchart.util.BaseHandle;
 import com.littleinferno.flowchart.util.DestroyListener;
 import com.littleinferno.flowchart.util.NameChangedListener;
 import com.littleinferno.flowchart.util.TypeChangedListener;
@@ -42,7 +43,7 @@ public class Variable {
     }
 
     @Deprecated
-    Variable(){
+    Variable() {
         this.nameChangedListeners = new ArrayList<>();
         this.typeChangedListeners = new ArrayList<>();
         this.arrayChangedListeners = new ArrayList<>();
@@ -129,11 +130,13 @@ public class Variable {
         return new VariableHandle(name, dataType, isArray);
     }
 
-    public static class VariableHandle {
+    @SuppressWarnings("WeakerAccess")
+    public static class VariableHandle implements BaseHandle {
         String name;
         DataType dataType;
         boolean isArray;
 
+        @SuppressWarnings("unused")
         public VariableHandle() {
         }
 

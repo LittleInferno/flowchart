@@ -3,12 +3,9 @@ package com.littleinferno.flowchart.node;
 import com.annimon.stream.Stream;
 import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonValue;
-import com.badlogic.gdx.utils.SerializationException;
-import com.badlogic.gdx.utils.reflect.ClassReflection;
-import com.badlogic.gdx.utils.reflect.ReflectionException;
-import com.littleinferno.flowchart.gui.Scene;
+import com.littleinferno.flowchart.scene.Scene;
+import com.littleinferno.flowchart.util.SerializeHelper;
 
-import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
@@ -20,11 +17,6 @@ public class NodeManager {
     private Scene scene;
 
     public NodeManager() {
-        nodes = new ArrayList<>();
-    }
-
-    public NodeManager(Scene scene) {
-        this.scene = scene;
         nodes = new ArrayList<>();
     }
 
@@ -73,30 +65,29 @@ public class NodeManager {
         return null;
     }
 
-    public void registerNode(Node node) {
+    private void registerNode(Node node) {
         nodes.add(node);
         if (scene != null)
             scene.addActor(node);
     }
 
-    public void deleteNode(Node node) {
+    void deleteNode(Node node) {
         nodes.remove(node);
         scene.getRoot().removeActor(node);
     }
 
     public static class NodeManagerSerializer implements Json.Serializer<NodeManager> {
-        NodeManager nodeManager;
-
         @Override
         public void write(Json json, NodeManager object, Class knownType) {
-
             json.writeObjectStart();
 
-            try {
-                writeNodes(json, object.nodes);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+            json.writeObjectStart("nodes");
+
+            Stream.of(object.nodes)
+                    .map(Node::getHandle)
+                    .forEach(handle -> SerializeHelper.writeHandle(json, handle));
+
+            json.writeObjectEnd();
 
             json.writeObjectEnd();
         }
@@ -104,37 +95,15 @@ public class NodeManager {
         @Override
         public NodeManager read(Json json, JsonValue jsonData, Class type) {
 
-            nodeManager = new NodeManager();
-            JsonValue data = jsonData.child;
+            NodeManager nodeManager = new NodeManager();
+            JsonValue data = jsonData.get("nodes");
+
             for (JsonValue valueMap = data.child; valueMap != null; valueMap = valueMap.next) {
-                try {
-                    readObject(json, ClassReflection.forName(valueMap.name()), valueMap);
-                } catch (ReflectionException ex) {
-                    throw new SerializationException(ex);
-                }
+                SerializeHelper.Pair read = SerializeHelper.readHandle(json, valueMap);
+                nodeManager.createNode(read.type, read.classHandle);
             }
+
             return nodeManager;
-        }
-
-        private void readObject(Json json, Class type, JsonValue valueMap) {
-            Node.NodeHandle object = (Node.NodeHandle) json.readValue(type, valueMap);
-            Node node = null;
-            try {
-                node = nodeManager.createNode(ClassReflection.forName(object.className), object);
-            } catch (ReflectionException e) {
-                e.printStackTrace();
-            }
-        }
-
-        private void writeNodes(Json json, List<Node> nodes) throws IOException {
-            json.writeObjectStart("nodes");
-
-            for (Node node : nodes) {
-                Node.NodeHandle nodeHandle = node.getHandle();
-                json.getWriter().name(nodeHandle.getClass().getName());
-                json.writeValue(nodeHandle);
-            }
-            json.writeObjectEnd();
         }
     }
 }

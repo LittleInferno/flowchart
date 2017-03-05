@@ -1,4 +1,4 @@
-package com.littleinferno.flowchart.gui;
+package com.littleinferno.flowchart.scene;
 
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.input.GestureDetector;
@@ -7,16 +7,14 @@ import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.DragAndDrop;
-import com.badlogic.gdx.utils.Json;
-import com.badlogic.gdx.utils.JsonValue;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.kotcrab.vis.ui.widget.VisTable;
 import com.kotcrab.vis.ui.widget.tabbedpane.Tab;
+import com.littleinferno.flowchart.gui.DropItem;
 import com.littleinferno.flowchart.node.NodeManager;
 import com.littleinferno.flowchart.project.Project;
+import com.littleinferno.flowchart.util.ClassHandle;
 import com.littleinferno.flowchart.wire.WireManager;
-
-import java.lang.reflect.InvocationTargetException;
 
 public class Scene extends Stage {
 
@@ -26,7 +24,7 @@ public class Scene extends Stage {
     private NodeManager nodeManager;
     private String name;
 
-    SceneHandle sceneHandle;
+    private SceneHandle sceneHandle;
 
     Scene(SceneHandle sceneHandle) {
         super(new ScreenViewport());
@@ -194,10 +192,10 @@ public class Scene extends Stage {
         }
     }
 
-    public static class SceneHandle {
+    @SuppressWarnings("WeakerAccess")
+    public static class SceneHandle extends ClassHandle {
         public NodeManager nodeManager;
         public String name;
-        public String className;
         public boolean closable;
 
         public SceneHandle() {
@@ -208,39 +206,10 @@ public class Scene extends Stage {
         }
 
         public SceneHandle(NodeManager nodeManager, String name, String className, boolean closable) {
+            super(className);
             this.nodeManager = nodeManager;
             this.name = name;
-            this.className = className;
             this.closable = closable;
-        }
-    }
-
-    public static class SceneSerializer<T extends Scene> implements Json.Serializer<T> {
-
-        @Override
-        public void write(Json json, T object, Class knownType) {
-
-            json.writeObjectStart();
-            json.writeValue("name", object.getName());
-            json.writeValue("nodeManager", object.getNodeManager());
-            json.writeObjectEnd();
-        }
-
-        @Override
-        public T read(Json json, JsonValue jsonData, Class type) {
-
-            T scene = null;
-            try {
-                //noinspection unchecked
-                scene = (T) type.getConstructor(NodeManager.class)
-                        .newInstance(json.readValue(NodeManager.class, jsonData.get("nodeManager")));
-            } catch (InstantiationException
-                    | IllegalAccessException
-                    | NoSuchMethodException
-                    | InvocationTargetException e) {
-                e.printStackTrace();
-            }
-            return scene;
         }
     }
 }

@@ -14,7 +14,7 @@ public class VariableItem extends DropItem {
     }
 
     @Override
-    void init(Scene scene) {
+    public void init(com.littleinferno.flowchart.scene.Scene scene) {
         scene.addActor(this);
 
         addItem(new MenuItem("set", new EventWrapper((event, actor) -> getStage()

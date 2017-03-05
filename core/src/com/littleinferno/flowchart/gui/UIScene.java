@@ -22,7 +22,7 @@ public class UIScene extends Stage {
     private TabbedPane tabbedPane;
     private InputMultiplexer inputMultiplexer;
 
-    private Scene show;
+    private com.littleinferno.flowchart.scene.Scene show;
 
     private static DragAndDrop dragAndDrop;
     public ControlTable controlTable;
@@ -105,7 +105,7 @@ public class UIScene extends Stage {
                     inputMultiplexer.removeProcessor(show.getGesture());
                 }
 
-                show = ((Scene.UiTab) tab).getScene();
+                show = ((com.littleinferno.flowchart.scene.Scene.UiTab) tab).getScene();
 
                 inputMultiplexer.addProcessor(show);
                 inputMultiplexer.addProcessor(show.getGesture());
@@ -133,7 +133,7 @@ public class UIScene extends Stage {
         dragAndDrop.addSource(source);
     }
 
-    public void pinToTabbedPane(Scene.UiTab uiTab) {
+    public void pinToTabbedPane(com.littleinferno.flowchart.scene.Scene.UiTab uiTab) {
         if (tabbedPane.getUIOrderedTabs().contains(uiTab, true))
             tabbedPane.switchTab(uiTab);
         else
@@ -142,7 +142,7 @@ public class UIScene extends Stage {
         show = uiTab.getScene();
     }
 
-    public void unpinFromTabbedPane(Scene.UiTab uiTab) {
+    public void unpinFromTabbedPane(com.littleinferno.flowchart.scene.Scene.UiTab uiTab) {
         tabbedPane.remove(uiTab);
     }
 
@@ -162,7 +162,7 @@ public class UIScene extends Stage {
         return inputMultiplexer;
     }
 
-    public Scene getShow() {
+    public com.littleinferno.flowchart.scene.Scene getShow() {
         return show;
     }
 

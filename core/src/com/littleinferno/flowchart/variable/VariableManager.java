@@ -7,14 +7,22 @@ import com.kotcrab.vis.ui.widget.ListView;
 import com.kotcrab.vis.ui.widget.VisTable;
 import com.littleinferno.flowchart.DataType;
 import com.littleinferno.flowchart.codegen.BaseCodeGenerator;
+import com.littleinferno.flowchart.util.BaseHandle;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class VariableManager {
 
     private ArrayList<Variable> variables;
     private int counter;
     private UI ui;
+
+    public VariableManager() {
+        variables = new ArrayList<>();
+        counter = 0;
+        ui = new UI(variables);
+    }
 
     public VariableManager(VariableManagerHandle variableManagerHandle) {
         this();
@@ -25,13 +33,7 @@ public class VariableManager {
                 .forEach(this::createVariable);
     }
 
-    public VariableManager() {
-        variables = new ArrayList<>();
-        counter = 0;
-        ui = new UI(variables);
-    }
-
-    public Variable createVariable(Variable.VariableHandle variableHandle) {
+    private Variable createVariable(Variable.VariableHandle variableHandle) {
         Variable variable = new Variable(variableHandle);
 
         variables.add(variable);
@@ -55,15 +57,6 @@ public class VariableManager {
         ui.update();
     }
 
-    public String gen(BaseCodeGenerator builder) {
-        final StringBuilder stringBuilder = new StringBuilder();
-
-        Stream.of(variables)
-                .forEach(variable -> stringBuilder.append(variable.gen(builder)));
-
-        return stringBuilder.toString();
-    }
-
     public Variable getVariable(String name) {
         return Stream.of(variables)
                 .filter(value -> value.getName().equals(name))
@@ -72,17 +65,22 @@ public class VariableManager {
                         new RuntimeException("Cannot find varable with name:\"" + name + "\""));
     }
 
+    public String gen(BaseCodeGenerator builder) {
+        return Stream.of(variables)
+                .map(variable -> variable.gen(builder))
+                .collect(Collectors.joining());
+    }
+
     public UI getUi() {
         return ui;
     }
 
     public VariableManagerHandle getHandle() {
         return new VariableManagerHandle(counter,
-                Stream.of(variables)
-                        .map(Variable::getHandle)
-                        .collect(Collectors.toCollection(ArrayList::new)));
+                Stream.of(variables).map(Variable::getHandle).toList());
     }
 
+    @SuppressWarnings("WeakerAccess")
     public static class UI {
 
         private ArrayListAdapter<Variable, VisTable> variableAdapter;
@@ -97,11 +95,11 @@ public class VariableManager {
             return detailsTable;
         }
 
-        public void update() {
+        void update() {
             variableAdapter.itemsChanged();
         }
 
-        public UI(ArrayList<Variable> variables) {
+        UI(ArrayList<Variable> variables) {
             variableAdapter = new VariableListAdapter(variables);
 
             detailsTable = new VisTable(true);
@@ -118,14 +116,16 @@ public class VariableManager {
         }
     }
 
-    public static class VariableManagerHandle {
+    @SuppressWarnings("WeakerAccess")
+    public static class VariableManagerHandle implements BaseHandle{
         int counter;
-        ArrayList<Variable.VariableHandle> variableHandles;
+        List<Variable.VariableHandle> variableHandles;
 
+        @SuppressWarnings("unused")
         public VariableManagerHandle() {
         }
 
-        public VariableManagerHandle(int counter, ArrayList<Variable.VariableHandle> variableHandles) {
+        public VariableManagerHandle(int counter, List<Variable.VariableHandle> variableHandles) {
             this.counter = counter;
             this.variableHandles = variableHandles;
         }
