@@ -21,6 +21,8 @@ import com.littleinferno.flowchart.node.NodeManager;
 import com.littleinferno.flowchart.util.ProjectException;
 import com.littleinferno.flowchart.variable.VariableManager;
 
+import java.util.UUID;
+
 public class Project implements Json.Serializable {
 
     private static Project instance;
@@ -63,8 +65,6 @@ public class Project implements Json.Serializable {
 
     private void initJsonManager() {
         jsonManger.addSerializer(NodeManager.class, new NodeManager.NodeManagerSerializer());
-//        jsonManger.addSerializer(FunctionScene.class, new Scene.SceneSerializer<>());
-//        jsonManger.addSerializer(MainScene.class, new Scene.SceneSerializer<>());
         jsonManger.addSerializer(SceneManager.class, new SceneManager.SceneManagerSerializer());
 
     }
@@ -192,6 +192,11 @@ public class Project implements Json.Serializable {
     public Scene getCurrentScene() {
         return uiScene.getShow();
     }
+
+    public static UUID createID() {
+        return UUID.randomUUID();
+    }
+
 
     @Override
     public void write(Json json) {

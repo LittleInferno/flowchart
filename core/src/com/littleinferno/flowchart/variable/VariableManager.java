@@ -29,7 +29,6 @@ public class VariableManager {
         counter = variableManagerHandle.counter;
 
         Stream.of(variableManagerHandle.variableHandles)
-                .map(Variable.VariableHandle.class::cast)
                 .forEach(this::createVariable);
     }
 

@@ -38,9 +38,14 @@ public class Scene extends Stage {
 
         gesture = new GestureDetector(new Gesture());
 
-        wireManager = new WireManager();
         this.nodeManager = sceneHandle.nodeManager;
         this.nodeManager.setScene(this);
+
+        wireManager = new WireManager(this);
+        if (sceneHandle.wireManagerHandle != null)
+            wireManager.init(sceneHandle.wireManagerHandle);
+        addActor(wireManager);
+        wireManager.toBack();
 
         Project.instance().getUiScene().addDragAndDropTarget(new DragAndDrop.Target(uiTab.getContentTable()) {
             @Override
@@ -71,7 +76,6 @@ public class Scene extends Stage {
             }
         });
 
-        addActor(wireManager);
     }
 
     public UiTab getUiTab() {
@@ -100,6 +104,7 @@ public class Scene extends Stage {
 
     public SceneHandle getHandle() {
         sceneHandle.name = name;
+        sceneHandle.wireManagerHandle = wireManager.getHandle();
         return sceneHandle;
     }
 
@@ -195,6 +200,7 @@ public class Scene extends Stage {
     @SuppressWarnings("WeakerAccess")
     public static class SceneHandle extends ClassHandle {
         public NodeManager nodeManager;
+        public WireManager.WireManagerHandle wireManagerHandle;
         public String name;
         public boolean closable;
 
@@ -202,12 +208,13 @@ public class Scene extends Stage {
         }
 
         public SceneHandle(NodeManager nodeManager, String name, boolean closeable) {
-            this(nodeManager, name, null, closeable);
+            this(null, nodeManager, null, name, closeable);
         }
 
-        public SceneHandle(NodeManager nodeManager, String name, String className, boolean closable) {
+        public SceneHandle(String className, NodeManager nodeManager, WireManager.WireManagerHandle wireManagerHandle, String name, boolean closable) {
             super(className);
             this.nodeManager = nodeManager;
+            this.wireManagerHandle = wireManagerHandle;
             this.name = name;
             this.closable = closable;
         }

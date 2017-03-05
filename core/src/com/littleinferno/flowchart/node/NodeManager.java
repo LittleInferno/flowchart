@@ -32,15 +32,10 @@ public class NodeManager {
     public BeginNode getBeginNode() {
         return (BeginNode) Stream.of(nodes)
                 .filter(scene -> scene.getName().equals("Begin"))
-                .findFirst().orElseGet(() -> createNode(BeginNode.class, (Object[]) null));
+                .findFirst().orElseGet(() -> createNode(BeginNode.class));
     }
 
     public <T extends Node> T createNode(Class<T> type, Object... args) {
-
-        if (args != null && type.equals(BeginNode.class)) {
-            //noinspection unchecked
-            return (T) getBeginNode();
-        }
 
         T node;
         try {
@@ -74,6 +69,13 @@ public class NodeManager {
     void deleteNode(Node node) {
         nodes.remove(node);
         scene.getRoot().removeActor(node);
+    }
+
+    public Node getNode(String id) {
+        return Stream.of(nodes)
+                .filter(value -> value.getId().equals(id))
+                .findFirst()
+                .orElseThrow(() -> new RuntimeException("Cannot find node with id:" + id));
     }
 
     public static class NodeManagerSerializer implements Json.Serializer<NodeManager> {

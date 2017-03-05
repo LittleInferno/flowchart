@@ -9,13 +9,11 @@ import com.kotcrab.vis.ui.widget.VisTable;
 import com.kotcrab.vis.ui.widget.VisWindow;
 import com.littleinferno.flowchart.Connection;
 import com.littleinferno.flowchart.DataType;
-import com.littleinferno.flowchart.JsonManger;
 import com.littleinferno.flowchart.codegen.CodeGen;
-import com.littleinferno.flowchart.scene.Scene;
 import com.littleinferno.flowchart.pin.Pin;
+import com.littleinferno.flowchart.project.Project;
+import com.littleinferno.flowchart.scene.Scene;
 import com.littleinferno.flowchart.util.ClassHandle;
-
-import java.util.UUID;
 
 public abstract class Node extends VisWindow implements CodeGen {
 
@@ -117,6 +115,27 @@ public abstract class Node extends VisWindow implements CodeGen {
         cells.removeIndex(cells.size - 1);
     }
 
+    public Pin getPin(String name) {
+        SnapshotArray<Actor> leftChildren = left.getChildren();
+
+        for (Actor actor : leftChildren) {
+            if (actor instanceof Pin) {
+                if (actor.getName().equals(name))
+                    return (Pin) actor;
+            }
+        }
+
+        SnapshotArray<Actor> rightChildren = right.getChildren();
+
+        for (Actor actor : rightChildren) {
+            if (actor instanceof Pin) {
+                if (actor.getName().equals(name))
+                    return (Pin) actor;
+            }
+        }
+        return null;
+    }
+
     @Override
     public void close() {
 
@@ -147,8 +166,8 @@ public abstract class Node extends VisWindow implements CodeGen {
         return nodeHandle;
     }
 
-    public UUID getId() {
-        return UUID.fromString(nodeHandle.id);
+    public String getId() {
+        return nodeHandle.id;
     }
 
     @Override
@@ -174,7 +193,7 @@ public abstract class Node extends VisWindow implements CodeGen {
             this.x = x;
             this.y = y;
             this.name = name;
-            this.id = JsonManger.getID().toString();
+            this.id = Project.createID().toString();
             this.closable = closable;
         }
     }

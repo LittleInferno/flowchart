@@ -103,7 +103,7 @@ public class Function {
         if (scene != null) {
             scene.getNodeManager().createNode(FunctionBeginNode.class, this).setPosition(350, 250);
 
-            FunctionBeginNode node = scene.getNodeManager().createNode(FunctionBeginNode.class, this);
+            FunctionReturnNode node = scene.getNodeManager().createNode(FunctionReturnNode.class, this);
             node.setPosition(600, 250);
             node.removeCloseButton();
         }

@@ -4,8 +4,6 @@ import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonWriter;
 
-import java.util.UUID;
-
 public class JsonManger {
 
     private Json json;
@@ -35,10 +33,6 @@ public class JsonManger {
 
     public <T> T load(Class<T> type, FileHandle fileHandle) {
         return load(type, fileHandle.readString());
-    }
-
-    public static UUID getID() {
-        return UUID.randomUUID();
     }
 
     public <T> T loadHandle(Class<T> type, FileHandle variables) {

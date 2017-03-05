@@ -29,7 +29,6 @@ public class FunctionManager {
         counter = functionManagerHandle.counter;
 
         Stream.of(functionManagerHandle.functionHandles)
-                .map(Function.FunctionHandle.class::cast)
                 .forEach(this::createFunction);
     }
 

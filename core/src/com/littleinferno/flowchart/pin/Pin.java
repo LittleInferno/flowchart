@@ -17,8 +17,8 @@ import com.kotcrab.vis.ui.widget.VisLabel;
 import com.kotcrab.vis.ui.widget.VisTable;
 import com.littleinferno.flowchart.Connection;
 import com.littleinferno.flowchart.DataType;
-import com.littleinferno.flowchart.scene.Scene;
 import com.littleinferno.flowchart.node.Node;
+import com.littleinferno.flowchart.scene.Scene;
 import com.littleinferno.flowchart.wire.WireManager;
 
 import java.util.ArrayList;
@@ -52,6 +52,7 @@ public class Pin extends VisTable {
     private Set<DataType> possibleConvert;
 
     private int wireId = WireManager.NULL_ID;
+    private Color typeColor;
 
     public Pin(Node parent, String name, Connection connection, DataType... convert) {
         possibleConvert = new HashSet<>();
@@ -139,24 +140,26 @@ public class Pin extends VisTable {
 
         switch (newType) {
             case EXECUTION:
-                image.setColor(style.execution);
+                typeColor = style.execution;
                 break;
             case BOOL:
-                image.setColor(style.bool);
+                typeColor = style.bool;
                 break;
             case INT:
-                image.setColor(style.integer);
+                typeColor = style.integer;
                 break;
             case FLOAT:
-                image.setColor(style.floating);
+                typeColor = style.floating;
                 break;
             case STRING:
-                image.setColor(style.string);
+                typeColor = style.string;
                 break;
             case UNIVERSAL:
-                image.setColor(style.universal);
+                typeColor = style.universal;
                 break;
         }
+
+        image.setColor(typeColor);
 
         if (isUniversal) {
             notifyListenersTypeChanged(newType);
@@ -345,6 +348,10 @@ public class Pin extends VisTable {
         }
     }
 
+    public Color getTypeColor() {
+        return typeColor;
+    }
+
     public interface PinListener {
         void typeChanged(DataType newType);
     }
@@ -362,6 +369,7 @@ public class Pin extends VisTable {
 
     }
 
+    @SuppressWarnings({"WeakerAccess", "unused"})
     public static class PinStyle {
         Drawable array, arrayConnected, pin, pinConnected;
         Color execution;
@@ -455,5 +463,10 @@ public class Pin extends VisTable {
                 }
             }));
         }
+    }
+
+    public class PinHandle {
+
+
     }
 }
