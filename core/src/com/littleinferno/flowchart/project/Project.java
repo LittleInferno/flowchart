@@ -1,34 +1,36 @@
 package com.littleinferno.flowchart.project;
 
-import com.badlogic.gdx.Application;
+import com.annimon.stream.Collectors;
+import com.annimon.stream.Stream;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
-import com.badlogic.gdx.utils.Json;
-import com.badlogic.gdx.utils.JsonValue;
 import com.kotcrab.vis.ui.VisUI;
 import com.littleinferno.flowchart.JsonManger;
+import com.littleinferno.flowchart.Setting;
 import com.littleinferno.flowchart.codegen.BaseCodeExecution;
 import com.littleinferno.flowchart.codegen.BaseCodeGenerator;
 import com.littleinferno.flowchart.codegen.JSCodeExecution;
 import com.littleinferno.flowchart.codegen.JSCodeGenerator;
 import com.littleinferno.flowchart.function.FunctionManager;
-import com.littleinferno.flowchart.scene.MainScene;
 import com.littleinferno.flowchart.gui.ProjectScreen;
-import com.littleinferno.flowchart.scene.Scene;
-import com.littleinferno.flowchart.scene.SceneManager;
 import com.littleinferno.flowchart.gui.UIScene;
 import com.littleinferno.flowchart.node.NodeManager;
+import com.littleinferno.flowchart.scene.MainScene;
+import com.littleinferno.flowchart.scene.Scene;
+import com.littleinferno.flowchart.scene.SceneManager;
 import com.littleinferno.flowchart.util.ProjectException;
+import com.littleinferno.flowchart.util.managers.BaseManager;
 import com.littleinferno.flowchart.variable.VariableManager;
 
+import java.util.ArrayList;
 import java.util.UUID;
 
-public class Project implements Json.Serializable {
+public class Project extends BaseManager {
 
     private static Project instance;
 
     private String name;
-    private String location;
+    private FileHandle location;
 
     private BaseCodeExecution codeExecution;
     private BaseCodeGenerator codeGenerator;
@@ -43,21 +45,20 @@ public class Project implements Json.Serializable {
 
     private ProjectScreen projectScreen;
 
-    public Project() {
-
-    }
-
-    public Project(String name, String location, BaseCodeGenerator codeGenerator, BaseCodeExecution codeExecution) {
+    public Project(String name, FileHandle location, BaseCodeGenerator codeGenerator, BaseCodeExecution codeExecution) {
         this.name = name;
-        this.location = location;
+        this.location = location.child(name);
+
+        if (!this.location.exists())
+            this.location.mkdirs();
+
         this.codeGenerator = codeGenerator;
         this.codeExecution = codeExecution;
 
-        this.variableManager = new VariableManager();
+        this.variableManager = new VariableManager(this);
         this.functionManager = new FunctionManager();
         this.sceneManager = new SceneManager();
         this.jsonManger = new JsonManger();
-
 
         this.uiScene = new UIScene();
         this.projectScreen = new ProjectScreen(uiScene);
@@ -69,12 +70,12 @@ public class Project implements Json.Serializable {
 
     }
 
-    public static Project createProject(String name, String location, BaseCodeGenerator codeGenerator, BaseCodeExecution codeExecution) {
+    public static Project createProject(String name, FileHandle location, BaseCodeGenerator codeGenerator, BaseCodeExecution codeExecution) {
         if (instance != null)
             instance.save();
 
         if (!VisUI.isLoaded()) {
-            if (Gdx.app.getType() == Application.ApplicationType.Android)
+            if (Gdx.app.getType() == com.badlogic.gdx.Application.ApplicationType.Android)
                 VisUI.load("X2/uiskin.json");
             else
                 VisUI.load("X1/uiskin.json");
@@ -90,12 +91,12 @@ public class Project implements Json.Serializable {
         return instance;
     }
 
-    public static Project loadProject(String name, String location) {
+    public static void load(String name, FileHandle location) {
         if (instance != null)
             instance.save();
 
         if (!VisUI.isLoaded()) {
-            if (Gdx.app.getType() == Application.ApplicationType.Android)
+            if (Gdx.app.getType() == com.badlogic.gdx.Application.ApplicationType.Android)
                 VisUI.load("X2/uiskin.json");
             else
                 VisUI.load("X1/uiskin.json");
@@ -104,23 +105,21 @@ public class Project implements Json.Serializable {
         instance = new Project(name, location, new JSCodeGenerator(), new JSCodeExecution());
         instance.init();
 
-        FileHandle variables = Gdx.files.external(location).child("variables.json");
-        instance.variableManager = new VariableManager(
+        FileHandle variables = instance.getLocation().child("variables.json");
+        instance.variableManager = new VariableManager(instance,
                 instance.jsonManger.loadHandle(VariableManager.VariableManagerHandle.class, variables));
 
-        FileHandle functions = Gdx.files.external(location).child("functions.json");
+        FileHandle functions = instance.getLocation().child("functions.json");
         instance.functionManager = new FunctionManager(
                 instance.jsonManger.loadHandle(FunctionManager.FunctionManagerHandle.class, functions));
 
-        FileHandle scenes = Gdx.files.external(location).child("scenes.json");
+        FileHandle scenes = instance.getLocation().child("scenes.json");
         instance.sceneManager = instance.jsonManger.load(SceneManager.class, scenes);
 
         MainScene scene = instance.getSceneManager().getMainScene();
         instance.uiScene.pinToTabbedPane(scene.getUiTab());
 
         instance.uiScene.controlTable.init();
-
-        return instance;
     }
 
 
@@ -138,15 +137,13 @@ public class Project implements Json.Serializable {
     }
 
     public void save() {
-        Gdx.files.external(location).mkdirs();
-
-        FileHandle variables = Gdx.files.external(location).child("variables.json");
+        FileHandle variables = location.child("variables.json");
         jsonManger.save(variableManager.getHandle(), variables);
 
-        FileHandle functions = Gdx.files.external(location).child("functions.json");
+        FileHandle functions = location.child("functions.json");
         jsonManger.save(functionManager.getHandle(), functions);
 
-        FileHandle scenes = Gdx.files.external(location).child("scenes.json");
+        FileHandle scenes = location.child("scenes.json");
         jsonManger.save(sceneManager, scenes);
 
     }
@@ -197,23 +194,27 @@ public class Project implements Json.Serializable {
         return UUID.randomUUID();
     }
 
-
-    @Override
-    public void write(Json json) {
-
-    }
-
-    @Override
-    public void read(Json json, JsonValue jsonData) {
-
-    }
-
     public ProjectScreen getProjectScreen() {
         return projectScreen;
     }
 
     public void setProgramStart(ProgramStart programStart) {
         this.programStart = programStart;
+    }
+
+    public static ArrayList<String> getProjectsNames() {
+        return Stream.of(Gdx.files.external(Setting.projectsLocation).list())
+                .map(FileHandle::name)
+                .collect(Collectors.toCollection(ArrayList::new));
+    }
+
+    public FileHandle getLocation() {
+        return location;
+    }
+
+    @Override
+    public void dispose() {
+
     }
 
     public interface ProgramStart {

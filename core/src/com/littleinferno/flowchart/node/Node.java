@@ -1,8 +1,11 @@
 package com.littleinferno.flowchart.node;
 
+import com.badlogic.gdx.Application;
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.ui.Cell;
 import com.badlogic.gdx.scenes.scene2d.ui.VerticalGroup;
+import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.SnapshotArray;
 import com.kotcrab.vis.ui.widget.VisTable;
@@ -25,6 +28,8 @@ public abstract class Node extends VisWindow implements CodeGen {
     public Node(NodeHandle nodeHandle) {
         super(nodeHandle.name);
 
+        getTitleLabel().setAlignment(Align.center);
+
         this.nodeHandle = nodeHandle;
         this.nodeHandle.className = this.getClass().getName();
 
@@ -34,8 +39,11 @@ public abstract class Node extends VisWindow implements CodeGen {
         setKeepWithinStage(false);
         setKeepWithinParent(false);
 
-
-        setWidth(200);
+        // TODO move to style
+        if (Gdx.app.getType() == Application.ApplicationType.Android)
+            setWidth(400);
+        else
+            setWidth(200);
 
         if (nodeHandle.closable) {
             addCloseButton();
@@ -43,19 +51,16 @@ public abstract class Node extends VisWindow implements CodeGen {
 
         VisTable container = new VisTable();
         VisTable main = new VisTable();
-        main.addSeparator();
 
         left = new VerticalGroup();
         left.top().left().fill();
         left.space(10);
-        container.add(left).grow().width(100);
-
-        container.addSeparator(true);
+        container.add(left).grow().width(getWidth() / 2);
 
         right = new VerticalGroup();
         right.top().right().fill();
         right.space(10);
-        container.add(right).grow().width(100).row();
+        container.add(right).grow().width(getWidth() / 2).row();
 
         main.add(container).grow().row();
 

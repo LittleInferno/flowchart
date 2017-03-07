@@ -7,25 +7,30 @@ import com.kotcrab.vis.ui.widget.ListView;
 import com.kotcrab.vis.ui.widget.VisTable;
 import com.littleinferno.flowchart.DataType;
 import com.littleinferno.flowchart.codegen.BaseCodeGenerator;
+import com.littleinferno.flowchart.project.Project;
 import com.littleinferno.flowchart.util.BaseHandle;
+import com.littleinferno.flowchart.util.ProjectManager;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class VariableManager {
+public class VariableManager extends ProjectManager {
 
     private ArrayList<Variable> variables;
     private int counter;
     private UI ui;
 
-    public VariableManager() {
+    public VariableManager(Project project) {
+        super(project);
+
         variables = new ArrayList<>();
         counter = 0;
         ui = new UI(variables);
     }
 
-    public VariableManager(VariableManagerHandle variableManagerHandle) {
-        this();
+    public VariableManager(Project project, VariableManagerHandle variableManagerHandle) {
+        this(project);
+
         counter = variableManagerHandle.counter;
 
         Stream.of(variableManagerHandle.variableHandles)
@@ -79,6 +84,12 @@ public class VariableManager {
                 Stream.of(variables).map(Variable::getHandle).toList());
     }
 
+    @Override
+    public void dispose() {
+        Stream.of(variables).forEach(Variable::destroy);
+        variables.clear();
+    }
+
     @SuppressWarnings("WeakerAccess")
     public static class UI {
 
@@ -116,7 +127,7 @@ public class VariableManager {
     }
 
     @SuppressWarnings("WeakerAccess")
-    public static class VariableManagerHandle implements BaseHandle{
+    public static class VariableManagerHandle implements BaseHandle {
         int counter;
         List<Variable.VariableHandle> variableHandles;
 

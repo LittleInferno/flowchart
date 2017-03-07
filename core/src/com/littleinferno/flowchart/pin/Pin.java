@@ -88,11 +88,13 @@ public class Pin extends VisTable {
         setType(type);
 
         if (connection == Connection.INPUT) {
-            add(image);
+            add(image).minWidth(image.getWidth()).minHeight(image.getHeight());
             add(label).growX().minWidth(0);
+            label.setAlignment(Align.left);
         } else {
             add(label).growX().minWidth(0);
-            add(image);
+            add(image).minWidth(image.getWidth()).minHeight(image.getHeight());
+            label.setAlignment(Align.right);
         }
 
         addListener(new InputListener() {

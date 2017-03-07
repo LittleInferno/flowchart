@@ -6,6 +6,7 @@ import com.badlogic.gdx.utils.reflect.ClassReflection;
 import com.badlogic.gdx.utils.reflect.ReflectionException;
 
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 
 public class SerializeHelper {
 
@@ -32,6 +33,34 @@ public class SerializeHelper {
         }
 
         json.writeValue(handle);
+    }
+
+    public static Class[] getItemClass(Object[] objects) {
+        Class classes[] = new Class[objects.length];
+        for (int i = 0; i < classes.length; ++i)
+            classes[i] = objects[i].getClass();
+
+        return classes;
+    }
+
+    public static <T> T createObject(Class<T> type, Object... args) {
+        T object = null;
+
+        try {
+            if (args != null && args.length > 0) {
+                object = type.getConstructor(SerializeHelper.getItemClass(args)).newInstance(args);
+            } else
+                object = type.getConstructor().newInstance();
+        } catch (InstantiationException
+                | IllegalAccessException
+                | InvocationTargetException
+                | NoSuchMethodException e) {
+            e.printStackTrace();
+
+            //TODO throw refl exception
+        }
+
+        return object;
     }
 
     static public class Pair {

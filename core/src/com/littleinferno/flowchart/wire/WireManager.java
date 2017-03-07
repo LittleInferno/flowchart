@@ -1,6 +1,7 @@
 package com.littleinferno.flowchart.wire;
 
 import com.annimon.stream.Stream;
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.scenes.scene2d.Actor;
@@ -67,7 +68,7 @@ public class WireManager extends Actor {
 
         batch.end();
         renderer.setProjectionMatrix(batch.getProjectionMatrix());
-
+        Gdx.gl.glLineWidth(3.f);
         renderer.begin(ShapeRenderer.ShapeType.Line);
         Stream.of(wires).forEach(wire -> wire.draw(renderer));
         renderer.end();

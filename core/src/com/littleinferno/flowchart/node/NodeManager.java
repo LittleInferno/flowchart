@@ -6,7 +6,6 @@ import com.badlogic.gdx.utils.JsonValue;
 import com.littleinferno.flowchart.scene.Scene;
 import com.littleinferno.flowchart.util.SerializeHelper;
 
-import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -36,28 +35,9 @@ public class NodeManager {
     }
 
     public <T extends Node> T createNode(Class<T> type, Object... args) {
-
-        T node;
-        try {
-            if (args != null && args.length > 0) {
-                Class classes[] = new Class[args.length];
-                for (int i = 0; i < classes.length; ++i)
-                    classes[i] = args[i].getClass();
-
-                node = type.getConstructor(classes).newInstance(args);
-            } else
-                node = type.getConstructor().newInstance();
-
-            registerNode(node);
-            return node;
-
-        } catch (InvocationTargetException |
-                IllegalAccessException |
-                InstantiationException |
-                NoSuchMethodException e) {
-            e.printStackTrace();
-        }
-        return null;
+        T node = SerializeHelper.createObject(type, args);
+        registerNode(node);
+        return node;
     }
 
     private void registerNode(Node node) {

@@ -68,7 +68,7 @@ public class UIScene extends Stage {
         load.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
-                Project.loadProject("test", "test/");
+              //  Project.load("test", "test/");
             }
         });
 

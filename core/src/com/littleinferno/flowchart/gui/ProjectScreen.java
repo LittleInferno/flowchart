@@ -6,16 +6,16 @@ import com.badlogic.gdx.graphics.GL20;
 
 public class ProjectScreen extends ScreenAdapter {
 
-    UIScene uiScene;
+    private UIScene uiScene;
 
     public ProjectScreen(UIScene uiScene) {
         this.uiScene = uiScene;
-
+        Gdx.gl.glClearColor(20 / 255.f, 20 / 255.f, 20 / 255.f, 0);
     }
 
     @Override
     public void resize(int width, int height) {
-        uiScene.getViewport().update(width, height, true);
+        uiScene.getViewport().update(width, height, false);
     }
 
     @Override

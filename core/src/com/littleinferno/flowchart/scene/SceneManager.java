@@ -6,7 +6,6 @@ import com.badlogic.gdx.utils.JsonValue;
 import com.littleinferno.flowchart.node.NodeManager;
 import com.littleinferno.flowchart.util.SerializeHelper;
 
-import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -29,23 +28,7 @@ public class SceneManager {
     }
 
     public <T extends Scene> T createScene(Class<T> type, Object... args) {
-        T scene = null;
-        try {
-            if (args != null && args.length > 0) {
-                Class classes[] = new Class[args.length];
-                for (int i = 0; i < classes.length; ++i)
-                    classes[i] = args[i].getClass();
-
-                scene = type.getConstructor(classes).newInstance(args);
-            } else
-                scene = type.getConstructor().newInstance();
-        } catch (InstantiationException
-                | IllegalAccessException
-                | InvocationTargetException
-                | NoSuchMethodException e) {
-            e.printStackTrace();
-        }
-
+        T scene = SerializeHelper.createObject(type, args);
         scenes.add(scene);
         return scene;
     }

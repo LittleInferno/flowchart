@@ -3,7 +3,7 @@ apply plugin: "java"
 sourceCompatibility = JavaVersion.VERSION_1_8
 sourceSets.main.java.srcDirs = [ "src/" ]
 
-project.ext.mainClassName = "com.littleinferno.flowchart.desktop.DesktopLauncher"
+project.ext.mainClassName = "com.littleinferno.app.desktop.DesktopLauncher"
 project.ext.assetsDir = new File("../android/assets");
 
 task run(dependsOn: classes, type: JavaExec) {

@@ -29,7 +29,7 @@ class Wire {
 
         if (begin.getConnection() == Connection.INPUT) {
             b.add(new Vector2(8, 8));
-            e.add(new Vector2(86, 8));
+            e.add(new Vector2(begin.getWidth() - 14, 8));
 
             float tmp = b.x;
             b.x = e.x;
@@ -39,7 +39,7 @@ class Wire {
             b.y = e.y;
             e.y = tmp;
         } else {
-            b.add(new Vector2(86, 8));
+            b.add(new Vector2(begin.getWidth() - 14, 8));
             e.add(new Vector2(8, 8));
         }
 
