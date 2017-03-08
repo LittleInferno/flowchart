@@ -400,12 +400,7 @@ public class Pin extends VisTable {
     }
 
 
-    private class PinGesture implements GestureDetector.GestureListener {
-
-        @Override
-        public boolean touchDown(float x, float y, int pointer, int button) {
-            return false;
-        }
+    private class PinGesture extends GestureDetector.GestureAdapter {
 
         @Override
         public boolean tap(float x, float y, int count, int button) {
@@ -422,35 +417,6 @@ public class Pin extends VisTable {
             getStage().addActor(pinPopumMenu);
 
             return true;
-        }
-
-        @Override
-        public boolean fling(float velocityX, float velocityY, int button) {
-            return false;
-        }
-
-        @Override
-        public boolean pan(float x, float y, float deltaX, float deltaY) {
-            return false;
-        }
-
-        @Override
-        public boolean panStop(float x, float y, int pointer, int button) {
-            return false;
-        }
-
-        @Override
-        public boolean zoom(float initialDistance, float distance) {
-            return false;
-        }
-
-        @Override
-        public boolean pinch(Vector2 initialPointer1, Vector2 initialPointer2, Vector2 pointer1, Vector2 pointer2) {
-            return false;
-        }
-
-        @Override
-        public void pinchStop() {
         }
     }
 

@@ -4,7 +4,6 @@ import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.input.GestureDetector;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Actor;
-import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.DragAndDrop;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
@@ -14,9 +13,10 @@ import com.littleinferno.flowchart.gui.DropItem;
 import com.littleinferno.flowchart.node.NodeManager;
 import com.littleinferno.flowchart.project.Project;
 import com.littleinferno.flowchart.util.ClassHandle;
+import com.littleinferno.flowchart.util.ProjectStage;
 import com.littleinferno.flowchart.wire.WireManager;
 
-public class Scene extends Stage {
+public class Scene extends ProjectStage {
 
     private UiTab uiTab;
     private GestureDetector gesture;
@@ -26,8 +26,8 @@ public class Scene extends Stage {
 
     private SceneHandle sceneHandle;
 
-    Scene(SceneHandle sceneHandle) {
-        super(new ScreenViewport());
+    Scene(SceneHandle sceneHandle, Project project) {
+        super(new ScreenViewport(), project);
 
         this.name = sceneHandle.name;
 
@@ -47,7 +47,7 @@ public class Scene extends Stage {
         addActor(wireManager);
         wireManager.toBack();
 
-        Project.instance().getUiScene().addDragAndDropTarget(new DragAndDrop.Target(uiTab.getContentTable()) {
+        project.getUiScene().addDragAndDropTarget(new DragAndDrop.Target(uiTab.getContentTable()) {
             @Override
             public boolean drag(DragAndDrop.Source source, DragAndDrop.Payload payload, float x, float y, int pointer) {
                 return true;
@@ -108,6 +108,11 @@ public class Scene extends Stage {
         return sceneHandle;
     }
 
+    @Override
+    public void dispose() {
+        super.dispose();
+    }
+
     public static class UiTab extends Tab {
 
         private VisTable uiTable;
@@ -137,29 +142,9 @@ public class Scene extends Stage {
 
     }
 
-    private class Gesture implements GestureDetector.GestureListener {
+    private class Gesture extends GestureDetector.GestureAdapter {
 
         private float scale1 = 1;
-
-        @Override
-        public boolean touchDown(float x, float y, int pointer, int button) {
-            return false;
-        }
-
-        @Override
-        public boolean tap(float x, float y, int count, int button) {
-            return false;
-        }
-
-        @Override
-        public boolean longPress(float x, float y) {
-            return false;
-        }
-
-        @Override
-        public boolean fling(float velocityX, float velocityY, int button) {
-            return false;
-        }
 
         @Override
         public boolean pan(float x, float y, float deltaX, float deltaY) {
@@ -173,27 +158,12 @@ public class Scene extends Stage {
         }
 
         @Override
-        public boolean panStop(float x, float y, int pointer, int button) {
-            return false;
-        }
-
-        @Override
         public boolean zoom(float initialDistance, float distance) {
             float ratio = initialDistance / distance;
             scale1 *= ratio;
             if (scale1 > 1)
                 ((OrthographicCamera) getCamera()).zoom = scale1;
             return false;
-        }
-
-        @Override
-        public boolean pinch(Vector2 initialPointer1, Vector2 initialPointer2, Vector2 pointer1, Vector2 pointer2) {
-            return false;
-        }
-
-        @Override
-        public void pinchStop() {
-
         }
     }
 

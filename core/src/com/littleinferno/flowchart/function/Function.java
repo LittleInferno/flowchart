@@ -21,13 +21,13 @@ import com.kotcrab.vis.ui.widget.VisValidatableTextField;
 import com.littleinferno.flowchart.Connection;
 import com.littleinferno.flowchart.DataType;
 import com.littleinferno.flowchart.codegen.BaseCodeGenerator;
-import com.littleinferno.flowchart.scene.FunctionScene;
 import com.littleinferno.flowchart.node.FunctionBeginNode;
 import com.littleinferno.flowchart.node.FunctionReturnNode;
 import com.littleinferno.flowchart.project.Project;
-import com.littleinferno.flowchart.util.DataSelectBox;
+import com.littleinferno.flowchart.scene.FunctionScene;
+import com.littleinferno.flowchart.util.gui.DataSelectBox;
 import com.littleinferno.flowchart.util.DestroyListener;
-import com.littleinferno.flowchart.util.InputForm;
+import com.littleinferno.flowchart.util.gui.InputForm;
 import com.littleinferno.flowchart.util.NameChangedListener;
 
 import java.util.ArrayList;
@@ -36,6 +36,7 @@ import java.util.List;
 
 public class Function {
 
+    private final FunctionManager functionManager;
     private String name;
 
     private List<FunctionReturnNode> returnNodes;
@@ -53,7 +54,8 @@ public class Function {
 
     private FunctionScene scene;
 
-    public Function(String name) {
+    public Function(FunctionManager functionManager, String name) {
+        this.functionManager = functionManager;
         this.name = name;
 
         parameters = new ArrayList<>();
@@ -73,11 +75,12 @@ public class Function {
                 .deleteScene(scene)
         );
 
-        this.scene = Project.instance().getSceneManager().createScene(FunctionScene.class, this);
+        this.scene = Project.instance().getSceneManager().createScene(FunctionScene.class, this, Project.instance());
     }
 
-    Function(FunctionHandle functionHandle) {
+    Function(FunctionManager functionManager, FunctionHandle functionHandle) {
         this.name = functionHandle.name;
+        this.functionManager = functionManager;
 
         parameters = new ArrayList<>();
 

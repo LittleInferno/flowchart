@@ -21,7 +21,7 @@ public class Application extends Game {
     @Override
     public void create() {
         sm = new ScreenManager(this);
-//             Project project = Project.createProject("test", "flowchart_projects", new JSCodeGenerator(), new JSCodeExecution());
+//             Project project = Project.createProject("test", Gdx.files.external("flowchart_projects"), new JSCodeGenerator(), new JSCodeExecution());
         Project.load("test", Gdx.files.external("flowchart_projects"));
 
         //  MenuScreen menuScreen = new MenuScreen();
@@ -42,7 +42,17 @@ public class Application extends Game {
         super.dispose();
 //        scene.dispose();
         sm.dispose();
+        Project.instance().dispose();
         VisUI.dispose();
+    }
+
+    void loadUI(){
+        if (!VisUI.isLoaded()) {
+            if (Gdx.app.getType() == com.badlogic.gdx.Application.ApplicationType.Android)
+                VisUI.load("X2/uiskin.json");
+            else
+                VisUI.load("X1/uiskin.json");
+        }
     }
 
 

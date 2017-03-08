@@ -8,24 +8,26 @@ import com.kotcrab.vis.ui.widget.VisTable;
 import com.littleinferno.flowchart.codegen.BaseCodeGenerator;
 import com.littleinferno.flowchart.project.Project;
 import com.littleinferno.flowchart.util.BaseHandle;
+import com.littleinferno.flowchart.util.ProjectManager;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class FunctionManager {
+public class FunctionManager extends ProjectManager {
 
     private ArrayList<Function> functions;
     private int counter;
     private UI ui;
 
-    public FunctionManager() {
+    public FunctionManager(Project project) {
+        super(project);
         functions = new ArrayList<>();
         counter = 0;
         ui = new UI(functions);
     }
 
-    public FunctionManager(FunctionManagerHandle functionManagerHandle) {
-        this();
+    public FunctionManager(Project project, FunctionManagerHandle functionManagerHandle) {
+        this(project);
         counter = functionManagerHandle.counter;
 
         Stream.of(functionManagerHandle.functionHandles)
@@ -33,7 +35,7 @@ public class FunctionManager {
     }
 
     private Function createFunction(Function.FunctionHandle functionHandle) {
-        Function function = new Function(functionHandle);
+        Function function = new Function(this, functionHandle);
 
         functions.add(function);
         ui.update();
@@ -42,7 +44,7 @@ public class FunctionManager {
     }
 
     public Function createFunction() {
-        Function function = new Function("newFun" + counter++);
+        Function function = new Function(this, "newFun" + counter++);
 
         functions.add(function);
         ui.update();
@@ -85,6 +87,11 @@ public class FunctionManager {
                 Stream.of(functions).map(Function::getHandle).toList());
     }
 
+    @Override
+    public void dispose() {
+
+    }
+
     @SuppressWarnings("WeakerAccess")
     public static class UI {
 
@@ -123,7 +130,7 @@ public class FunctionManager {
     }
 
     @SuppressWarnings("WeakerAccess")
-    public static class FunctionManagerHandle implements BaseHandle{
+    public static class FunctionManagerHandle implements BaseHandle {
         int counter;
         List<Function.FunctionHandle> functionHandles;
 

@@ -45,6 +45,15 @@ public class ControlTable extends VisTable {
         });
         functionTable.add(createFunction).growX().row();
 
+        variableTable.add(sceneUi.getProject().getVariableManager().getUi().getVarTable()).grow().row();
+        variableTable.addSeparator();
+        variableTable.add(sceneUi.getProject().getVariableManager().getUi().getDetailsTable()).growX().row();
+        variableTable.addSeparator();
+
+        functionTable.add(sceneUi.getProject().getFunctionManager().getUi().getFunTable()).grow().row();
+        functionTable.addSeparator();
+        functionTable.add(sceneUi.getProject().getFunctionManager().getUi().getDetailsTable()).growX().height(250).row();
+        functionTable.addSeparator();
 
         consoleTable = new ConsoleTable();
 
@@ -93,18 +102,6 @@ public class ControlTable extends VisTable {
         add(container).grow();
 
         setBackground(VisUI.getSkin().getDrawable("window-bg"));
-    }
-
-    public void init(){
-        variableTable.add(Project.instance().getVariableManager().getUi().getVarTable()).grow().row();
-        variableTable.addSeparator();
-        variableTable.add(Project.instance().getVariableManager().getUi().getDetailsTable()).growX().row();
-        variableTable.addSeparator();
-
-        functionTable.add(Project.instance().getFunctionManager().getUi().getFunTable()).grow().row();
-        functionTable.addSeparator();
-        functionTable.add(Project.instance().getFunctionManager().getUi().getDetailsTable()).growX().height(250).row();
-        functionTable.addSeparator();
     }
 
     public static ConsoleTable getConsole() {

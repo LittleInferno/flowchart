@@ -9,8 +9,8 @@ import com.littleinferno.flowchart.project.Project;
 public class FunctionScene extends Scene {
 
     @SuppressWarnings("unused")
-    public FunctionScene(Function function) {
-        super(new FunctionSceneHandle(new NodeManager(), function.getName(), function.getName()));
+    public FunctionScene(Function function, Project project) {
+        super(new FunctionSceneHandle(new NodeManager(), function.getName(), function.getName()), project);
         function.addListener(newName -> {
             setName(newName);
             UiTab uiTab = getUiTab();
@@ -22,8 +22,8 @@ public class FunctionScene extends Scene {
     }
 
     @SuppressWarnings("unused")
-    public FunctionScene(FunctionSceneHandle functionSceneHandle) {
-        super(functionSceneHandle);
+    public FunctionScene(FunctionSceneHandle functionSceneHandle, Project project) {
+        super(functionSceneHandle, project);
 
         Function function = Project.instance()
                 .getFunctionManager()

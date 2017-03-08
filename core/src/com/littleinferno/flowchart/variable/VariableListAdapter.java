@@ -2,33 +2,17 @@ package com.littleinferno.flowchart.variable;
 
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.utils.DragAndDrop;
-import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
-import com.kotcrab.vis.ui.VisUI;
-import com.kotcrab.vis.ui.util.adapter.ArrayListAdapter;
 import com.kotcrab.vis.ui.widget.VisLabel;
 import com.kotcrab.vis.ui.widget.VisTable;
 import com.littleinferno.flowchart.gui.VariableItem;
 import com.littleinferno.flowchart.project.Project;
+import com.littleinferno.flowchart.util.BaseListAdaptor;
 
 import java.util.ArrayList;
 
-public class VariableListAdapter extends ArrayListAdapter<Variable, VisTable> {
-    private final Drawable bg = VisUI.getSkin().getDrawable("window-bg");
-    private final Drawable selection = VisUI.getSkin().getDrawable("list-selection");
-
+public class VariableListAdapter extends BaseListAdaptor<Variable, VisTable> {
     public VariableListAdapter(ArrayList<Variable> array) {
         super(array);
-        setSelectionMode(SelectionMode.SINGLE);
-    }
-
-    @Override
-    protected void selectView(VisTable view) {
-        view.setBackground(selection);
-    }
-
-    @Override
-    protected void deselectView(VisTable view) {
-        view.setBackground(bg);
     }
 
     @Override

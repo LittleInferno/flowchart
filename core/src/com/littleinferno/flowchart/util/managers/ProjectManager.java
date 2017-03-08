@@ -1,7 +1,6 @@
-package com.littleinferno.flowchart.util;
+package com.littleinferno.flowchart.util.managers;
 
 import com.littleinferno.flowchart.project.Project;
-import com.littleinferno.flowchart.util.managers.BaseManager;
 
 public abstract class ProjectManager extends BaseManager {
 

@@ -1,4 +1,4 @@
-package com.littleinferno.flowchart.util;
+package com.littleinferno.flowchart.util.gui;
 
 import com.kotcrab.vis.ui.widget.VisSelectBox;
 import com.littleinferno.flowchart.DataType;

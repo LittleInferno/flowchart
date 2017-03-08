@@ -1,16 +1,9 @@
 package com.littleinferno.flowchart.project;
 
-import com.annimon.stream.Collectors;
-import com.annimon.stream.Stream;
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
-import com.kotcrab.vis.ui.VisUI;
 import com.littleinferno.flowchart.JsonManger;
-import com.littleinferno.flowchart.Setting;
 import com.littleinferno.flowchart.codegen.BaseCodeExecution;
 import com.littleinferno.flowchart.codegen.BaseCodeGenerator;
-import com.littleinferno.flowchart.codegen.JSCodeExecution;
-import com.littleinferno.flowchart.codegen.JSCodeGenerator;
 import com.littleinferno.flowchart.function.FunctionManager;
 import com.littleinferno.flowchart.gui.ProjectScreen;
 import com.littleinferno.flowchart.gui.UIScene;
@@ -22,7 +15,6 @@ import com.littleinferno.flowchart.util.ProjectException;
 import com.littleinferno.flowchart.util.managers.BaseManager;
 import com.littleinferno.flowchart.variable.VariableManager;
 
-import java.util.ArrayList;
 import java.util.UUID;
 
 public class Project extends BaseManager {
@@ -39,6 +31,7 @@ public class Project extends BaseManager {
     private VariableManager variableManager;
     private FunctionManager functionManager;
     private SceneManager sceneManager;
+
     private JsonManger jsonManger;
 
     private UIScene uiScene;
@@ -56,11 +49,41 @@ public class Project extends BaseManager {
         this.codeExecution = codeExecution;
 
         this.variableManager = new VariableManager(this);
-        this.functionManager = new FunctionManager();
-        this.sceneManager = new SceneManager();
+        this.functionManager = new FunctionManager(this);
+        this.sceneManager = new SceneManager(this);
         this.jsonManger = new JsonManger();
 
-        this.uiScene = new UIScene();
+        this.uiScene = new UIScene(this);
+        //   uiScene.init();
+        this.projectScreen = new ProjectScreen(uiScene);
+    }
+
+    public Project(ProjectHandle projectHandle) {
+        instance = this;
+        this.name = projectHandle.name;
+        this.location = projectHandle.location;
+
+        jsonManger = new JsonManger();
+        initJsonManager();
+
+        this.uiScene = new UIScene(this);
+
+        variableManager = new VariableManager(this,
+                jsonManger.loadHandle(VariableManager.VariableManagerHandle.class,
+                        location.child("variables.json")));
+
+        functionManager = new FunctionManager(this,
+                jsonManger.loadHandle(FunctionManager.FunctionManagerHandle.class,
+                        location.child("functions.json")));
+
+        sceneManager = instance.jsonManger.load(SceneManager.class, location.child("scenes.json"));
+
+        uiScene.init();
+
+
+        MainScene scene = sceneManager.getMainScene();
+        uiScene.pinToTabbedPane(scene.getUiTab());
+
         this.projectScreen = new ProjectScreen(uiScene);
     }
 
@@ -74,19 +97,11 @@ public class Project extends BaseManager {
         if (instance != null)
             instance.save();
 
-        if (!VisUI.isLoaded()) {
-            if (Gdx.app.getType() == com.badlogic.gdx.Application.ApplicationType.Android)
-                VisUI.load("X2/uiskin.json");
-            else
-                VisUI.load("X1/uiskin.json");
-        }
-
         instance = new Project(name, location, codeGenerator, codeExecution);
         instance.init();
 
         MainScene scene = instance.getSceneManager().getMainScene();
         instance.uiScene.pinToTabbedPane(scene.getUiTab());
-        instance.uiScene.controlTable.init();
 
         return instance;
     }
@@ -95,31 +110,7 @@ public class Project extends BaseManager {
         if (instance != null)
             instance.save();
 
-        if (!VisUI.isLoaded()) {
-            if (Gdx.app.getType() == com.badlogic.gdx.Application.ApplicationType.Android)
-                VisUI.load("X2/uiskin.json");
-            else
-                VisUI.load("X1/uiskin.json");
-        }
-
-        instance = new Project(name, location, new JSCodeGenerator(), new JSCodeExecution());
-        instance.init();
-
-        FileHandle variables = instance.getLocation().child("variables.json");
-        instance.variableManager = new VariableManager(instance,
-                instance.jsonManger.loadHandle(VariableManager.VariableManagerHandle.class, variables));
-
-        FileHandle functions = instance.getLocation().child("functions.json");
-        instance.functionManager = new FunctionManager(
-                instance.jsonManger.loadHandle(FunctionManager.FunctionManagerHandle.class, functions));
-
-        FileHandle scenes = instance.getLocation().child("scenes.json");
-        instance.sceneManager = instance.jsonManger.load(SceneManager.class, scenes);
-
-        MainScene scene = instance.getSceneManager().getMainScene();
-        instance.uiScene.pinToTabbedPane(scene.getUiTab());
-
-        instance.uiScene.controlTable.init();
+        new Project(new ProjectHandle(name, null, null, location.child(name)));
     }
 
 
@@ -176,6 +167,10 @@ public class Project extends BaseManager {
         return uiScene;
     }
 
+    public JsonManger getJsonManger() {
+        return jsonManger;
+    }
+
     public void runProgram() {
         String code = variableManager.gen(codeGenerator) +
                 functionManager.gen(codeGenerator) +
@@ -202,22 +197,35 @@ public class Project extends BaseManager {
         this.programStart = programStart;
     }
 
-    public static ArrayList<String> getProjectsNames() {
-        return Stream.of(Gdx.files.external(Setting.projectsLocation).list())
-                .map(FileHandle::name)
-                .collect(Collectors.toCollection(ArrayList::new));
-    }
-
     public FileHandle getLocation() {
         return location;
     }
 
     @Override
     public void dispose() {
-
+        sceneManager.dispose();
+        variableManager.dispose();
+        functionManager.dispose();
     }
 
     public interface ProgramStart {
         String gen(BaseCodeGenerator builder);
+    }
+
+    public static class ProjectHandle {
+        public String name;
+        public String codeGenerator;
+        public String codeExecution;
+        public FileHandle location;
+
+        public ProjectHandle() {
+        }
+
+        public ProjectHandle(String projectName, String codeGenerator, String codeExecution, FileHandle location) {
+            this.name = projectName;
+            this.codeGenerator = codeGenerator;
+            this.codeExecution = codeExecution;
+            this.location = location;
+        }
     }
 }

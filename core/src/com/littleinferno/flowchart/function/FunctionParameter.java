@@ -3,7 +3,7 @@ package com.littleinferno.flowchart.function;
 import com.annimon.stream.Stream;
 import com.littleinferno.flowchart.Connection;
 import com.littleinferno.flowchart.DataType;
-import com.littleinferno.flowchart.util.ArrayChangedListener;
+import com.littleinferno.flowchart.util.gui.ArrayChangedListener;
 import com.littleinferno.flowchart.util.NameChangedListener;
 import com.littleinferno.flowchart.util.TypeChangedListener;
 

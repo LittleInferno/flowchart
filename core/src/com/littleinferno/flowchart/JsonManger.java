@@ -35,7 +35,7 @@ public class JsonManger {
         return load(type, fileHandle.readString());
     }
 
-    public <T> T loadHandle(Class<T> type, FileHandle variables) {
-        return json.fromJson(type, variables.readString());
+    public <T> T loadHandle(Class<T> type, FileHandle fileHandle) {
+        return json.fromJson(type, fileHandle.readString());
     }
 }

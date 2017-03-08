@@ -2,7 +2,6 @@ package com.littleinferno.flowchart.gui;
 
 import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.scenes.scene2d.Actor;
-import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.DragAndDrop;
@@ -16,8 +15,9 @@ import com.kotcrab.vis.ui.widget.tabbedpane.TabbedPane;
 import com.kotcrab.vis.ui.widget.tabbedpane.TabbedPaneAdapter;
 import com.littleinferno.flowchart.codegen.BaseCodeGenerator;
 import com.littleinferno.flowchart.project.Project;
+import com.littleinferno.flowchart.util.ProjectStage;
 
-public class UIScene extends Stage {
+public class UIScene extends ProjectStage {
 
     private TabbedPane tabbedPane;
     private InputMultiplexer inputMultiplexer;
@@ -27,8 +27,9 @@ public class UIScene extends Stage {
     private static DragAndDrop dragAndDrop;
     public ControlTable controlTable;
 
-    public UIScene() {
-        super(new ScreenViewport());
+    public UIScene(Project project) {
+        super(new ScreenViewport(), project);
+        dragAndDrop = new DragAndDrop();
     }
 
     public void init() {
@@ -38,7 +39,6 @@ public class UIScene extends Stage {
 
         show = null;
 
-        dragAndDrop = new DragAndDrop();
 
         VisTable container = new VisTable();
         container.setFillParent(true);
@@ -68,7 +68,7 @@ public class UIScene extends Stage {
         load.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
-              //  Project.load("test", "test/");
+                //  Project.load("test", "test/");
             }
         });
 

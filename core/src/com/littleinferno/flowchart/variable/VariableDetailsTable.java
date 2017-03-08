@@ -9,8 +9,8 @@ import com.kotcrab.vis.ui.widget.VisLabel;
 import com.kotcrab.vis.ui.widget.VisTable;
 import com.kotcrab.vis.ui.widget.VisTextButton;
 import com.littleinferno.flowchart.project.Project;
-import com.littleinferno.flowchart.util.DataSelectBox;
-import com.littleinferno.flowchart.util.InputForm;
+import com.littleinferno.flowchart.util.gui.DataSelectBox;
+import com.littleinferno.flowchart.util.gui.InputForm;
 
 class VariableDetailsTable extends VisTable {
 
