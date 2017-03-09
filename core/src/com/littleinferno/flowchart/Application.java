@@ -4,6 +4,8 @@ import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.kotcrab.vis.ui.VisUI;
+import com.littleinferno.flowchart.codegen.JSCodeExecution;
+import com.littleinferno.flowchart.codegen.JSCodeGenerator;
 import com.littleinferno.flowchart.project.Project;
 import com.littleinferno.flowchart.screen.ScreenManager;
 
@@ -17,12 +19,14 @@ public class Application extends Game {
     private ScreenManager sm;
     private final float SCALE = 1.f;
 
+    public Application() {
+    }
 
     @Override
     public void create() {
         sm = new ScreenManager(this);
-//             Project project = Project.createProject("test", Gdx.files.external("flowchart_projects"), new JSCodeGenerator(), new JSCodeExecution());
-        Project.load("test", Gdx.files.external("flowchart_projects"));
+             Project project = Project.createProject("test", Gdx.files.external("flowchart_projects"), new JSCodeGenerator(), new JSCodeExecution());
+//        Project.load("test", Gdx.files.external("flowchart_projects"));
 
         //  MenuScreen menuScreen = new MenuScreen();
         // this.scene = ;
@@ -46,7 +50,7 @@ public class Application extends Game {
         VisUI.dispose();
     }
 
-    void loadUI(){
+    void loadUI() {
         if (!VisUI.isLoaded()) {
             if (Gdx.app.getType() == com.badlogic.gdx.Application.ApplicationType.Android)
                 VisUI.load("X2/uiskin.json");

@@ -4,6 +4,8 @@ import com.badlogic.gdx.files.FileHandle;
 import com.littleinferno.flowchart.JsonManger;
 import com.littleinferno.flowchart.codegen.BaseCodeExecution;
 import com.littleinferno.flowchart.codegen.BaseCodeGenerator;
+import com.littleinferno.flowchart.codegen.JSCodeExecution;
+import com.littleinferno.flowchart.codegen.JSCodeGenerator;
 import com.littleinferno.flowchart.function.FunctionManager;
 import com.littleinferno.flowchart.gui.ProjectScreen;
 import com.littleinferno.flowchart.gui.UIScene;
@@ -80,6 +82,9 @@ public class Project extends BaseManager {
 
         uiScene.init();
 
+        codeGenerator = new JSCodeGenerator();
+        codeExecution = new JSCodeExecution();
+        codeExecution.init();
 
         MainScene scene = sceneManager.getMainScene();
         uiScene.pinToTabbedPane(scene.getUiTab());

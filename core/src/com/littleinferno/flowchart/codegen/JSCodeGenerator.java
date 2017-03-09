@@ -229,6 +229,11 @@ public class JSCodeGenerator implements BaseCodeGenerator {
     }
 
     @Override
+    public String makeSetArrayItem(String array, String item, String index) {
+        return makeStatement(makeAssign(array + "[" + index + "]", item));
+    }
+
+    @Override
     public String makeStatement(String expression) {
         return expression + ";\n";
     }

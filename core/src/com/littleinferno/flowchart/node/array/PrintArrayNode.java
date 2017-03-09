@@ -9,12 +9,12 @@ public class PrintArrayNode extends Node {
     private Pin next;
     private Pin value;
 
-    public PrintArrayNode(NodeHandle nodeHandle) {
-        super(nodeHandle);
-    }
-
     public PrintArrayNode() {
         this(new NodeHandle("print array", true));
+    }
+
+    public PrintArrayNode(NodeHandle nodeHandle) {
+        super(nodeHandle);
 
         next = addExecutionOutputPin();
         addExecutionInputPin();
@@ -32,7 +32,7 @@ public class PrintArrayNode extends Node {
         Pin.Connector n = next.getConnector();
         String nextStr = n != null ? n.parent.gen(builder, n.pin) : "";
 
-        String format = String.format("com.littleinferno.app.jsutil.IO.printArray(%s)", valStr);
+        String format = String.format("com.littleinferno.flowchart.jsutil.IO.printArray(%s)", valStr);
 
         return String.format("%s%s", builder.makeStatement(format), nextStr);
     }

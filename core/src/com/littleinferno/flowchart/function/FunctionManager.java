@@ -8,7 +8,7 @@ import com.kotcrab.vis.ui.widget.VisTable;
 import com.littleinferno.flowchart.codegen.BaseCodeGenerator;
 import com.littleinferno.flowchart.project.Project;
 import com.littleinferno.flowchart.util.BaseHandle;
-import com.littleinferno.flowchart.util.ProjectManager;
+import com.littleinferno.flowchart.util.managers.ProjectManager;
 
 import java.util.ArrayList;
 import java.util.List;

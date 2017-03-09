@@ -62,6 +62,8 @@ public interface BaseCodeGenerator {
 
     String makeGetArrayItem(final String array, final String item);
 
+    String makeSetArrayItem(final String array, final String item, String index);
+
     String makeStatement(String expression);
 
     String makeIf(Pin condition, Pin block, Pin next);

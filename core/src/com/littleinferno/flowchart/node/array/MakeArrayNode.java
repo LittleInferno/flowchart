@@ -20,12 +20,12 @@ public class MakeArrayNode extends Node {
     private int counter = 0;
 
 
-    public MakeArrayNode(NodeHandle nodeHandle) {
-        super(nodeHandle);
-    }
-
     public MakeArrayNode() {
         this(new NodeHandle("make array", true));
+    }
+
+    public MakeArrayNode(NodeHandle nodeHandle) {
+        super(nodeHandle);
 
         array = addDataOutputPin("array", Pin.DEFAULT_CONVERT);
         array.setArray(true);

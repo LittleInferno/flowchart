@@ -12,12 +12,12 @@ public class ArrayAddNode extends Node {
     private Pin item;
     private Pin length;
 
-    public ArrayAddNode(NodeHandle nodeHandle) {
-        super(nodeHandle);
-    }
-
     public ArrayAddNode() {
         this(new NodeHandle("Add", true));
+    }
+
+    public ArrayAddNode(NodeHandle nodeHandle) {
+        super(nodeHandle);
 
         next = addExecutionOutputPin();
         addExecutionInputPin();
