@@ -30,7 +30,7 @@ public class PrintNode extends Node {
         Pin.Connector n = next.getConnector();
         String nextStr = n != null ? n.parent.gen(builder, n.pin) : "";
 
-        String format = String.format("com.littleinferno.app.jsutil.IO.print(%s)", valStr);
+        String format = String.format("com.littleinferno.flowchart.jsutil.IO.print(%s)", valStr);
 
         return String.format("%s%s", builder.makeStatement(format), nextStr);
     }

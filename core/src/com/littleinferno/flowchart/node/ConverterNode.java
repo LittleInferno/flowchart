@@ -17,7 +17,7 @@ public class ConverterNode extends Node {
     public String gen(BaseCodeGenerator builder, Pin with) {
       //  Pin.Connector from = getPin("from").getConnector();
 
-      //  return from.parent.gen(builder, from.pin);
+      //  return from.parent.getStr(builder, from.pin);
         return null;
     }
 }

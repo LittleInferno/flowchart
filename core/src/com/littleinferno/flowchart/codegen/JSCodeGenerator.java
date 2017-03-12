@@ -64,7 +64,7 @@ public class JSCodeGenerator implements BaseCodeGenerator {
         generate(left);
         generate(right);
 
-        return createBinary("+");
+        return createBinary("-");
     }
 
     @Override

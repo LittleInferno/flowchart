@@ -78,7 +78,7 @@ class VariableDetailsTable extends VisTable {
         add(new VisLabel("name: "));
         add(variableName).growX().expandY();
         add(deleteVariable).row();
-        add(new VisLabel("type: "));
+        add(new VisLabel("title: "));
         add(variableType).growX().expandY();
         add(isArray);
     }

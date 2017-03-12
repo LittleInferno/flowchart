@@ -69,6 +69,10 @@ public class Pin extends VisTable {
         }
     }
 
+    public void setParent(Node parent) {
+        this.parent = parent;
+    }
+
     private void init(final Node parent, String name, final Connection connection, final DataType type) {
         this.parent = parent;
         this.connection = connection;

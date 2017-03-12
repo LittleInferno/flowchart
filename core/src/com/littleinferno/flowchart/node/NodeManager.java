@@ -40,10 +40,11 @@ public class NodeManager {
         return node;
     }
 
-    private void registerNode(Node node) {
+    public Node registerNode(Node node) {
         nodes.add(node);
         if (scene != null)
             scene.addActor(node);
+        return node;
     }
 
     void deleteNode(Node node) {

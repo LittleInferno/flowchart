@@ -4,6 +4,7 @@ import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.kotcrab.vis.ui.VisUI;
+import com.littleinferno.flowchart.codegen.BaseJSEngine;
 import com.littleinferno.flowchart.codegen.JSCodeExecution;
 import com.littleinferno.flowchart.codegen.JSCodeGenerator;
 import com.littleinferno.flowchart.project.Project;
@@ -18,14 +19,15 @@ public class Application extends Game {
     private Project project;
     private ScreenManager sm;
     private final float SCALE = 1.f;
+    public static BaseJSEngine jsEngine = null;
 
     public Application() {
     }
 
     @Override
     public void create() {
-        sm = new ScreenManager(this);
-             Project project = Project.createProject("test", Gdx.files.external("flowchart_projects"), new JSCodeGenerator(), new JSCodeExecution());
+
+        Project project = Project.createProject("test", Gdx.files.external("flowchart_projects"), new JSCodeGenerator(), new JSCodeExecution());
 //        Project.load("test", Gdx.files.external("flowchart_projects"));
 
         //  MenuScreen menuScreen = new MenuScreen();
@@ -45,7 +47,8 @@ public class Application extends Game {
     public void dispose() {
         super.dispose();
 //        scene.dispose();
-        sm.dispose();
+        if (sm != null)
+            sm.dispose();
         Project.instance().dispose();
         VisUI.dispose();
     }

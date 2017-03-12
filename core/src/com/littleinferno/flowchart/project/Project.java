@@ -1,6 +1,8 @@
 package com.littleinferno.flowchart.project;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
+import com.kotcrab.vis.ui.VisUI;
 import com.littleinferno.flowchart.JsonManger;
 import com.littleinferno.flowchart.codegen.BaseCodeExecution;
 import com.littleinferno.flowchart.codegen.BaseCodeGenerator;
@@ -10,6 +12,7 @@ import com.littleinferno.flowchart.function.FunctionManager;
 import com.littleinferno.flowchart.gui.ProjectScreen;
 import com.littleinferno.flowchart.gui.UIScene;
 import com.littleinferno.flowchart.node.NodeManager;
+import com.littleinferno.flowchart.plugin.NodePluginManager;
 import com.littleinferno.flowchart.scene.MainScene;
 import com.littleinferno.flowchart.scene.Scene;
 import com.littleinferno.flowchart.scene.SceneManager;
@@ -33,6 +36,7 @@ public class Project extends BaseManager {
     private VariableManager variableManager;
     private FunctionManager functionManager;
     private SceneManager sceneManager;
+    private NodePluginManager nodePluginManager;
 
     private JsonManger jsonManger;
 
@@ -41,6 +45,13 @@ public class Project extends BaseManager {
     private ProjectScreen projectScreen;
 
     public Project(String name, FileHandle location, BaseCodeGenerator codeGenerator, BaseCodeExecution codeExecution) {
+        if (!VisUI.isLoaded()) {
+            if (Gdx.app.getType() == com.badlogic.gdx.Application.ApplicationType.Android)
+                VisUI.load("X2/uiskin.json");
+            else
+                VisUI.load("X1/uiskin.json");
+        }
+
         this.name = name;
         this.location = location.child(name);
 
@@ -54,6 +65,8 @@ public class Project extends BaseManager {
         this.functionManager = new FunctionManager(this);
         this.sceneManager = new SceneManager(this);
         this.jsonManger = new JsonManger();
+        this.nodePluginManager = new NodePluginManager();
+        this.nodePluginManager.addPlugins(Gdx.files.internal("plugins"));
 
         this.uiScene = new UIScene(this);
         //   uiScene.init();
@@ -62,6 +75,14 @@ public class Project extends BaseManager {
 
     public Project(ProjectHandle projectHandle) {
         instance = this;
+
+        if (!VisUI.isLoaded()) {
+            if (Gdx.app.getType() == com.badlogic.gdx.Application.ApplicationType.Android)
+                VisUI.load("X2/uiskin.json");
+            else
+                VisUI.load("X1/uiskin.json");
+        }
+
         this.name = projectHandle.name;
         this.location = projectHandle.location;
 
@@ -162,6 +183,10 @@ public class Project extends BaseManager {
 
     public SceneManager getSceneManager() {
         return sceneManager;
+    }
+
+    public NodePluginManager getNodePluginManager() {
+        return nodePluginManager;
     }
 
     public String getName() {

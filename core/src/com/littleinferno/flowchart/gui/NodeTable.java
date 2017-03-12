@@ -8,28 +8,9 @@ import com.kotcrab.vis.ui.util.adapter.ArrayListAdapter;
 import com.kotcrab.vis.ui.widget.ListView;
 import com.kotcrab.vis.ui.widget.VisLabel;
 import com.kotcrab.vis.ui.widget.VisTable;
-import com.littleinferno.flowchart.node.BoolNode;
-import com.littleinferno.flowchart.node.FloatNode;
-import com.littleinferno.flowchart.node.IfNode;
-import com.littleinferno.flowchart.node.IntegerNode;
-import com.littleinferno.flowchart.node.PrintNode;
-import com.littleinferno.flowchart.node.StringNode;
-import com.littleinferno.flowchart.node.array.ArrayAddNode;
-import com.littleinferno.flowchart.node.array.ArrayGetNode;
-import com.littleinferno.flowchart.node.array.ArraySetNode;
-import com.littleinferno.flowchart.node.array.MakeArrayNode;
-import com.littleinferno.flowchart.node.array.PrintArrayNode;
-import com.littleinferno.flowchart.node.math.AddNode;
-import com.littleinferno.flowchart.node.math.DivNode;
-import com.littleinferno.flowchart.node.math.EqualNode;
-import com.littleinferno.flowchart.node.math.GreatNode;
-import com.littleinferno.flowchart.node.math.LessNode;
-import com.littleinferno.flowchart.node.math.MulNode;
-import com.littleinferno.flowchart.node.math.SubNode;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.Set;
 
 class NodeTable extends VisTable {
 
@@ -38,37 +19,40 @@ class NodeTable extends VisTable {
     NodeTable(UIScene sceneUi) {
         super(true);
         this.sceneUi = sceneUi;
-        String[] items = new String[]{
-                BoolNode.class.getName(),
-                IntegerNode.class.getName(),
-                FloatNode.class.getName(),
-                StringNode.class.getName(),
+        Set<String> nodeList = sceneUi.getProject().getNodePluginManager().getNodeList();
 
-                AddNode.class.getName(),
-                SubNode.class.getName(),
-                MulNode.class.getName(),
-                DivNode.class.getName(),
+//        String[] items = new String[]{
+//                BoolNode.class.getName(),
+//                IntegerNode.class.getName(),
+//                FloatNode.class.getName(),
+//                StringNode.class.getName(),
+//
+//                AddNode.class.getName(),
+//                SubNode.class.getName(),
+//                MulNode.class.getName(),
+//                DivNode.class.getName(),
+//
+//                EqualNode.class.getName(),
+//                LessNode.class.getName(),
+//                GreatNode.class.getName(),
+//
+//                IfNode.class.getName(),
+//
+//                MakeArrayNode.class.getName(),
+//                ArrayAddNode.class.getName(),
+//                ArrayGetNode.class.getName(),
+//                ArraySetNode.class.getName(),
+//                PrintNode.class.getName(),
+//                PrintArrayNode.class.getName(),
+//
+//                TestNode.class.getName()
+//        };
 
-                EqualNode.class.getName(),
-                LessNode.class.getName(),
-                GreatNode.class.getName(),
-
-                IfNode.class.getName(),
-
-                MakeArrayNode.class.getName(),
-                ArrayAddNode.class.getName(),
-                ArrayGetNode.class.getName(),
-                ArraySetNode.class.getName(),
-                PrintNode.class.getName(),
-                PrintArrayNode.class.getName()
-        };
-
-        List<String> tmp = Arrays.asList(items);
-        ArrayList<String> array = new ArrayList<String>();
-        array.addAll(tmp);
+        ArrayList<String> array = new ArrayList<>();
+        array.addAll(nodeList);
 
         NodeAdapter adapter = new NodeAdapter(array);
-        ListView<String> view = new ListView<String>(adapter);
+        ListView<String> view = new ListView<>(adapter);
 
         add(view.getMainTable()).grow().row();
     }
@@ -106,12 +90,7 @@ class NodeTable extends VisTable {
                 public DragAndDrop.Payload dragStart(InputEvent event, float x, float y, int pointer) {
                     DragAndDrop.Payload payload = new DragAndDrop.Payload();
 
-                    try {
-                        Class<?> node = Class.forName(item);
-                        payload.setObject(node);
-                    } catch (ClassNotFoundException e) {
-                        e.printStackTrace();
-                    }
+                    payload.setObject(sceneUi.getProject().getNodePluginManager().createNode(item));
 
                     payload.setDragActor(new VisLabel(it.getText()));
 

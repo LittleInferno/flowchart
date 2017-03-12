@@ -10,7 +10,9 @@ import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.kotcrab.vis.ui.widget.VisTable;
 import com.kotcrab.vis.ui.widget.tabbedpane.Tab;
 import com.littleinferno.flowchart.gui.DropItem;
+import com.littleinferno.flowchart.node.Node;
 import com.littleinferno.flowchart.node.NodeManager;
+import com.littleinferno.flowchart.node.PluginNode;
 import com.littleinferno.flowchart.project.Project;
 import com.littleinferno.flowchart.util.ClassHandle;
 import com.littleinferno.flowchart.util.ProjectStage;
@@ -63,7 +65,9 @@ public class Scene extends ProjectStage {
 
                 screenToStageCoordinates(vec);
 
-                if (object instanceof Actor) {
+                if (object instanceof PluginNode) {
+                    getNodeManager().registerNode((Node) object).setPosition(vec.x, vec.y);
+                } else if (object instanceof Actor) {
                     Actor target = (Actor) object;
 
                     target.setPosition(vec.x, vec.y);

@@ -1,5 +1,6 @@
 package com.littleinferno.flowchart.node;
 
+import com.annimon.stream.Stream;
 import com.badlogic.gdx.Application;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.scenes.scene2d.Actor;
@@ -103,6 +104,20 @@ public abstract class Node extends VisWindow implements CodeGen {
         right.addActor(pin);
         pack();
         return pin;
+    }
+
+    public void addPins(Pin[] pins) {
+        Stream.of(pins)
+                .peek(p -> p.setParent(this))
+                .forEach(
+                pin -> {
+                    if (pin.getConnection() == Connection.INPUT)
+                        left.addActor(pin);
+                    else
+                        right.addActor(pin);
+                }
+        );
+        pack();
     }
 
     public void removePin(final Pin pin) {
