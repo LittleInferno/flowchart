@@ -297,7 +297,7 @@ public class JSCodeGenerator implements BaseCodeGenerator {
     private void generate(final Pin pin) {
         Pin connectedPin = pin.getConnectedPin();
         connectedPin.getNode().gen(this, connectedPin);
-    }
+}
 
     private String getPreviousExpression() {
         return previousExpressions.pop();

@@ -1,6 +1,5 @@
 package com.littleinferno.flowchart.node.array;
 
-import com.annimon.stream.Stream;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.kotcrab.vis.ui.widget.VisTextButton;
@@ -14,7 +13,6 @@ import java.util.List;
 
 public class MakeArrayNode extends Node {
 
-    private Pin.PinListener listener;
     private Pin array;
     private List<Pin> values;
     private int counter = 0;
@@ -29,14 +27,6 @@ public class MakeArrayNode extends Node {
 
         array = addDataOutputPin("array", Pin.DEFAULT_CONVERT);
         array.setArray(true);
-
-        listener = t -> {
-            array.setType(t);
-            Stream.of(values).forEach(v -> v.setType(t));
-        };
-
-        array.addListener(listener);
-
 
         values = new ArrayList<>();
 
@@ -54,8 +44,6 @@ public class MakeArrayNode extends Node {
                     values.add(addDataInputPin("value" + counter++, values.get(0).getType()));
                 else {
                     Pin pin = addDataInputPin("value" + counter++, Pin.DEFAULT_CONVERT);
-                    pin.addListener(listener);
-
                     values.add(pin);
                 }
             }

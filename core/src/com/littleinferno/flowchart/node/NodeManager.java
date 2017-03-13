@@ -3,6 +3,7 @@ package com.littleinferno.flowchart.node;
 import com.annimon.stream.Stream;
 import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonValue;
+import com.littleinferno.flowchart.project.Project;
 import com.littleinferno.flowchart.scene.Scene;
 import com.littleinferno.flowchart.util.SerializeHelper;
 
@@ -28,10 +29,12 @@ public class NodeManager {
         Stream.of(nodes).forEach(node -> scene.addActor(node));
     }
 
-    public BeginNode getBeginNode() {
-        return (BeginNode) Stream.of(nodes)
-                .filter(scene -> scene.getName().equals("Begin"))
-                .findFirst().orElseGet(() -> createNode(BeginNode.class));
+    public PluginNode getBeginNode() {
+        return Stream.of(nodes)
+                .filter(scene -> scene.getName().equals("begin"))
+                .map(PluginNode.class::cast)
+                .findFirst()
+                .orElseGet(() -> registerNode(Project.instance().getNodePluginManager().getStartNode()));
     }
 
     public <T extends Node> T createNode(Class<T> type, Object... args) {
@@ -40,7 +43,7 @@ public class NodeManager {
         return node;
     }
 
-    public Node registerNode(Node node) {
+    public <T extends Node> T registerNode(T node) {
         nodes.add(node);
         if (scene != null)
             scene.addActor(node);

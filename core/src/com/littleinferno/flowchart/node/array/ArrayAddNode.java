@@ -26,14 +26,6 @@ public class ArrayAddNode extends Node {
 
         item = addDataInputPin("item", Pin.DEFAULT_CONVERT);
         length = addDataOutputPin("length", DataType.INT);
-
-        Pin.PinListener listener = t -> {
-            array.setType(t);
-            item.setType(t);
-        };
-
-        array.addListener(listener);
-        item.addListener(listener);
     }
 
     @Override

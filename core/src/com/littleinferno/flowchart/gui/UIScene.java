@@ -14,7 +14,6 @@ import com.kotcrab.vis.ui.widget.tabbedpane.Tab;
 import com.kotcrab.vis.ui.widget.tabbedpane.TabbedPane;
 import com.kotcrab.vis.ui.widget.tabbedpane.TabbedPaneAdapter;
 import com.littleinferno.flowchart.codegen.BaseCodeGenerator;
-import com.littleinferno.flowchart.node.JSNode;
 import com.littleinferno.flowchart.project.Project;
 import com.littleinferno.flowchart.util.ProjectStage;
 

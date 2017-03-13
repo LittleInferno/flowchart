@@ -45,6 +45,8 @@ public class Project extends BaseManager {
     private ProjectScreen projectScreen;
 
     public Project(String name, FileHandle location, BaseCodeGenerator codeGenerator, BaseCodeExecution codeExecution) {
+        instance = this;
+
         if (!VisUI.isLoaded()) {
             if (Gdx.app.getType() == com.badlogic.gdx.Application.ApplicationType.Android)
                 VisUI.load("X2/uiskin.json");
@@ -58,6 +60,9 @@ public class Project extends BaseManager {
         if (!this.location.exists())
             this.location.mkdirs();
 
+        this.nodePluginManager = new NodePluginManager();
+        this.nodePluginManager.addPlugins(Gdx.files.internal("plugins"));
+
         this.codeGenerator = codeGenerator;
         this.codeExecution = codeExecution;
 
@@ -65,8 +70,6 @@ public class Project extends BaseManager {
         this.functionManager = new FunctionManager(this);
         this.sceneManager = new SceneManager(this);
         this.jsonManger = new JsonManger();
-        this.nodePluginManager = new NodePluginManager();
-        this.nodePluginManager.addPlugins(Gdx.files.internal("plugins"));
 
         this.uiScene = new UIScene(this);
         //   uiScene.init();
@@ -123,7 +126,7 @@ public class Project extends BaseManager {
         if (instance != null)
             instance.save();
 
-        instance = new Project(name, location, codeGenerator, codeExecution);
+        new Project(name, location, codeGenerator, codeExecution);
         instance.init();
 
         MainScene scene = instance.getSceneManager().getMainScene();
@@ -204,7 +207,7 @@ public class Project extends BaseManager {
     public void runProgram() {
         String code = variableManager.gen(codeGenerator) +
                 functionManager.gen(codeGenerator) +
-                programStart.gen(codeGenerator);
+                nodePluginManager.getStartNode().gen(codeGenerator, null);
 
         System.out.println(code);
         codeExecution.setCode(code);

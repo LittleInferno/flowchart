@@ -27,25 +27,11 @@ class NodeTable extends VisTable {
 //                FloatNode.class.getName(),
 //                StringNode.class.getName(),
 //
-//                AddNode.class.getName(),
-//                SubNode.class.getName(),
-//                MulNode.class.getName(),
-//                DivNode.class.getName(),
-//
-//                EqualNode.class.getName(),
-//                LessNode.class.getName(),
-//                GreatNode.class.getName(),
-//
-//                IfNode.class.getName(),
-//
 //                MakeArrayNode.class.getName(),
 //                ArrayAddNode.class.getName(),
 //                ArrayGetNode.class.getName(),
 //                ArraySetNode.class.getName(),
-//                PrintNode.class.getName(),
 //                PrintArrayNode.class.getName(),
-//
-//                TestNode.class.getName()
 //        };
 
         ArrayList<String> array = new ArrayList<>();

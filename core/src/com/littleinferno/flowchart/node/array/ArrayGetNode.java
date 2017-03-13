@@ -21,16 +21,6 @@ public class ArrayGetNode extends Node {
         array = addDataInputPin("array", Pin.DEFAULT_CONVERT);
         index = addDataInputPin("index", DataType.INT);
         item = addDataOutputPin("item", Pin.DEFAULT_CONVERT);
-
-        Pin.PinListener listener = t -> {
-            array.setType(t);
-            item.setType(t);
-        };
-
-        array.setArray(true);
-        array.addListener(listener);
-        item.addListener(listener);
-
     }
 
     @Override

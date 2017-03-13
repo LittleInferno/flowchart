@@ -22,6 +22,8 @@ import java.util.Set;
 public class NodePluginManager {
 
     private Map<String, PluginNodeHandle> handles;
+    private PluginNode startNode;
+
     private static Context rhino;
 
     private static Scriptable scope;
@@ -63,17 +65,11 @@ public class NodePluginManager {
                 .map(name -> objectToPin(name, (ScriptableObject) pins.get(name)))
                 .toArray(Pin[]::new);
 
+        Boolean programStart = (Boolean) object.get("programstart");
 
-        NativeArray typeEquals = (NativeArray) object.get("typeAlwaysEqual");
-
-        if (typeEquals != null) {
-            Pin.PinListener listener = t -> Stream.of(nodePins).forEach(v -> v.setType(t));
-
-            Stream.of(typeEquals.toArray())
-                    .map(String.class::cast)
-                    .forEach(key -> Stream.of(nodePins)
-                    .filter(value -> value.getName().equals(key))
-                    .forEach(p -> p.addListener(listener)));
+        if (programStart != null && programStart) {
+            startNode = new PluginNode(new PluginNodeHandle(nodeName, nodeTitle, nodePins, nodeFun));
+            return;
         }
 
         handles.put(nodeName, new PluginNodeHandle(nodeName, nodeTitle, nodePins, nodeFun));
@@ -99,7 +95,7 @@ public class NodePluginManager {
     }
 
     public Node createNode(String type) {
-        return new PluginNode(handles.get(type));
+        return new PluginNode(new PluginNodeHandle(handles.get(type)));
     }
 
     static Scriptable getScope() {
@@ -108,6 +104,10 @@ public class NodePluginManager {
 
     public static Context getContext() {
         return rhino;
+    }
+
+    public PluginNode getStartNode() {
+        return startNode;
     }
 
     public static class PluginNodeHandle {
@@ -121,6 +121,18 @@ public class NodePluginManager {
             this.title = title;
             this.pins = pins;
             this.function = function;
+        }
+
+        public PluginNodeHandle(PluginNodeHandle other) {
+            this.name = other.name;
+            this.title = other.title;
+            this.pins = new Pin[other.pins.length];
+
+            for (int i = 0; i < pins.length; ++i) {
+                pins[i] = new Pin(other.pins[i]);
+            }
+
+            this.function = other.function;
         }
     }
 

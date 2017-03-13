@@ -114,7 +114,7 @@ function equalNode() {
         name: "equal node",
         title: "equal",
         gen: function (node) {
-            return codegen.makeAdd(this.makeEq("a"), node.getPin("b"));
+            return codegen.makeEq(node.getPin("a"), node.getPin("b"));
         },
         pins: {
             "a": {

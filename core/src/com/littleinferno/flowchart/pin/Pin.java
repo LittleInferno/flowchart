@@ -1,5 +1,6 @@
 package com.littleinferno.flowchart.pin;
 
+import com.annimon.stream.Stream;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.input.GestureDetector;
 import com.badlogic.gdx.math.Vector2;
@@ -17,6 +18,7 @@ import com.kotcrab.vis.ui.widget.VisLabel;
 import com.kotcrab.vis.ui.widget.VisTable;
 import com.littleinferno.flowchart.Connection;
 import com.littleinferno.flowchart.DataType;
+import com.littleinferno.flowchart.codegen.BaseCodeGenerator;
 import com.littleinferno.flowchart.node.Node;
 import com.littleinferno.flowchart.scene.Scene;
 import com.littleinferno.flowchart.wire.WireManager;
@@ -39,10 +41,10 @@ public class Pin extends VisTable {
     private DataType type;
     private boolean isConnect;
     private boolean isArray;
+
     private boolean isUniversal;
     private VisLabel label;
     private VisImage image;
-    private List<PinListener> listeners;
 
     private Node parent;
     private GestureDetector gestureDetector;
@@ -53,6 +55,13 @@ public class Pin extends VisTable {
 
     private int wireId = WireManager.NULL_ID;
     private Color typeColor;
+
+    public Pin(Pin other) {
+        setStyle(other.style);
+        this.possibleConvert = new HashSet<>(other.possibleConvert);
+        init(other.parent, other.getName(), other.connection, other.type);
+        this.isArray = other.isArray;
+    }
 
     public Pin(Node parent, String name, Connection connection, DataType... convert) {
         possibleConvert = new HashSet<>();
@@ -77,7 +86,6 @@ public class Pin extends VisTable {
         this.parent = parent;
         this.connection = connection;
         this.isUniversal = type == DataType.UNIVERSAL;
-        this.listeners = new ArrayList<>();
         this.connectedPins = new ArrayList<>();
         this.gestureDetector = new GestureDetector(new PinGesture());
 
@@ -168,17 +176,23 @@ public class Pin extends VisTable {
         image.setColor(typeColor);
 
         if (isUniversal) {
-            notifyListenersTypeChanged(newType);
+
             if (connectedPin != null) connectedPin.setType(newType);
 
-            if (!connectedPins.isEmpty()) {
-                for (Pin i : connectedPins) {
-                    i.setType(newType);
-                }
-            }
+            Stream.of(connectedPin)
+                    .forEach(pin -> setType(newType));
+
+            if (parent != null)
+                Stream.of(parent.getPins())
+                        .filter(Pin::isUniversal)
+                        .forEach(pin -> pin.setType(newType));
         }
 
         return true;
+    }
+
+    public boolean isUniversal() {
+        return isUniversal;
     }
 
     public boolean isArray() {
@@ -334,10 +348,6 @@ public class Pin extends VisTable {
 //        getStage().addActor(converter);
 //    }
 
-    public void addListener(PinListener listener) {
-        listeners.add(listener);
-    }
-
     public Pin getConnectedPin() {
         return connectedPin;
     }
@@ -346,18 +356,8 @@ public class Pin extends VisTable {
         return parent;
     }
 
-    private void notifyListenersTypeChanged(DataType newType) {
-        for (PinListener listener : listeners) {
-            listener.typeChanged(newType);
-        }
-    }
-
     public Color getTypeColor() {
         return typeColor;
-    }
-
-    public interface PinListener {
-        void typeChanged(DataType newType);
     }
 
     static public class Connector {
@@ -371,6 +371,11 @@ public class Pin extends VisTable {
             this.parent = pin.parent;
         }
 
+    }
+
+    public String generate(BaseCodeGenerator generator) {
+        Pin connectedPin = this.getConnectedPin();
+        return connectedPin.getNode().gen(generator, connectedPin);
     }
 
     @SuppressWarnings({"WeakerAccess", "unused"})

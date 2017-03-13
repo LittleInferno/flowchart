@@ -19,6 +19,8 @@ import com.littleinferno.flowchart.project.Project;
 import com.littleinferno.flowchart.scene.Scene;
 import com.littleinferno.flowchart.util.ClassHandle;
 
+import java.util.List;
+
 public abstract class Node extends VisWindow implements CodeGen {
 
     protected final VerticalGroup left;
@@ -110,13 +112,13 @@ public abstract class Node extends VisWindow implements CodeGen {
         Stream.of(pins)
                 .peek(p -> p.setParent(this))
                 .forEach(
-                pin -> {
-                    if (pin.getConnection() == Connection.INPUT)
-                        left.addActor(pin);
-                    else
-                        right.addActor(pin);
-                }
-        );
+                        pin -> {
+                            if (pin.getConnection() == Connection.INPUT)
+                                left.addActor(pin);
+                            else
+                                right.addActor(pin);
+                        }
+                );
         pack();
     }
 
@@ -154,6 +156,21 @@ public abstract class Node extends VisWindow implements CodeGen {
             }
         }
         return null;
+    }
+
+    public List<Pin> getPins() {
+
+        List<Pin> pins = Stream.of(left.getChildren())
+                .filter(value -> value instanceof Pin)
+                .map(Pin.class::cast)
+                .toList();
+
+        pins.addAll(Stream.of(right.getChildren())
+                .filter(value -> value instanceof Pin)
+                .map(Pin.class::cast)
+                .toList());
+
+        return pins;
     }
 
     @Override

@@ -25,16 +25,6 @@ public class ArraySetNode extends Node {
         array = addDataInputPin("array", Pin.DEFAULT_CONVERT);
         item = addDataInputPin("item", Pin.DEFAULT_CONVERT);
         index = addDataInputPin("index", DataType.INT);
-
-        Pin.PinListener listener = t -> {
-            array.setType(t);
-            item.setType(t);
-        };
-
-        array.setArray(true);
-        array.addListener(listener);
-        item.addListener(listener);
-
     }
 
     @Override
