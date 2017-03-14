@@ -72,7 +72,7 @@ public class WireManager extends Actor {
         renderer.begin(ShapeRenderer.ShapeType.Line);
         Stream.of(wires).forEach(wire -> wire.draw(renderer));
         renderer.end();
-
+        Gdx.gl.glLineWidth(1.f);
         batch.begin();
     }
 
