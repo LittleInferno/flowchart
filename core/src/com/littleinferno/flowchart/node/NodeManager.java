@@ -1,5 +1,6 @@
 package com.littleinferno.flowchart.node;
 
+import com.annimon.stream.Optional;
 import com.annimon.stream.Stream;
 import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonValue;
@@ -29,35 +30,39 @@ public class NodeManager {
         Stream.of(nodes).forEach(node -> scene.addActor(node));
     }
 
-    public Node createNode(String type) {
+    public Optional<Node> createNode(String type) {
         return createNode(scene.getProject().getNodePluginManager().getNodeHandle(type));
     }
 
-    public Node createNode(String type, Node.NodeHandle nodeHandle) {
+    private Node createNode(String type, Node.NodeHandle nodeHandle) {
         return createNode(Project.instance().getNodePluginManager().getNodeHandle(type), nodeHandle);
     }
 
-    private Node createNode(NodePluginManager.PluginNodeHandle handle) {
-        return createNode(handle, new Node.NodeHandle(handle.title, handle.closable, handle.name));
+    private Optional<Node> createNode(NodePluginManager.PluginNodeHandle handle) {
+        if (scene.getType().equals(handle.sceneType) || handle.sceneType.equals("any"))
+            return Optional.of(createNode(handle, new Node.NodeHandle(handle.title, handle.closable, handle.name)));
+        return Optional.empty();
     }
 
     private Node createNode(NodePluginManager.PluginNodeHandle pluginHandle, Node.NodeHandle nodeHandle) {
-        return registerNode(getIfSingle(pluginHandle))
-                .initFromHandle(nodeHandle);
+        return registerNode(getIfSingle(pluginHandle, nodeHandle));
     }
 
-    private Node getIfSingle(NodePluginManager.PluginNodeHandle handle) {
-        return handle.single ? getOrCreateNode(handle) : create(handle);
+    private Node getIfSingle(NodePluginManager.PluginNodeHandle pluginHandle, Node.NodeHandle nodeHandle) {
+        return pluginHandle.single
+                ? getOrCreateNode(pluginHandle, nodeHandle)
+                : create(pluginHandle).initFromHandle(nodeHandle);
     }
 
-    private Node getOrCreateNode(NodePluginManager.PluginNodeHandle handle) {
+    private Node getOrCreateNode(NodePluginManager.PluginNodeHandle handle, Node.NodeHandle nodeHandle) {
         return Stream.of(nodes)
-                .filter(value -> value instanceof PluginNode)
-                .map(PluginNode.class::cast)
+                .filter(value -> value instanceof PluginNode) // TODO renmove it
+                .map(PluginNode.class::cast) // TODO renmove it
                 .filter(value -> value.getPluginHandle().name.equals(handle.name))
                 .limit(1)
                 .findFirst()
-                .orElseGet(() -> create(handle));
+                .map(Node.class::cast) // TODO renmove it
+                .orElseGet(() -> create(handle).initFromHandle(nodeHandle));
     }
 
     private PluginNode create(NodePluginManager.PluginNodeHandle pluginHandle) {
@@ -83,6 +88,16 @@ public class NodeManager {
                 .orElseThrow(() -> new RuntimeException("Cannot find node with id:" + id));
     }
 
+
+    public Optional<Node> getStartNode() {
+        return Stream.of(nodes)
+                .filter(value -> value instanceof PluginNode) // TODO renmove it
+                .map(PluginNode.class::cast) // TODO renmove it
+                .filter(value -> value.getPluginHandle().start)
+                .limit(1)
+                .map(Node.class::cast)        // TODO renmove it
+                .findFirst();
+    }
 
     public static class NodeManagerSerializer implements Json.Serializer<NodeManager> {
         @Override

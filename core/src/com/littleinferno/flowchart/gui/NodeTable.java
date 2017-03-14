@@ -76,7 +76,7 @@ class NodeTable extends VisTable {
                 public DragAndDrop.Payload dragStart(InputEvent event, float x, float y, int pointer) {
                     DragAndDrop.Payload payload = new DragAndDrop.Payload();
 
-                    payload.setObject(sceneUi.getProject().getCurrentScene().getNodeManager().createNode(item));
+                    payload.setObject(item);
 
                     payload.setDragActor(new VisLabel(it.getText()));
 

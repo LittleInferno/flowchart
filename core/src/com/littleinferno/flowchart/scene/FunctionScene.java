@@ -40,6 +40,11 @@ public class FunctionScene extends Scene {
         });
     }
 
+    @Override
+    public String getType() {
+        return "function";
+    }
+
 
     @SuppressWarnings("WeakerAccess")
     public static class FunctionSceneHandle extends SceneHandle {

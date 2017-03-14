@@ -11,6 +11,11 @@ public class MainScene extends Scene {
         super(sceneHandle, project);
     }
 
+    @Override
+    public String getType() {
+        return "main";
+    }
+
     @SuppressWarnings("unused")
     public MainScene(NodeManager nodeManager, Project project) {
         this(new SceneHandle(nodeManager, "main", false), project);

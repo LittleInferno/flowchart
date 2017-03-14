@@ -1,22 +1,23 @@
 package com.littleinferno.flowchart.scene;
 
+import com.annimon.stream.Optional;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.input.GestureDetector;
 import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.DragAndDrop;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.kotcrab.vis.ui.widget.VisTable;
 import com.kotcrab.vis.ui.widget.tabbedpane.Tab;
 import com.littleinferno.flowchart.gui.DropItem;
+import com.littleinferno.flowchart.node.Node;
 import com.littleinferno.flowchart.node.NodeManager;
 import com.littleinferno.flowchart.project.Project;
 import com.littleinferno.flowchart.util.ClassHandle;
 import com.littleinferno.flowchart.util.ProjectStage;
 import com.littleinferno.flowchart.wire.WireManager;
 
-public class Scene extends ProjectStage {
+public abstract class Scene extends ProjectStage {
 
     private UiTab uiTab;
     private GestureDetector gesture;
@@ -63,17 +64,14 @@ public class Scene extends ProjectStage {
 
                 screenToStageCoordinates(vec);
 
-
-                // if (object instanceof PluginNode) {
-                //getNodeManager().registerNode((Node) object).setPosition(vec.x, vec.y);
-                //  } else
-                if (object instanceof Actor) {
-                    Actor target = (Actor) object;
-
-                    target.setPosition(vec.x, vec.y);
-
-                    if (object instanceof DropItem)
-                        ((DropItem) target).init(Scene.this);
+                if (object instanceof DropItem) {
+                    DropItem dropItem = (DropItem) object;
+                    dropItem.setPosition(vec.x, vec.y);
+                    dropItem.init(Scene.this);
+                } else {
+                    Optional<Node> node = getNodeManager().createNode((String) object);
+                    Vector2 v = vec;
+                    node.ifPresent(n->n.setPosition(v.x, v.y));
                 }
             }
         });
@@ -114,6 +112,8 @@ public class Scene extends ProjectStage {
     public void dispose() {
         super.dispose();
     }
+
+    public abstract String getType();
 
     public static class UiTab extends Tab {
 

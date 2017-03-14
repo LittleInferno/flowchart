@@ -209,8 +209,13 @@ public class Project extends BaseManager {
 
     public void runProgram() {
         String code = variableManager.gen(codeGenerator) +
-                functionManager.gen(codeGenerator);// +
-                //nodePluginManager.getStartNode().gen(codeGenerator, null);
+                functionManager.gen(codeGenerator)
+                + sceneManager
+                .getMainScene()
+                .getNodeManager()
+                .getStartNode()
+                .map(node -> node.gen(codeGenerator, null))
+                .orElseGet(() -> "");
 
         System.out.println(code);
         codeExecution.setCode(code);
