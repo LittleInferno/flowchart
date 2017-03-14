@@ -66,7 +66,7 @@ public class NodePluginManager {
         nodeHandle.single = (single != null) ? single : false;
 
         Boolean closable = (Boolean) object.get("closable");
-        nodeHandle.single = (closable != null) ? closable : true;
+        nodeHandle.closable = (closable != null) ? closable : true;
 
         String sceneType = (String) object.get("sceneType");
         if (sceneType == null) sceneType = "any";

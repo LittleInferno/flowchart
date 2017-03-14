@@ -66,12 +66,6 @@ public abstract class Node extends VisWindow implements CodeGen {
 
         add(main).grow();
         top();
-
-
-        container.setDebug(true, true);
-left.setDebug(true,true);
-        right.setDebug(true,true);
-
     }
 
     Node initFromHandle(NodeHandle nodeHandle) {
