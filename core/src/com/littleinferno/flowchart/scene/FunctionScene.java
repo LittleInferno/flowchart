@@ -42,7 +42,7 @@ public class FunctionScene extends Scene {
 
     @Override
     public String getType() {
-        return "function";
+        return "codegen";
     }
 
 

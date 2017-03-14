@@ -17,7 +17,7 @@ public class FunctionItem extends DropItem {
 
         if (scene != function.getScene()) {
         //    scene.getNodeManager()
-                   // .createNode(FunctionCallNode.class, function)
+                   // .createNode(FunctionCallNode.class, codegen)
                //     .setPosition(FunctionItem.this.getX(), FunctionItem.this.getY());
             return;
         }
@@ -26,7 +26,7 @@ public class FunctionItem extends DropItem {
 
         addItem(new MenuItem("call", new EventWrapper((event, actor) -> getStage()
              //   .getNodeManager()
-          //      .createNode(FunctionCallNode.class, function)
+          //      .createNode(FunctionCallNode.class, codegen)
           //      .setPosition(FunctionItem.this.getX(), FunctionItem.this.getY())
         )));
 
@@ -34,7 +34,7 @@ public class FunctionItem extends DropItem {
 
         addItem(new MenuItem("return", new EventWrapper((event, actor) -> getStage()
             //    .getNodeManager()
-            //    .createNode(FunctionReturnNode.class, function)
+            //    .createNode(FunctionReturnNode.class, codegen)
             //    .setPosition(FunctionItem.this.getX(), FunctionItem.this.getY())
         )));
 

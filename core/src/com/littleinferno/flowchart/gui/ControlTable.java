@@ -59,7 +59,7 @@ public class ControlTable extends VisTable {
 
         final VisTextButton nodes = new VisTextButton("node", "toggle");
         final VisTextButton variables = new VisTextButton("variable", "toggle");
-        final VisTextButton functions = new VisTextButton("function", "toggle");
+        final VisTextButton functions = new VisTextButton("codegen", "toggle");
         final VisTextButton console = new VisTextButton("console", "toggle");
 
         ButtonGroup<VisTextButton> tabs = new ButtonGroup<>();

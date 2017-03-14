@@ -248,7 +248,7 @@ public class Function {
                     float w = getStage().getWidth() / 2;
                     float h = getStage().getHeight() / 2;
                     InputForm inputForm =
-                            new InputForm("function title", function::getName, function::setName);
+                            new InputForm("codegen title", function::getName, function::setName);
                     inputForm.setPosition(w - inputForm.getWidth() / 2, h);
                     getStage().addActor(inputForm);
                     inputForm.focus();

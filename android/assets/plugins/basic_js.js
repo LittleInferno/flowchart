@@ -3,11 +3,14 @@ var NativePin = com.littleinferno.flowchart.pin.Pin;
 var NativeType = com.littleinferno.flowchart.DataType;
 var NativeConnection = com.littleinferno.flowchart.Connection;
 var NativeGenerator = com.littleinferno.flowchart.codegen.JSCodeGenerator;
+var NativeCell = com.badlogic.gdx.scenes.scene2d.ui.Cell;
+var NativeCell = com.badlogic.gdx.scenes.scene2d.ui.Cell;
+var NativeTextField = com.kotcrab.vis.ui.widget.VisTextField;
 
 var codegen = new NativeGenerator();
 
 function exportNodes() {
-    return [ifNode(), beginNode(), printNode()];
+    return [ifNode(), beginNode(), printNode(), integerNode(), floatNode(), stringNode()];
 }
 
 function ifNode() {
@@ -69,7 +72,8 @@ function beginNode() {
         ],
         programstart: true,
         single: true,
-        sceneType: "main"
+        sceneType: "main",
+        closable:false
     }
 }
 
@@ -103,6 +107,77 @@ function printNode() {
                 type: [NativeType.BOOL, NativeType.INT, NativeType.FLOAT, NativeType.STRING],
                 connection: NativeConnection.INPUT
             },
+        ],
+    }
+}
+
+function integerNode() {
+    return {
+        name: "integer node",
+        title: "int",
+        init: function (node) {
+            var field = new NativeTextField("");
+            field.setName("field");
+            field.setTextFieldFilter(function (textField, c) { return c >= '0' && c <= '9' || c == '+' || c == '-'; });
+            node.getContainer().add(field).colspan(2).growX();
+            node.pack();
+        },
+        gen: function (node) {
+            return node.findActor("field").getText();
+        },
+        pins: [
+            {
+                name: "data",
+                type: NativeType.INT,
+                connection: NativeConnection.OUTPUT
+            }
+        ],
+    }
+}
+
+function floatNode() {
+    return {
+        name: "float node",
+        title: "float",
+        init: function (node) {
+            var field = new NativeTextField("");
+            field.setName("field");
+            field.setTextFieldFilter(function (textField, c) { return c >= '0' && c <= '9' || c == '.' || c == '+' || c == '-';});
+        node.getContainer().add(field).colspan(2).growX();
+        node.pack();
+    },
+        gen: function (node) {
+            return node.findActor("field").getText();
+        },
+    pins: [
+        {
+            name: "data",
+            type: NativeType.FLOAT,
+            connection: NativeConnection.OUTPUT
+        }
+    ],
+    }
+}
+
+function stringNode() {
+    return {
+        name: "string node",
+        title: "string",
+        init: function (node) {
+            var field = new NativeTextField("");
+            field.setName("field");
+            node.getContainer().add(field).colspan(2).growX();
+            node.pack();
+        },
+        gen: function (node) {
+            return codegen.makeString(node.findActor("field").getText());
+        },
+        pins: [
+            {
+                name: "data",
+                type: NativeType.FLOAT,
+                connection: NativeConnection.OUTPUT
+            }
         ],
     }
 }

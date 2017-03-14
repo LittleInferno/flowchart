@@ -12,6 +12,7 @@ public class PluginNode extends Node {
     public PluginNode(NodePluginManager.PluginNodeHandle handle) {
         this.handle = handle;
         addPins(handle.pins);
+        handle.init.call(this);
     }
 
     public PluginNode(NodeHandle nodeHandle) {
@@ -20,7 +21,7 @@ public class PluginNode extends Node {
 
     @Override
     public String gen(BaseCodeGenerator builder, Pin with) {
-        return (String) handle.function.call(this);
+        return (String) handle.codegen.call(this);
     }
 
     NodePluginManager.PluginNodeHandle getPluginHandle() {

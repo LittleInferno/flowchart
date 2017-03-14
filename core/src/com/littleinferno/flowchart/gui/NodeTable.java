@@ -23,9 +23,6 @@ class NodeTable extends VisTable {
 
 //        String[] items = new String[]{
 //                BoolNode.class.getName(),
-//                IntegerNode.class.getName(),
-//                FloatNode.class.getName(),
-//                StringNode.class.getName(),
 //
 //                MakeArrayNode.class.getName(),
 //                ArrayAddNode.class.getName(),

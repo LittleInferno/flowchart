@@ -24,6 +24,7 @@ public abstract class Node extends VisWindow implements CodeGen {
 
     protected final VerticalGroup left;
     protected final VerticalGroup right;
+    private final VisTable container;
 
     private NodeHandle nodeHandle;
 
@@ -32,11 +33,11 @@ public abstract class Node extends VisWindow implements CodeGen {
 
         left = new VerticalGroup();
         right = new VerticalGroup();
+        container = null;
     }
 
     public Node() {
         super("");
-
         getTitleLabel().setAlignment(Align.center);
 
         setKeepWithinStage(false);
@@ -48,7 +49,7 @@ public abstract class Node extends VisWindow implements CodeGen {
         else
             setWidth(200);
 
-        VisTable container = new VisTable();
+        container = new VisTable();
         VisTable main = new VisTable();
 
         left = new VerticalGroup();
@@ -65,6 +66,11 @@ public abstract class Node extends VisWindow implements CodeGen {
 
         add(main).grow();
         top();
+
+
+        container.setDebug(true, true);
+left.setDebug(true,true);
+        right.setDebug(true,true);
 
     }
 
@@ -202,6 +208,10 @@ public abstract class Node extends VisWindow implements CodeGen {
         getStage().getNodeManager().deleteNode(this);
 
         super.close();
+    }
+
+    public VisTable getContainer() {
+        return container;
     }
 
     public NodeHandle getHandle() {

@@ -54,27 +54,33 @@ public class NodePluginManager {
     }
 
     public void registerNode(ScriptableObject object) {
-        String nodeName = (String) object.get("name");
-        String nodeTitle = (String) object.get("title");
+        PluginNodeHandle nodeHandle = new PluginNodeHandle();
+
+        nodeHandle.name = (String) object.get("name");
+        nodeHandle.title = (String) object.get("title");
 
         Boolean start = (Boolean) object.get("programstart");
-        boolean nodeStart = (start != null) ? start : false;
+        nodeHandle.start = (start != null) ? start : false;
 
         Boolean single = (Boolean) object.get("single");
-        boolean nodeSingle = (single != null) ? single : false;
+        nodeHandle.single = (single != null) ? single : false;
+
+        Boolean closable = (Boolean) object.get("closable");
+        nodeHandle.single = (closable != null) ? closable : true;
 
         String sceneType = (String) object.get("sceneType");
         if (sceneType == null) sceneType = "any";
+        nodeHandle.sceneType = sceneType;
 
-        ScriptFun nodeFun = new ScriptFun((Function) object.get("gen"));
+        nodeHandle.codegen = new ScriptFun((Function) object.get("gen"));
+        nodeHandle.init = new ScriptFun((Function) object.get("init"));
 
         //noinspection unchecked
         List<NativeObject> pins = (List<NativeObject>) object.get("pins");
 
-        Pin[] nodePins = Stream.of(pins).map(this::objectToPin).toArray(Pin[]::new);
+        nodeHandle.pins = Stream.of(pins).map(this::objectToPin).toArray(Pin[]::new);
 
-        handles.put(nodeName,
-                new PluginNodeHandle(nodeName, nodeTitle, nodePins, nodeFun, nodeStart, nodeSingle, sceneType, true));
+        handles.put(nodeHandle.name, nodeHandle);
     }
 
     private Pin objectToPin(NativeObject object) {
@@ -115,34 +121,28 @@ public class NodePluginManager {
 
 
     public static class PluginNodeHandle {
-        public final String title;
-        public final String name;
-        public final Pin[] pins;
-        public final ScriptFun function;
+        public String title;
+        public String name;
+        public Pin[] pins;
+        public ScriptFun codegen;
+        public ScriptFun init;
 
-        public final boolean start;
-        public final boolean single;
-        public final String sceneType;
-        public final boolean closable;
+        public boolean start;
+        public boolean single;
+        public String sceneType;
+        public boolean closable;
 
-        public PluginNodeHandle(String name, String title, Pin[] pins, ScriptFun function, boolean start, boolean single, String sceneType, boolean closable) {
-            this.name = name;
-            this.title = title;
-            this.pins = pins;
-            this.function = function;
-            this.start = start;
-            this.single = single;
-            this.sceneType = sceneType;
-            this.closable = closable;
+        PluginNodeHandle() {
         }
 
-        public PluginNodeHandle(PluginNodeHandle other) {
+        PluginNodeHandle(PluginNodeHandle other) {
             this.name = other.name;
             this.title = other.title;
             this.start = other.start;
             this.single = other.single;
             this.sceneType = other.sceneType;
             this.closable = other.closable;
+            this.init = other.init;
 
             this.pins = new Pin[other.pins.length];
 
@@ -150,7 +150,7 @@ public class NodePluginManager {
                 pins[i] = new Pin(other.pins[i]);
             }
 
-            this.function = other.function;
+            this.codegen = other.codegen;
         }
     }
 
@@ -162,7 +162,9 @@ public class NodePluginManager {
         }
 
         public Object call(Object... args) {
+            if (function != null)
             return Context.jsToJava(function.call(getContext(), getScope(), getScope(), args), Object.class);
+            return null;
         }
     }
 

@@ -138,7 +138,7 @@ public class JSCodeGenerator implements BaseCodeGenerator {
 
     @Override
     public String makeFunction(final String name, final String params, final BaseBlock body) {
-        return String.format("function %s(%s)%s", name, params, body);
+        return String.format("codegen %s(%s)%s", name, params, body);
     }
 
     @Override
