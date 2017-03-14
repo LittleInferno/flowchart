@@ -16,20 +16,23 @@ function addNode() {
         gen: function (node) {
             return codegen.makeAdd(node.getPin("a"), node.getPin("b"));
         },
-        pins: {
-            "a": {
+        pins: [
+            {
+                name: "a",
                 type: [NativeType.INT, NativeType.FLOAT, NativeType.STRING],
                 connection: NativeConnection.INPUT
             },
-            "b": {
+            {
+                name: "b",
                 type: [NativeType.INT, NativeType.FLOAT, NativeType.STRING],
                 connection: NativeConnection.INPUT
             },
-            "result": {
+            {
+                name: "result",
                 type: [NativeType.INT, NativeType.FLOAT, NativeType.STRING],
                 connection: NativeConnection.OUTPUT
             },
-        },
+        ],
         typeAlwaysEqual: ["a", "b", "result"]
     }
 }
@@ -41,20 +44,23 @@ function subNode() {
         gen: function (node) {
             return codegen.makeSub(node.getPin("a"), node.getPin("b"));
         },
-        pins: {
-            "a": {
+        pins: [
+            {
+                name: "a",
                 type: [NativeType.INT, NativeType.FLOAT, NativeType.FLOAT],
                 connection: NativeConnection.INPUT
             },
-            "b": {
+            {
+                name: "b",
                 type: [NativeType.INT, NativeType.FLOAT, NativeType.FLOAT],
                 connection: NativeConnection.INPUT
             },
-            "result": {
+            {
+                name: "result",
                 type: [NativeType.INT, NativeType.FLOAT, NativeType.FLOAT],
                 connection: NativeConnection.OUTPUT
             },
-        },
+        ],
         typeAlwaysEqual: ["a", "b", "result"]
     }
 }
@@ -66,20 +72,23 @@ function mulNode() {
         gen: function (node) {
             return codegen.makeMul(node.getPin("a"), node.getPin("b"));
         },
-        pins: {
-            "a": {
+        pins: [
+            {
+                name: "a",
                 type: [NativeType.INT, NativeType.FLOAT],
                 connection: NativeConnection.INPUT
             },
-            "b": {
+            {
+                name: "b",
                 type: [NativeType.INT, NativeType.FLOAT],
                 connection: NativeConnection.INPUT
             },
-            "result": {
+            {
+                name: "result",
                 type: [NativeType.INT, NativeType.FLOAT],
                 connection: NativeConnection.OUTPUT
             },
-        },
+        ],
         typeAlwaysEqual: ["a", "b", "result"]
     }
 }
@@ -91,20 +100,23 @@ function divNode() {
         gen: function (node) {
             return codegen.makeAdd(node.getPin("a"), node.getPin("b"));
         },
-        pins: {
-            "a": {
+        pins: [
+            {
+                name: "a",
                 type: [NativeType.INT, NativeType.FLOAT],
                 connection: NativeConnection.INPUT
             },
-            "b": {
+            {
+                name: "b",
                 type: [NativeType.INT, NativeType.FLOAT],
                 connection: NativeConnection.INPUT
             },
-            "result": {
+            {
+                name: "result",
                 type: [NativeType.INT, NativeType.FLOAT],
                 connection: NativeConnection.OUTPUT
             },
-        },
+        ],
         typeAlwaysEqual: ["a", "b", "result"]
     }
 }
@@ -116,20 +128,23 @@ function equalNode() {
         gen: function (node) {
             return codegen.makeEq(node.getPin("a"), node.getPin("b"));
         },
-        pins: {
-            "a": {
+        pins: [
+            {
+                name: "a",
                 type: [NativeType.BOOL, NativeType.INT, NativeType.FLOAT, NativeType.STRING],
                 connection: NativeConnection.INPUT
             },
-            "b": {
+            {
+                name: "b",
                 type: [NativeType.BOOL, NativeType.INT, NativeType.FLOAT, NativeType.STRING],
                 connection: NativeConnection.INPUT
             },
-            "result": {
+            {
+                name: "result",
                 type: NativeType.BOOL,
                 connection: NativeConnection.OUTPUT
             },
-        },
+        ],
         typeAlwaysEqual: ["a", "b"]
     }
 }
@@ -141,20 +156,23 @@ function lessNode() {
         gen: function (node) {
             return codegen.makeLt(node.getPin("a"), node.getPin("b"));
         },
-        pins: {
-            "a": {
+        pins: [
+            {
+                name: "a",
                 type: [NativeType.BOOL, NativeType.INT, NativeType.FLOAT, NativeType.STRING],
                 connection: NativeConnection.INPUT
             },
-            "b": {
+            {
+                name: "b",
                 type: [NativeType.BOOL, NativeType.INT, NativeType.FLOAT, NativeType.STRING],
                 connection: NativeConnection.INPUT
             },
-            "result": {
+            {
+                name: "result",
                 type: NativeType.BOOL,
                 connection: NativeConnection.OUTPUT
             },
-        },
+        ],
         typeAlwaysEqual: ["a", "b"]
     }
 }
@@ -166,20 +184,23 @@ function greatNode() {
         gen: function (node) {
             return codegen.makeGt(node.getPin("a"), node.getPin("b"));
         },
-        pins: {
-            "a": {
+        pins: [
+            {
+                name: "a",
                 type: [NativeType.BOOL, NativeType.INT, NativeType.FLOAT, NativeType.STRING],
                 connection: NativeConnection.INPUT
             },
-            "b": {
+            {
+                name: "b",
                 type: [NativeType.BOOL, NativeType.INT, NativeType.FLOAT, NativeType.STRING],
                 connection: NativeConnection.INPUT
             },
-            "result": {
+            {
+                name: "result",
                 type: NativeType.BOOL,
                 connection: NativeConnection.OUTPUT
             },
-        },
+        ],
         typeAlwaysEqual: ["a", "b"]
     }
 }

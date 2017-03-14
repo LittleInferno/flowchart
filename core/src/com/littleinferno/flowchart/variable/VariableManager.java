@@ -66,7 +66,7 @@ public class VariableManager extends ProjectManager {
                 .filter(value -> value.getName().equals(name))
                 .findFirst()
                 .orElseThrow(() ->
-                        new RuntimeException("Cannot find varable with name:\"" + name + "\""));
+                        new RuntimeException("Cannot find varable with title:\"" + name + "\""));
     }
 
     public String gen(BaseCodeGenerator builder) {

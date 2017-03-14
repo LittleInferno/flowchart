@@ -69,7 +69,7 @@ public class FunctionManager extends ProjectManager {
                 .filter(value -> value.getName().equals(name))
                 .findFirst()
                 .orElseThrow(() ->
-                        new RuntimeException("Cannot find function with name:\"" + name + "\""));
+                        new RuntimeException("Cannot find function with title:\"" + name + "\""));
     }
 
     public String gen(BaseCodeGenerator builder) {

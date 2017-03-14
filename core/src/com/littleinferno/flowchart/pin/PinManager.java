@@ -9,31 +9,31 @@ public class PinManager {
 //
 //    private int idCounter = 0;
 //
-//    public Tuple<Integer, Pin> getDataInputPin(final String name, final DataType dataType) {
+//    public Tuple<Integer, Pin> getDataInputPin(final String title, final DataType dataType) {
 //        idCounter++;
 //
-//        pins.put(idCounter, new DataInputPin(name, dataType));
+//        pins.put(idCounter, new DataInputPin(title, dataType));
 //        return new Tuple<Integer, Pin>(idCounter, pins.get(idCounter));
 //    }
 //
-//    public Tuple<Integer, Pin> getDataOutputPin(final String name, final DataType dataType) {
+//    public Tuple<Integer, Pin> getDataOutputPin(final String title, final DataType dataType) {
 //        idCounter++;
 //
-//        pins.put(idCounter, new DataOutputPin(name, dataType));
+//        pins.put(idCounter, new DataOutputPin(title, dataType));
 //        return new Tuple<Integer, Pin>(idCounter, pins.get(idCounter));
 //    }
 //
-//    public Tuple<Integer, Pin> getExecutionInputPin(final String name) {
+//    public Tuple<Integer, Pin> getExecutionInputPin(final String title) {
 //        idCounter++;
 //
-//        pins.put(idCounter, new ExecutionInputPin(name));
+//        pins.put(idCounter, new ExecutionInputPin(title));
 //        return new Tuple<Integer, Pin>(idCounter, pins.get(idCounter));
 //    }
 //
-//    public Tuple<Integer, Pin> getExecutionOutputPin(final String name) {
+//    public Tuple<Integer, Pin> getExecutionOutputPin(final String title) {
 //        idCounter++;
 //
-//        pins.put(idCounter, new ExecutionOutputPin(name));
+//        pins.put(idCounter, new ExecutionOutputPin(title));
 //        return new Tuple<Integer, Pin>(idCounter, pins.get(idCounter));
 //    }
 //

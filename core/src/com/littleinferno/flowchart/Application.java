@@ -5,8 +5,6 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.kotcrab.vis.ui.VisUI;
 import com.littleinferno.flowchart.codegen.BaseJSEngine;
-import com.littleinferno.flowchart.codegen.JSCodeExecution;
-import com.littleinferno.flowchart.codegen.JSCodeGenerator;
 import com.littleinferno.flowchart.project.Project;
 import com.littleinferno.flowchart.screen.ScreenManager;
 
@@ -27,8 +25,8 @@ public class Application extends Game {
     @Override
     public void create() {
 
-        Project project = Project.createProject("test", Gdx.files.external("flowchart_projects"), new JSCodeGenerator(), new JSCodeExecution());
-//        Project.load("test", Gdx.files.external("flowchart_projects"));
+//        Project project = Project.createProject("test", Gdx.files.external("flowchart_projects"), new JSCodeGenerator(), new JSCodeExecution());
+        Project.load("test", Gdx.files.external("flowchart_projects"));
 
         //  MenuScreen menuScreen = new MenuScreen();
         // this.scene = ;

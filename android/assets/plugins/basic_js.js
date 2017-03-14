@@ -7,7 +7,7 @@ var NativeGenerator = com.littleinferno.flowchart.codegen.JSCodeGenerator;
 var codegen = new NativeGenerator();
 
 function exportNodes() {
-    return [ifNode(),beginNode(),printNode() ];
+    return [ifNode(), beginNode(), printNode()];
 }
 
 function ifNode() {
@@ -17,35 +17,39 @@ function ifNode() {
         gen: function (node) {
             var conditionStr = node.getPin("condition").generate(codegen);
             var trueString = node.getPin("True").generate(codegen);
-            var falseString = node.getPin("False").isConnect() ? node.getPin("False").generate(codegen) :"";
+            var falseString = node.getPin("False").isConnect() ? node.getPin("False").generate(codegen) : "";
 
             var string;
             if (!(!falseString || 0 === falseString.length))
                 string = codegen.makeIfElse(conditionStr,
-                        codegen.makeBlock(trueString), codegen.makeBlock(falseString));
+                    codegen.makeBlock(trueString), codegen.makeBlock(falseString));
             else
                 string = codegen.makeIf(conditionStr, codegen.makeBlock(trueString));
 
             return string;
         },
-        pins: {
-            "ex in": {
+        pins: [
+            {
+                name: "ex in",
                 type: NativeType.EXECUTION,
                 connection: NativeConnection.INPUT
             },
-            "condition":{
+            {
+                name: "condition",
                 type: NativeType.BOOL,
                 connection: NativeConnection.INPUT
             },
-            "True": {
+            {
+                name: "True",
                 type: NativeType.EXECUTION,
                 connection: NativeConnection.OUTPUT
             },
-            "False": {
+            {
+                name: "False",
                 type: NativeType.EXECUTION,
                 connection: NativeConnection.OUTPUT
             },
-        }
+        ]
     }
 }
 
@@ -54,15 +58,18 @@ function beginNode() {
         name: "begin node",
         title: "begin",
         gen: function (node) {
-            return node.getPin("start").isConnect() ? node.getPin("start").generate(codegen):"";
+            return node.getPin("start").isConnect() ? node.getPin("start").generate(codegen) : "";
         },
-        pins: {
-            "start": {
+        pins: [
+            {
+                name: "start",
                 type: NativeType.EXECUTION,
                 connection: NativeConnection.OUTPUT
             }
-        },
-        programstart : true
+        ],
+        programstart: true,
+        single: true,
+        sceneType: "main"
     }
 }
 
@@ -72,27 +79,30 @@ function printNode() {
         title: "print",
         gen: function (node) {
 
-                var valStr = node.getPin("item").generate(codegen);
+            var valStr = node.getPin("item").generate(codegen);
 
-                var nextStr = node.getPin("ex out").isConnect() ? node.getPin("ex out").generate(codegen) : "";
+            var nextStr = node.getPin("ex out").isConnect() ? node.getPin("ex out").generate(codegen) : "";
 
-                var format = "com.littleinferno.flowchart.jsutil.IO.print("+valStr+")";
+            var format = "com.littleinferno.flowchart.jsutil.IO.print(" + valStr + ")";
 
-                return codegen.makeStatement(format) + nextStr;
+            return codegen.makeStatement(format) + nextStr;
         },
-        pins: {
-            "ex in": {
+        pins: [
+            {
+                name: "ex in",
                 type: NativeType.EXECUTION,
                 connection: NativeConnection.INPUT
             },
-            "ex out": {
+            {
+                name: "ex out",
                 type: NativeType.EXECUTION,
                 connection: NativeConnection.OUTPUT
             },
-            "item": {
+            {
+                name: "item",
                 type: [NativeType.BOOL, NativeType.INT, NativeType.FLOAT, NativeType.STRING],
                 connection: NativeConnection.INPUT
             },
-        },
+        ],
     }
 }

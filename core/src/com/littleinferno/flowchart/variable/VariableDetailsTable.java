@@ -32,7 +32,7 @@ class VariableDetailsTable extends VisTable {
                 float w = getStage().getWidth() / 2;
                 float h = getStage().getHeight() / 2;
                 InputForm inputForm =
-                        new InputForm("variable name", variable::getName, variable::setName);
+                        new InputForm("variable title", variable::getName, variable::setName);
                 inputForm.setPosition(w - inputForm.getWidth() / 2, h);
                 getStage().addActor(inputForm);
                 inputForm.focus();
@@ -75,7 +75,7 @@ class VariableDetailsTable extends VisTable {
             }
         });
 
-        add(new VisLabel("name: "));
+        add(new VisLabel("title: "));
         add(variableName).growX().expandY();
         add(deleteVariable).row();
         add(new VisLabel("title: "));

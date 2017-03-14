@@ -10,7 +10,7 @@ public class CreateNewProject extends VisTable {
 
         VisTextField peojectName = new VisTextField();
 
-        add(new VisLabel("Project name: "));
+        add(new VisLabel("Project title: "));
         add(peojectName).fillX().expandX();
     }
 
@@ -19,7 +19,7 @@ public class CreateNewProject extends VisTable {
 //    buttonTable.add(cancelButton);
 //    buttonTable.add(acceptButton);
 //
-//    add(new VisLabel("first name: "));
+//    add(new VisLabel("first title: "));
 //    add(firstNameField).expand().fill();
 
 

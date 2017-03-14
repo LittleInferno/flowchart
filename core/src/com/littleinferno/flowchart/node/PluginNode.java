@@ -10,9 +10,7 @@ public class PluginNode extends Node {
     private NodePluginManager.PluginNodeHandle handle;
 
     public PluginNode(NodePluginManager.PluginNodeHandle handle) {
-        super(new NodeHandle(handle.title, true));
         this.handle = handle;
-
         addPins(handle.pins);
     }
 
@@ -25,5 +23,7 @@ public class PluginNode extends Node {
         return (String) handle.function.call(this);
     }
 
-
+    NodePluginManager.PluginNodeHandle getPluginHandle() {
+        return handle;
+    }
 }

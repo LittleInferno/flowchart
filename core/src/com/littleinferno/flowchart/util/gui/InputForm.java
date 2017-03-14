@@ -46,7 +46,7 @@ public class InputForm extends VisWindow {
         buttonTable.add(cancelButton);
         buttonTable.add(acceptButton);
 
-        add(new VisLabel("name: "));
+        add(new VisLabel("title: "));
         add(nameField).grow().row();
         add(buttonTable).grow().colspan(2).padBottom(3);
 

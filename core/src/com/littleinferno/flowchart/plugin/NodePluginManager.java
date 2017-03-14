@@ -15,14 +15,15 @@ import org.mozilla.javascript.NativeObject;
 import org.mozilla.javascript.Scriptable;
 import org.mozilla.javascript.ScriptableObject;
 
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 public class NodePluginManager {
 
     private Map<String, PluginNodeHandle> handles;
-    private PluginNode startNode;
 
     private static Context rhino;
 
@@ -56,35 +57,37 @@ public class NodePluginManager {
         String nodeName = (String) object.get("name");
         String nodeTitle = (String) object.get("title");
 
-        NativeObject pins = (NativeObject) object.get("pins");
+        Boolean start = (Boolean) object.get("programstart");
+        boolean nodeStart = (start != null) ? start : false;
+
+        Boolean single = (Boolean) object.get("single");
+        boolean nodeSingle = (single != null) ? single : false;
+
+        String sceneType = (String) object.get("sceneType");
+        if (sceneType == null) sceneType = "any";
 
         ScriptFun nodeFun = new ScriptFun((Function) object.get("gen"));
 
-        Pin[] nodePins = Stream.of(pins.keySet())
-                .map(String.class::cast)
-                .map(name -> objectToPin(name, (ScriptableObject) pins.get(name)))
-                .toArray(Pin[]::new);
+        //noinspection unchecked
+        List<NativeObject> pins = (List<NativeObject>) object.get("pins");
 
-        Boolean programStart = (Boolean) object.get("programstart");
+        Pin[] nodePins = Stream.of(pins).map(this::objectToPin).toArray(Pin[]::new);
 
-        if (programStart != null && programStart) {
-            startNode = new PluginNode(new PluginNodeHandle(nodeName, nodeTitle, nodePins, nodeFun));
-            return;
-        }
-
-        handles.put(nodeName, new PluginNodeHandle(nodeName, nodeTitle, nodePins, nodeFun));
+        handles.put(nodeName,
+                new PluginNodeHandle(nodeName, nodeTitle, nodePins, nodeFun, nodeStart, nodeSingle, sceneType, true));
     }
 
-    private Pin objectToPin(String name, ScriptableObject object) {
+    private Pin objectToPin(NativeObject object) {
+        String name = (String) object.get("name");
         Connection connection = (Connection) object.get("connection");
         Object type = object.get("type");
 
-        DataType[] types = new DataType[1];
+        DataType[] types = null;
         if (type instanceof DataType)
-            types[0] = (DataType) type;
+            types = new DataType[]{(DataType) type};
         else {
             NativeArray na = (NativeArray) type;
-            types = Stream.of(na.toArray()).toArray(DataType[]::new);
+            types = Arrays.copyOf(na.toArray(), na.size(), DataType[].class);
         }
 
         return new Pin(null, name, connection, types);
@@ -98,34 +101,49 @@ public class NodePluginManager {
         return new PluginNode(new PluginNodeHandle(handles.get(type)));
     }
 
-    static Scriptable getScope() {
+    public PluginNodeHandle getNodeHandle(String type) {
+        return new PluginNodeHandle(handles.get(type));
+    }
+
+    private static Scriptable getScope() {
         return scope;
     }
 
-    public static Context getContext() {
+    private static Context getContext() {
         return rhino;
     }
 
-    public PluginNode getStartNode() {
-        return startNode;
-    }
 
     public static class PluginNodeHandle {
-        public String name;
-        public String title;
-        public Pin[] pins;
-        public ScriptFun function;
+        public final String title;
+        public final String name;
+        public final Pin[] pins;
+        public final ScriptFun function;
 
-        public PluginNodeHandle(String name, String title, Pin[] pins, ScriptFun function) {
+        public final boolean start;
+        public final boolean single;
+        public final String sceneType;
+        public final boolean closable;
+
+        public PluginNodeHandle(String name, String title, Pin[] pins, ScriptFun function, boolean start, boolean single, String sceneType, boolean closable) {
             this.name = name;
             this.title = title;
             this.pins = pins;
             this.function = function;
+            this.start = start;
+            this.single = single;
+            this.sceneType = sceneType;
+            this.closable = closable;
         }
 
         public PluginNodeHandle(PluginNodeHandle other) {
             this.name = other.name;
             this.title = other.title;
+            this.start = other.start;
+            this.single = other.single;
+            this.sceneType = other.sceneType;
+            this.closable = other.closable;
+
             this.pins = new Pin[other.pins.length];
 
             for (int i = 0; i < pins.length; ++i) {

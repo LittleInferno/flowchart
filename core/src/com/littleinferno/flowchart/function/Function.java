@@ -21,14 +21,13 @@ import com.kotcrab.vis.ui.widget.VisValidatableTextField;
 import com.littleinferno.flowchart.Connection;
 import com.littleinferno.flowchart.DataType;
 import com.littleinferno.flowchart.codegen.BaseCodeGenerator;
-import com.littleinferno.flowchart.node.FunctionBeginNode;
 import com.littleinferno.flowchart.node.FunctionReturnNode;
 import com.littleinferno.flowchart.project.Project;
 import com.littleinferno.flowchart.scene.FunctionScene;
-import com.littleinferno.flowchart.util.gui.DataSelectBox;
 import com.littleinferno.flowchart.util.DestroyListener;
-import com.littleinferno.flowchart.util.gui.InputForm;
 import com.littleinferno.flowchart.util.NameChangedListener;
+import com.littleinferno.flowchart.util.gui.DataSelectBox;
+import com.littleinferno.flowchart.util.gui.InputForm;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -104,11 +103,11 @@ public class Function {
 
     public void init() {
         if (scene != null) {
-            scene.getNodeManager().createNode(FunctionBeginNode.class, this).setPosition(350, 250);
+         //   scene.getNodeManager().createNode(FunctionBeginNode.class, this).setPosition(350, 250);
 
-            FunctionReturnNode node = scene.getNodeManager().createNode(FunctionReturnNode.class, this);
-            node.setPosition(600, 250);
-            node.removeCloseButton();
+        //    FunctionReturnNode node = scene.getNodeManager().createNode(FunctionReturnNode.class, this);
+          //  node.setPosition(600, 250);
+          //  node.removeCloseButton();
         }
     }
 
@@ -249,7 +248,7 @@ public class Function {
                     float w = getStage().getWidth() / 2;
                     float h = getStage().getHeight() / 2;
                     InputForm inputForm =
-                            new InputForm("function name", function::getName, function::setName);
+                            new InputForm("function title", function::getName, function::setName);
                     inputForm.setPosition(w - inputForm.getWidth() / 2, h);
                     getStage().addActor(inputForm);
                     inputForm.focus();
@@ -268,7 +267,7 @@ public class Function {
             });
 
             VisTable header = new VisTable();
-            header.add(new VisLabel("name: ")).growY();
+            header.add(new VisLabel("title: ")).growY();
             header.add(functionName).grow();
             header.add(deleteFunction).row();
 

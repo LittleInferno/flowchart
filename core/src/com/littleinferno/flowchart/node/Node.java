@@ -17,7 +17,6 @@ import com.littleinferno.flowchart.codegen.CodeGen;
 import com.littleinferno.flowchart.pin.Pin;
 import com.littleinferno.flowchart.project.Project;
 import com.littleinferno.flowchart.scene.Scene;
-import com.littleinferno.flowchart.util.ClassHandle;
 
 import java.util.List;
 
@@ -29,16 +28,17 @@ public abstract class Node extends VisWindow implements CodeGen {
     private NodeHandle nodeHandle;
 
     public Node(NodeHandle nodeHandle) {
-        super(nodeHandle.name);
+        super("");
+
+        left = new VerticalGroup();
+        right = new VerticalGroup();
+    }
+
+    public Node() {
+        super("");
 
         getTitleLabel().setAlignment(Align.center);
 
-        this.nodeHandle = nodeHandle;
-        this.nodeHandle.className = this.getClass().getName();
-
-        setPosition(nodeHandle.x, nodeHandle.y);
-
-        setName(nodeHandle.name);
         setKeepWithinStage(false);
         setKeepWithinParent(false);
 
@@ -47,10 +47,6 @@ public abstract class Node extends VisWindow implements CodeGen {
             setWidth(400);
         else
             setWidth(200);
-
-        if (nodeHandle.closable) {
-            addCloseButton();
-        }
 
         VisTable container = new VisTable();
         VisTable main = new VisTable();
@@ -70,6 +66,17 @@ public abstract class Node extends VisWindow implements CodeGen {
         add(main).grow();
         top();
 
+    }
+
+    Node initFromHandle(NodeHandle nodeHandle) {
+        this.nodeHandle = nodeHandle;
+        setPosition(nodeHandle.x, nodeHandle.y);
+        setName(nodeHandle.title);
+        setTitle(nodeHandle.title);
+        if (nodeHandle.closable) {
+            addCloseButton();
+        }
+        return this;
     }
 
     public Pin addDataInputPin(final String name, DataType... possibleConvert) {
@@ -213,22 +220,28 @@ public abstract class Node extends VisWindow implements CodeGen {
     }
 
     @SuppressWarnings("WeakerAccess")
-    static public class NodeHandle extends ClassHandle {
+    static public class NodeHandle {
         public float x, y;
-        public String name, id;
+        public String title;
+        public String name;
+        public String id;
         public boolean closable;
 
         public NodeHandle() {
         }
 
-        public NodeHandle(String name, boolean closable) {
-            this(0, 0, name, null, closable);
+        public NodeHandle(String title, boolean closable) {
+            this(title, closable, null);
         }
 
-        public NodeHandle(float x, float y, String name, String className, boolean closable) {
-            super(className);
+        public NodeHandle(String title, boolean closable, String name) {
+            this(0, 0, title, name, closable);
+        }
+
+        public NodeHandle(float x, float y, String title, String name, boolean closable) {
             this.x = x;
             this.y = y;
+            this.title = title;
             this.name = name;
             this.id = Project.createID().toString();
             this.closable = closable;

@@ -3,9 +3,9 @@ package com.littleinferno.flowchart.node;
 import com.annimon.stream.Stream;
 import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonValue;
+import com.littleinferno.flowchart.plugin.NodePluginManager;
 import com.littleinferno.flowchart.project.Project;
 import com.littleinferno.flowchart.scene.Scene;
-import com.littleinferno.flowchart.util.SerializeHelper;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -29,21 +29,42 @@ public class NodeManager {
         Stream.of(nodes).forEach(node -> scene.addActor(node));
     }
 
-    public PluginNode getBeginNode() {
+    public Node createNode(String type) {
+        return createNode(scene.getProject().getNodePluginManager().getNodeHandle(type));
+    }
+
+    public Node createNode(String type, Node.NodeHandle nodeHandle) {
+        return createNode(Project.instance().getNodePluginManager().getNodeHandle(type), nodeHandle);
+    }
+
+    private Node createNode(NodePluginManager.PluginNodeHandle handle) {
+        return createNode(handle, new Node.NodeHandle(handle.title, handle.closable, handle.name));
+    }
+
+    private Node createNode(NodePluginManager.PluginNodeHandle pluginHandle, Node.NodeHandle nodeHandle) {
+        return registerNode(getIfSingle(pluginHandle))
+                .initFromHandle(nodeHandle);
+    }
+
+    private Node getIfSingle(NodePluginManager.PluginNodeHandle handle) {
+        return handle.single ? getOrCreateNode(handle) : create(handle);
+    }
+
+    private Node getOrCreateNode(NodePluginManager.PluginNodeHandle handle) {
         return Stream.of(nodes)
-                .filter(scene -> scene.getName().equals("begin"))
+                .filter(value -> value instanceof PluginNode)
                 .map(PluginNode.class::cast)
+                .filter(value -> value.getPluginHandle().name.equals(handle.name))
+                .limit(1)
                 .findFirst()
-                .orElseGet(() -> registerNode(Project.instance().getNodePluginManager().getStartNode()));
+                .orElseGet(() -> create(handle));
     }
 
-    public <T extends Node> T createNode(Class<T> type, Object... args) {
-        T node = SerializeHelper.createObject(type, args);
-        registerNode(node);
-        return node;
+    private PluginNode create(NodePluginManager.PluginNodeHandle pluginHandle) {
+        return new PluginNode(pluginHandle);
     }
 
-    public <T extends Node> T registerNode(T node) {
+    private <T extends Node> T registerNode(T node) {
         nodes.add(node);
         if (scene != null)
             scene.addActor(node);
@@ -62,18 +83,18 @@ public class NodeManager {
                 .orElseThrow(() -> new RuntimeException("Cannot find node with id:" + id));
     }
 
+
     public static class NodeManagerSerializer implements Json.Serializer<NodeManager> {
         @Override
         public void write(Json json, NodeManager object, Class knownType) {
             json.writeObjectStart();
 
-            json.writeObjectStart("nodes");
 
-            Stream.of(object.nodes)
+            json.writeValue("nodes", Stream.of(object.nodes)
+                    .filter(value -> value instanceof PluginNode)
                     .map(Node::getHandle)
-                    .forEach(handle -> SerializeHelper.writeHandle(json, handle));
+                    .toArray());
 
-            json.writeObjectEnd();
 
             json.writeObjectEnd();
         }
@@ -82,12 +103,11 @@ public class NodeManager {
         public NodeManager read(Json json, JsonValue jsonData, Class type) {
 
             NodeManager nodeManager = new NodeManager();
-            JsonValue data = jsonData.get("nodes");
 
-            for (JsonValue valueMap = data.child; valueMap != null; valueMap = valueMap.next) {
-                SerializeHelper.Pair read = SerializeHelper.readHandle(json, valueMap);
-                nodeManager.createNode(read.type, read.classHandle);
-            }
+            //noinspection unchecked
+            List<Node.NodeHandle> list = json.readValue(List.class, Node.NodeHandle.class, jsonData.child());
+
+            Stream.of(list).forEach(f -> nodeManager.createNode(f.name, f));
 
             return nodeManager;
         }

@@ -89,6 +89,9 @@ public class Project extends BaseManager {
         this.name = projectHandle.name;
         this.location = projectHandle.location;
 
+        this.nodePluginManager = new NodePluginManager();
+        this.nodePluginManager.addPlugins(Gdx.files.internal("plugins"));
+
         jsonManger = new JsonManger();
         initJsonManager();
 
@@ -206,8 +209,8 @@ public class Project extends BaseManager {
 
     public void runProgram() {
         String code = variableManager.gen(codeGenerator) +
-                functionManager.gen(codeGenerator) +
-                nodePluginManager.getStartNode().gen(codeGenerator, null);
+                functionManager.gen(codeGenerator);// +
+                //nodePluginManager.getStartNode().gen(codeGenerator, null);
 
         System.out.println(code);
         codeExecution.setCode(code);
