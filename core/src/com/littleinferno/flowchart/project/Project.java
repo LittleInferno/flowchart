@@ -56,12 +56,12 @@ public class Project extends BaseManager {
 
         this.name = name;
         this.location = location.child(name);
-
-        if (!this.location.exists())
-            this.location.mkdirs();
+        this.location.mkdirs();
+        this.location.child("lib").mkdirs();
 
         this.nodePluginManager = new NodePluginManager();
         this.nodePluginManager.addPlugins(Gdx.files.internal("plugins"));
+
 
         this.codeGenerator = codeGenerator;
         this.codeExecution = codeExecution;
@@ -72,7 +72,6 @@ public class Project extends BaseManager {
         this.jsonManger = new JsonManger();
 
         this.uiScene = new UIScene(this);
-        //   uiScene.init();
         this.projectScreen = new ProjectScreen(uiScene);
     }
 
@@ -91,6 +90,7 @@ public class Project extends BaseManager {
 
         this.nodePluginManager = new NodePluginManager();
         this.nodePluginManager.addPlugins(Gdx.files.internal("plugins"));
+        this.nodePluginManager.addPlugins(location.child("lib"));
 
         jsonManger = new JsonManger();
         initJsonManager();
