@@ -6,11 +6,12 @@ var NativeGenerator = com.littleinferno.flowchart.codegen.JSCodeGenerator;
 var NativeCell = com.badlogic.gdx.scenes.scene2d.ui.Cell;
 var NativeCell = com.badlogic.gdx.scenes.scene2d.ui.Cell;
 var NativeTextField = com.kotcrab.vis.ui.widget.VisTextField;
+var NativeSelectBox = com.kotcrab.vis.ui.widget.VisSelectBox;
 
 var codegen = new NativeGenerator();
 
 function exportNodes() {
-    return [ifNode(), beginNode(), printNode(), integerNode(), floatNode(), stringNode()];
+    return [ifNode(), beginNode(), printNode(), integerNode(), floatNode(), stringNode(), boolNode()];
 }
 
 function ifNode() {
@@ -176,6 +177,30 @@ function stringNode() {
             {
                 name: "data",
                 type: NativeType.FLOAT,
+                connection: NativeConnection.OUTPUT
+            }
+        ],
+    }
+}
+
+function boolNode() {
+    return {
+        name: "bool node",
+        title: "bool",
+        init: function (node) {
+            var field = new NativeSelectBox();
+            field.setName("field");
+            field.setItems("True", "False");
+            node.getContainer().add(field).colspan(2).growX();
+            node.pack();
+        },
+        gen: function (node) {
+            return node.findActor("field").getSelectedIndex() == 0 ? "true" : "false";
+        },
+        pins: [
+            {
+                name: "data",
+                type: NativeType.BOOL,
                 connection: NativeConnection.OUTPUT
             }
         ],

@@ -22,8 +22,6 @@ class NodeTable extends VisTable {
         Set<String> nodeList = sceneUi.getProject().getNodePluginManager().getNodeList();
 
 //        String[] items = new String[]{
-//                BoolNode.class.getName(),
-//
 //                MakeArrayNode.class.getName(),
 //                ArrayAddNode.class.getName(),
 //                ArrayGetNode.class.getName(),
