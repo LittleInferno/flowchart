@@ -23,7 +23,7 @@ public class JSCodeGenerator implements BaseCodeGenerator {
 
     @Override
     public String makeString(String str) {
-        return makeExpr("\n" + str + "\"");
+        return makeExpr("\"" + str + "\"");
     }
 
     @Override
