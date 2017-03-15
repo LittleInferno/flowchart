@@ -4,8 +4,6 @@ import com.annimon.stream.Stream;
 import com.badlogic.gdx.files.FileHandle;
 import com.littleinferno.flowchart.Connection;
 import com.littleinferno.flowchart.DataType;
-import com.littleinferno.flowchart.node.Node;
-import com.littleinferno.flowchart.node.PluginNode;
 import com.littleinferno.flowchart.pin.Pin;
 
 import org.mozilla.javascript.Context;
@@ -15,15 +13,15 @@ import org.mozilla.javascript.NativeObject;
 import org.mozilla.javascript.Scriptable;
 import org.mozilla.javascript.ScriptableObject;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 public class NodePluginManager {
 
-    private Map<String, PluginNodeHandle> handles;
+    private Map<String, PluginHandle> handles;
 
     private static Context rhino;
 
@@ -46,14 +44,14 @@ public class NodePluginManager {
 
         Function fct = (Function) scope.get("exportNodes", scope);
         NativeArray result = (NativeArray) fct.call(rhino, scope, scope, new Object[]{});
-        registerNodes(result);
+        registerNodes(file.nameWithoutExtension(), result);
     }
 
-    private void registerNodes(NativeArray object) {
-        for (Object i : object) registerNode((ScriptableObject) i);
+    private void registerNodes(String pluginName, NativeArray object) {
+        for (Object i : object) registerNode(pluginName, (ScriptableObject) i);
     }
 
-    public void registerNode(ScriptableObject object) {
+    public void registerNode(String pluginName, ScriptableObject object) {
         PluginNodeHandle nodeHandle = new PluginNodeHandle();
 
         nodeHandle.name = (String) object.get("name");
@@ -80,7 +78,15 @@ public class NodePluginManager {
 
         nodeHandle.pins = Stream.of(pins).map(this::objectToPin).toArray(Pin[]::new);
 
-        handles.put(nodeHandle.name, nodeHandle);
+        if (handles.keySet().contains(pluginName))
+            handles.get(pluginName).handles.add(nodeHandle);
+        else {
+            PluginHandle pluginHandle = new PluginHandle(pluginName);
+            pluginHandle.handles.add(nodeHandle);
+            handles.put(pluginName, pluginHandle);
+
+        }
+
     }
 
     private Pin objectToPin(NativeObject object) {
@@ -99,16 +105,21 @@ public class NodePluginManager {
         return new Pin(null, name, connection, types);
     }
 
-    public Set<String> getNodeList() {
-        return handles.keySet();
+    public String[] getNodeList() {
+        return Stream.of(handles)
+                .map(Map.Entry::getValue)
+                .flatMap(handle -> Stream.of(handle.getNodeList("any")))
+                .toArray(String[]::new);
     }
 
-    public Node createNode(String type) {
-        return new PluginNode(new PluginNodeHandle(handles.get(type)));
-    }
-
-    public PluginNodeHandle getNodeHandle(String type) {
-        return new PluginNodeHandle(handles.get(type));
+    public PluginNodeHandle getNodeHandle(String nodeType, String sceneType) {
+        return new PluginNodeHandle(Stream.of(handles)
+                .map(Map.Entry::getValue)
+                .flatMap(handle -> Stream.of(handle.handles))
+                .filter(handle -> handle.name.equals(nodeType))
+                .filter(handle -> handle.sceneType.equals(sceneType) || handle.sceneType.equals("any"))
+                .findFirst()
+                .orElseThrow(() -> new RuntimeException("cannoot find node:" + nodeType + " scene type:" + sceneType)));
     }
 
     private static Scriptable getScope() {
@@ -119,6 +130,22 @@ public class NodePluginManager {
         return rhino;
     }
 
+    private static class PluginHandle {
+        final String name;
+        final List<PluginNodeHandle> handles;
+
+        PluginHandle(String name) {
+            this.name = name;
+            this.handles = new ArrayList<>();
+        }
+
+        public String[] getNodeList(String sceneType) {
+            return Stream.of(handles)
+                    .filter(value -> value.sceneType.equals(sceneType))
+                    .map(value -> value.name)
+                    .toArray(String[]::new);
+        }
+    }
 
     public static class PluginNodeHandle {
         public String title;
@@ -163,7 +190,7 @@ public class NodePluginManager {
 
         public Object call(Object... args) {
             if (function != null)
-            return Context.jsToJava(function.call(getContext(), getScope(), getScope(), args), Object.class);
+                return Context.jsToJava(function.call(getContext(), getScope(), getScope(), args), Object.class);
             return null;
         }
     }

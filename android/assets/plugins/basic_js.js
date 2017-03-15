@@ -8,8 +8,6 @@ var NativeCell = com.badlogic.gdx.scenes.scene2d.ui.Cell;
 var NativeTextField = com.kotcrab.vis.ui.widget.VisTextField;
 var NativeSelectBox = com.kotcrab.vis.ui.widget.VisSelectBox;
 
-var codegen = new NativeGenerator();
-
 function exportNodes() {
     return [ifNode(), beginNode(), printNode(), integerNode(), floatNode(), stringNode(), boolNode()];
 }
@@ -18,7 +16,7 @@ function ifNode() {
     return {
         name: "if node",
         title: "if",
-        gen: function (node) {
+        gen: function (node, codegen) {
             var conditionStr = node.getPin("condition").generate(codegen);
             var trueString = node.getPin("True").generate(codegen);
             var falseString = node.getPin("False").isConnect() ? node.getPin("False").generate(codegen) : "";
@@ -61,7 +59,7 @@ function beginNode() {
     return {
         name: "begin node",
         title: "begin",
-        gen: function (node) {
+        gen: function (node, codegen) {
             return node.getPin("start").isConnect() ? node.getPin("start").generate(codegen) : "";
         },
         pins: [
@@ -73,7 +71,7 @@ function beginNode() {
         ],
         programstart: true,
         single: true,
-        sceneType: "main",
+      //  sceneType: "main",
         closable:false
     }
 }
@@ -82,7 +80,7 @@ function printNode() {
     return {
         name: "print node",
         title: "print",
-        gen: function (node) {
+        gen: function (node, codegen) {
 
             var valStr = node.getPin("item").generate(codegen);
 
@@ -123,8 +121,8 @@ function integerNode() {
             node.getContainer().add(field).colspan(2).growX();
             node.pack();
         },
-        gen: function (node) {
-            return node.findActor("field").getText();
+        gen: function (node, codegen) {
+            return codegen.makeExpr(node.findActor("field").getText());
         },
         pins: [
             {
@@ -147,8 +145,8 @@ function floatNode() {
         node.getContainer().add(field).colspan(2).growX();
         node.pack();
     },
-        gen: function (node) {
-            return node.findActor("field").getText();
+        gen: function (node, codegen) {
+            return codegen.makeExpr(node.findActor("field").getText());
         },
     pins: [
         {
@@ -170,13 +168,13 @@ function stringNode() {
             node.getContainer().add(field).colspan(2).growX();
             node.pack();
         },
-        gen: function (node) {
-            return codegen.makeString(node.findActor("field").getText());
+        gen: function (node, codegen) {
+            return codegen.makeExpr(codegen.makeString(node.findActor("field").getText()));
         },
         pins: [
             {
                 name: "data",
-                type: NativeType.FLOAT,
+                type: NativeType.STRING,
                 connection: NativeConnection.OUTPUT
             }
         ],
@@ -194,7 +192,7 @@ function boolNode() {
             node.getContainer().add(field).colspan(2).growX();
             node.pack();
         },
-        gen: function (node) {
+        gen: function (node, codegen) {
             return node.findActor("field").getSelectedIndex() == 0 ? "true" : "false";
         },
         pins: [

@@ -10,7 +10,7 @@ public class FunctionScene extends Scene {
 
     @SuppressWarnings("unused")
     public FunctionScene(Function function, Project project) {
-        super(new FunctionSceneHandle(new NodeManager(), function.getName(), function.getName()), project);
+        super(new FunctionSceneHandle(new NodeManager.NodeManagerHandle(), function.getName(), function.getName()), project);
         function.addListener(newName -> {
             setName(newName);
             UiTab uiTab = getUiTab();
@@ -54,7 +54,7 @@ public class FunctionScene extends Scene {
         public FunctionSceneHandle() {
         }
 
-        public FunctionSceneHandle(NodeManager nodeManager, String name, String functionName) {
+        public FunctionSceneHandle(NodeManager.NodeManagerHandle nodeManager, String name, String functionName) {
             super(nodeManager, name, true);
             this.functionName = functionName;
         }

@@ -3,8 +3,6 @@ var NativeType = com.littleinferno.flowchart.DataType;
 var NativeConnection = com.littleinferno.flowchart.Connection;
 var NativeGenerator = com.littleinferno.flowchart.codegen.JSCodeGenerator;
 
-var codegen = new NativeGenerator();
-
 function exportNodes() {
     return [addNode(), subNode(), mulNode(), divNode(), equalNode(), lessNode(), greatNode()];
 }
@@ -13,7 +11,7 @@ function addNode() {
     return {
         name: "add node",
         title: "add",
-        gen: function (node) {
+        gen: function (node, codegen) {
             return codegen.makeAdd(node.getPin("a"), node.getPin("b"));
         },
         pins: [
@@ -41,7 +39,7 @@ function subNode() {
     return {
         name: "sub node",
         title: "sub",
-        gen: function (node) {
+        gen: function (node, codegen) {
             return codegen.makeSub(node.getPin("a"), node.getPin("b"));
         },
         pins: [
@@ -69,7 +67,7 @@ function mulNode() {
     return {
         name: "mul node",
         title: "mul",
-        gen: function (node) {
+        gen: function (node, codegen) {
             return codegen.makeMul(node.getPin("a"), node.getPin("b"));
         },
         pins: [
@@ -97,7 +95,7 @@ function divNode() {
     return {
         name: "div node",
         title: "div",
-        gen: function (node) {
+        gen: function (node, codegen) {
             return codegen.makeAdd(node.getPin("a"), node.getPin("b"));
         },
         pins: [
@@ -125,7 +123,7 @@ function equalNode() {
     return {
         name: "equal node",
         title: "equal",
-        gen: function (node) {
+        gen: function (node, codegen) {
             return codegen.makeEq(node.getPin("a"), node.getPin("b"));
         },
         pins: [
@@ -153,7 +151,7 @@ function lessNode() {
     return {
         name: "less node",
         title: "less",
-        gen: function (node) {
+        gen: function (node, codegen) {
             return codegen.makeLt(node.getPin("a"), node.getPin("b"));
         },
         pins: [
@@ -181,7 +179,7 @@ function greatNode() {
     return {
         name: "great node",
         title: "great",
-        gen: function (node) {
+        gen: function (node, codegen) {
             return codegen.makeGt(node.getPin("a"), node.getPin("b"));
         },
         pins: [

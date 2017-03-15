@@ -27,7 +27,7 @@ public class SceneManager extends ProjectManager {
     }
 
     private MainScene createMain() {
-        return createScene(MainScene.class, new NodeManager(), Project.instance());
+        return createScene(MainScene.class, new NodeManager.NodeManagerHandle(), Project.instance());
     }
 
     public <T extends Scene> T createScene(Class<T> type, Object... args) {

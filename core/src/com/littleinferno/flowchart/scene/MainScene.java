@@ -17,7 +17,7 @@ public class MainScene extends Scene {
     }
 
     @SuppressWarnings("unused")
-    public MainScene(NodeManager nodeManager, Project project) {
+    public MainScene(NodeManager.NodeManagerHandle nodeManager, Project project) {
         this(new SceneHandle(nodeManager, "main", false), project);
     }
 }

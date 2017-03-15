@@ -10,7 +10,7 @@ import com.kotcrab.vis.ui.widget.VisLabel;
 import com.kotcrab.vis.ui.widget.VisTable;
 
 import java.util.ArrayList;
-import java.util.Set;
+import java.util.Collections;
 
 class NodeTable extends VisTable {
 
@@ -19,7 +19,7 @@ class NodeTable extends VisTable {
     NodeTable(UIScene sceneUi) {
         super(true);
         this.sceneUi = sceneUi;
-        Set<String> nodeList = sceneUi.getProject().getNodePluginManager().getNodeList();
+        String[] nodeList = sceneUi.getProject().getNodePluginManager().getNodeList();
 
 //        String[] items = new String[]{
 //                MakeArrayNode.class.getName(),
@@ -30,7 +30,7 @@ class NodeTable extends VisTable {
 //        };
 
         ArrayList<String> array = new ArrayList<>();
-        array.addAll(nodeList);
+        Collections.addAll(array, nodeList);
 
         NodeAdapter adapter = new NodeAdapter(array);
         ListView<String> view = new ListView<>(adapter);
@@ -62,9 +62,7 @@ class NodeTable extends VisTable {
             final VisTable table = new VisTable();
             table.left();
 
-            String[] strings = item.split("[.]");
-
-            final VisLabel it = new VisLabel(strings[strings.length - 1]);
+            final VisLabel it = new VisLabel(item);
 
             sceneUi.addDragAndDropSource(new DragAndDrop.Source(table) {
                 @Override

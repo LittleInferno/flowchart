@@ -11,7 +11,6 @@ import com.littleinferno.flowchart.codegen.JSCodeGenerator;
 import com.littleinferno.flowchart.function.FunctionManager;
 import com.littleinferno.flowchart.gui.ProjectScreen;
 import com.littleinferno.flowchart.gui.UIScene;
-import com.littleinferno.flowchart.node.NodeManager;
 import com.littleinferno.flowchart.plugin.NodePluginManager;
 import com.littleinferno.flowchart.scene.MainScene;
 import com.littleinferno.flowchart.scene.Scene;
@@ -120,7 +119,6 @@ public class Project extends BaseManager {
     }
 
     private void initJsonManager() {
-        jsonManger.addSerializer(NodeManager.class, new NodeManager.NodeManagerSerializer());
         jsonManger.addSerializer(SceneManager.class, new SceneManager.SceneManagerSerializer());
 
     }

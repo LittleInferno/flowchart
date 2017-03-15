@@ -17,6 +17,14 @@ public class NodeManager {
 
     private Scene scene;
 
+    public NodeManager(Scene scene, NodeManagerHandle nodeManagerHandle) {
+        this.scene = scene;
+        this.nodes = new ArrayList<>();
+
+        Stream.of(nodeManagerHandle.nodes)
+                .forEach(handle -> createNode(handle.name, handle));
+    }
+
     public NodeManager() {
         nodes = new ArrayList<>();
     }
@@ -31,11 +39,11 @@ public class NodeManager {
     }
 
     public Optional<Node> createNode(String type) {
-        return createNode(scene.getProject().getNodePluginManager().getNodeHandle(type));
+        return createNode(scene.getProject().getNodePluginManager().getNodeHandle(type, scene.getType()));
     }
 
     private Node createNode(String type, Node.NodeHandle nodeHandle) {
-        return createNode(Project.instance().getNodePluginManager().getNodeHandle(type), nodeHandle);
+        return createNode(Project.instance().getNodePluginManager().getNodeHandle(type, scene.getType()), nodeHandle);
     }
 
     private Optional<Node> createNode(NodePluginManager.PluginNodeHandle handle) {
@@ -88,7 +96,6 @@ public class NodeManager {
                 .orElseThrow(() -> new RuntimeException("Cannot find node with id:" + id));
     }
 
-
     public Optional<Node> getStartNode() {
         return Stream.of(nodes)
                 .filter(value -> value instanceof PluginNode) // TODO renmove it
@@ -97,6 +104,24 @@ public class NodeManager {
                 .limit(1)
                 .map(Node.class::cast)        // TODO renmove it
                 .findFirst();
+    }
+
+    public NodeManagerHandle getHandle() {
+        return new NodeManagerHandle(Stream.of(nodes).map(Node::getHandle).toList());
+    }
+
+
+    @SuppressWarnings("WeakerAccess")
+    public static class NodeManagerHandle {
+        public List<Node.NodeHandle> nodes;
+
+        public NodeManagerHandle() {
+            nodes = new ArrayList<>();
+        }
+
+        public NodeManagerHandle(List<Node.NodeHandle> nodes) {
+            this.nodes = nodes;
+        }
     }
 
     public static class NodeManagerSerializer implements Json.Serializer<NodeManager> {

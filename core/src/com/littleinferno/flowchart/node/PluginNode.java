@@ -21,7 +21,7 @@ public class PluginNode extends Node {
 
     @Override
     public String gen(BaseCodeGenerator builder, Pin with) {
-        return (String) handle.codegen.call(this);
+        return (String) handle.codegen.call(this, builder);
     }
 
     NodePluginManager.PluginNodeHandle getPluginHandle() {

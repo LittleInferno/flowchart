@@ -39,7 +39,7 @@ public abstract class Scene extends ProjectStage {
 
         gesture = new GestureDetector(new Gesture());
 
-        this.nodeManager = sceneHandle.nodeManager;
+        this.nodeManager = new NodeManager(this, sceneHandle.nodeManagerHandle);
         this.nodeManager.setScene(this);
 
         wireManager = new WireManager(this);
@@ -71,7 +71,7 @@ public abstract class Scene extends ProjectStage {
                 } else {
                     Optional<Node> node = getNodeManager().createNode((String) object);
                     Vector2 v = vec;
-                    node.ifPresent(n->n.setPosition(v.x, v.y));
+                    node.ifPresent(n -> n.setPosition(v.x, v.y));
                 }
             }
         });
@@ -105,6 +105,7 @@ public abstract class Scene extends ProjectStage {
     public SceneHandle getHandle() {
         sceneHandle.name = name;
         sceneHandle.wireManagerHandle = wireManager.getHandle();
+        sceneHandle.nodeManagerHandle = nodeManager.getHandle();
         return sceneHandle;
     }
 
@@ -171,7 +172,7 @@ public abstract class Scene extends ProjectStage {
 
     @SuppressWarnings("WeakerAccess")
     public static class SceneHandle extends ClassHandle {
-        public NodeManager nodeManager;
+        public NodeManager.NodeManagerHandle nodeManagerHandle;
         public WireManager.WireManagerHandle wireManagerHandle;
         public String name;
         public boolean closable;
@@ -179,13 +180,13 @@ public abstract class Scene extends ProjectStage {
         public SceneHandle() {
         }
 
-        public SceneHandle(NodeManager nodeManager, String name, boolean closeable) {
-            this(null, nodeManager, null, name, closeable);
+        public SceneHandle(NodeManager.NodeManagerHandle nodeManagerHandle, String name, boolean closeable) {
+            this(null, nodeManagerHandle, null, name, closeable);
         }
 
-        public SceneHandle(String className, NodeManager nodeManager, WireManager.WireManagerHandle wireManagerHandle, String name, boolean closable) {
+        public SceneHandle(String className, NodeManager.NodeManagerHandle nodeManagerHandle, WireManager.WireManagerHandle wireManagerHandle, String name, boolean closable) {
             super(className);
-            this.nodeManager = nodeManager;
+            this.nodeManagerHandle = nodeManagerHandle;
             this.wireManagerHandle = wireManagerHandle;
             this.name = name;
             this.closable = closable;
