@@ -112,6 +112,10 @@ public class NodePluginManager {
                 .toArray(String[]::new);
     }
 
+    public List<PluginHandle> getHandles() {
+        return Stream.of(handles).map(Map.Entry::getValue).toList();
+    }
+
     public PluginNodeHandle getNodeHandle(String nodeType, String sceneType) {
         return new PluginNodeHandle(Stream.of(handles)
                 .map(Map.Entry::getValue)
@@ -130,7 +134,7 @@ public class NodePluginManager {
         return rhino;
     }
 
-    private static class PluginHandle {
+    public static class PluginHandle {
         final String name;
         final List<PluginNodeHandle> handles;
 
@@ -144,6 +148,16 @@ public class NodePluginManager {
                     .filter(value -> value.sceneType.equals(sceneType))
                     .map(value -> value.name)
                     .toArray(String[]::new);
+        }
+
+        public String getName() {
+            return name;
+        }
+
+        public List<PluginNodeHandle> getHandles(String sceneType) {
+            return Stream.of(handles)
+                    .filter(value -> value.sceneType.equals(sceneType))
+                    .toList();
         }
     }
 
