@@ -3,11 +3,11 @@ package com.littleinferno.flowchart.screen;
 import com.annimon.stream.Stream;
 import com.badlogic.gdx.Screen;
 import com.littleinferno.flowchart.Application;
+import com.littleinferno.flowchart.util.Objects;
 import com.littleinferno.flowchart.util.managers.AbstactManager;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Objects;
 
 public class ScreenManager extends AbstactManager {
 

@@ -1,18 +1,17 @@
-package com.littleinferno.flowchart.gui.menu;
+package com.littleinferno.flowchart.gui.menu.openproject;
 
 import com.badlogic.gdx.files.FileHandle;
 import com.kotcrab.vis.ui.widget.ListView;
 import com.kotcrab.vis.ui.widget.VisTable;
 import com.littleinferno.flowchart.project.Project;
-import com.littleinferno.flowchart.util.Files;
 
 import java.util.ArrayList;
 
-class ProjectsTable extends VisTable {
+public class ProjectsTable extends VisTable {
 
-    ProjectsTable() {
+    public ProjectsTable() {
 
-        ArrayList<FileHandle> projects = Files.getProjects();
+        ArrayList<FileHandle> projects =null;// Files.getProjects();
         ProjectListAdapter adapter = new ProjectListAdapter(projects);
         ListView<FileHandle> listView = new ListView<>(adapter);
 

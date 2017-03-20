@@ -1,4 +1,4 @@
-package com.littleinferno.flowchart.gui.menu;
+package com.littleinferno.flowchart.gui.menu.openproject;
 
 import com.badlogic.gdx.files.FileHandle;
 import com.kotcrab.vis.ui.widget.VisLabel;
