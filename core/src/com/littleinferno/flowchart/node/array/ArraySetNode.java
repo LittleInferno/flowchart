@@ -13,11 +13,11 @@ public class ArraySetNode extends Node {
     private Pin item;
 
     public ArraySetNode() {
-        this(new Node.NodeHandle("Get", true));
+        this(new NodeParams("Get", true));
     }
 
-    public ArraySetNode(Node.NodeHandle nodeHandle) {
-        super(nodeHandle);
+    public ArraySetNode(NodeParams nodeParams) {
+        super(nodeParams);
 
         next = addExecutionOutputPin();
 

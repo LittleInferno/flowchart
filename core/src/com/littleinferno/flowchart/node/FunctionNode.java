@@ -3,6 +3,8 @@ package com.littleinferno.flowchart.node;
 import com.littleinferno.flowchart.function.Function;
 import com.littleinferno.flowchart.project.Project;
 
+import java.util.HashMap;
+
 public abstract class FunctionNode extends Node {
 
     protected Function function;
@@ -16,7 +18,7 @@ public abstract class FunctionNode extends Node {
         return function;
     }
 
-    static class FunctionNodeHandle extends NodeHandle {
+    static class FunctionNodeHandle extends NodeParams {
         public String funName;
 
         public FunctionNodeHandle() {
@@ -28,7 +30,7 @@ public abstract class FunctionNode extends Node {
         }
 
         public FunctionNodeHandle(float x, float y, String className, String id, String funName) {
-            super(x, y, className, id, true);
+            super(x, y, className, id, true, new HashMap<>());
             this.funName = funName;
         }
     }

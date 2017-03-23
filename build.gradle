@@ -74,6 +74,8 @@ project(":core") {
         compile "com.badlogicgames.gdx:gdx:$gdxVersion"
         compile "com.kotcrab.vis:vis-ui:$visuiVersion"
         compile 'com.annimon:stream:1.1.5'
+        compile 'com.google.code.gson:gson:2.8.0'
+        compile 'io.reactivex.rxjava2:rxjava:2.0.7'
         compile group: 'org.mozilla', name: 'rhino', version: '1.7.7.1'
     }
 }

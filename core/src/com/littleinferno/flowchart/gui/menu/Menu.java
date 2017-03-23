@@ -8,14 +8,16 @@ import com.badlogic.gdx.scenes.scene2d.ui.VerticalGroup;
 import com.kotcrab.vis.ui.VisUI;
 import com.kotcrab.vis.ui.widget.VisTable;
 import com.kotcrab.vis.ui.widget.VisTextButton;
+import com.littleinferno.flowchart.gui.menu.openproject.ProjectsTable;
 import com.littleinferno.flowchart.util.EventWrapper;
 
 public class Menu extends Stage {
 
     private final VisTable main;
 
-    private VisTextButton createProject;
-    private VisTextButton loadProject;
+    private final VisTextButton createProject;
+    private final VisTextButton loadProject;
+    private final VisTextButton plugins;
 
     public Menu() {
 
@@ -26,6 +28,7 @@ public class Menu extends Stage {
 
         createProject = new VisTextButton("create new");
         loadProject = new VisTextButton("load");
+        plugins = new VisTextButton("plugins");
 
         ButtonGroup<VisTextButton> buttonGroup = new ButtonGroup<>(createProject, loadProject);
         buttonGroup.setMaxCheckCount(1);
@@ -34,11 +37,11 @@ public class Menu extends Stage {
         VerticalGroup verticalGroup = new VerticalGroup();
         verticalGroup.addActor(createProject);
         verticalGroup.addActor(loadProject);
-
+        verticalGroup.addActor(plugins);
 
         main.add(verticalGroup).left().growY();//.row();
 
-        this.addActor(main);
+        addActor(main);
 
         Stack stack = new Stack();
         ProjectsTable projectsTable = new ProjectsTable();
@@ -56,7 +59,7 @@ public class Menu extends Stage {
             projectsTable.setVisible(loadProject.isChecked());
 
         }));
-        setDebugAll(true);
+
     }
 
 

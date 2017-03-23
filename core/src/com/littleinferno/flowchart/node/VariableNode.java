@@ -12,7 +12,7 @@ public abstract class VariableNode extends Node {
         this.variable = Project.instance().getVariableManager().getVariable(nodeHandle.varName);
     }
 
-    static class VariableNodeHandle extends NodeHandle {
+    static class VariableNodeHandle extends Node.NodeParams {
         public String varName;
 
         public VariableNodeHandle() {
@@ -24,7 +24,7 @@ public abstract class VariableNode extends Node {
         }
 
         public VariableNodeHandle(float x, float y, String className, String id, String varName) {
-            super(x, y, className, id, true);
+            super(x, y, className, id, true, null);
             this.varName = varName;
         }
     }

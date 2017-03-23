@@ -58,7 +58,7 @@ public class Pin extends VisTable {
 
     public Pin(Pin other) {
         setStyle(other.style);
-        this.possibleConvert = new HashSet<>(other.possibleConvert);
+        this.possibleConvert = other.possibleConvert;
         init(other.parent, other.getName(), other.connection, other.type);
         this.isArray = other.isArray;
     }
@@ -336,11 +336,11 @@ public class Pin extends VisTable {
 //
 //        ConverterNode converter;
 //        if (getConnection() == Connection.INPUT.INPUT) {
-//            converter = new ConverterNode(second.getType(), first.getType(), getSkin());
+//            converter = new ConverterNode(second.getOperator(), first.getOperator(), getSkin());
 //            converter.getPin("from").connect(second);
 //            converter.getPin("to").connect(first);
 //        } else {
-//            converter = new ConverterNode(first.getType(), second.getType(), getSkin());
+//            converter = new ConverterNode(first.getOperator(), second.getOperator(), getSkin());
 //            converter.getPin("from").connect(first);
 //            converter.getPin("to").connect(second);
 //        }

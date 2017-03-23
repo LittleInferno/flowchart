@@ -18,7 +18,9 @@ import com.littleinferno.flowchart.pin.Pin;
 import com.littleinferno.flowchart.project.Project;
 import com.littleinferno.flowchart.scene.Scene;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public abstract class Node extends VisWindow implements CodeGen {
 
@@ -26,9 +28,9 @@ public abstract class Node extends VisWindow implements CodeGen {
     protected final VerticalGroup right;
     private final VisTable container;
 
-    private NodeHandle nodeHandle;
+    private NodeParams nodeParams;
 
-    public Node(NodeHandle nodeHandle) {
+    public Node(NodeParams nodeParams) {
         super("");
 
         left = new VerticalGroup();
@@ -68,12 +70,12 @@ public abstract class Node extends VisWindow implements CodeGen {
         top();
     }
 
-    Node initFromHandle(NodeHandle nodeHandle) {
-        this.nodeHandle = nodeHandle;
-        setPosition(nodeHandle.x, nodeHandle.y);
-        setName(nodeHandle.title);
-        setTitle(nodeHandle.title);
-        if (nodeHandle.closable) {
+    Node initFromHandle(NodeParams nodeParams) {
+        this.nodeParams = nodeParams;
+        setPosition(nodeParams.x, nodeParams.y);
+        setName(nodeParams.title);
+        setTitle(nodeParams.title);
+        if (nodeParams.closable) {
             addCloseButton();
         }
         return this;
@@ -208,14 +210,14 @@ public abstract class Node extends VisWindow implements CodeGen {
         return container;
     }
 
-    public NodeHandle getHandle() {
-        nodeHandle.x = getX();
-        nodeHandle.y = getY();
-        return nodeHandle;
+    public NodeParams getHandle() {
+        nodeParams.setX(getX());
+        nodeParams.setY(getY());
+        return nodeParams;
     }
 
     public String getId() {
-        return nodeHandle.id;
+        return nodeParams.id;
     }
 
     @Override
@@ -224,31 +226,77 @@ public abstract class Node extends VisWindow implements CodeGen {
     }
 
     @SuppressWarnings("WeakerAccess")
-    static public class NodeHandle {
-        public float x, y;
-        public String title;
-        public String name;
-        public String id;
-        public boolean closable;
+    static public class NodeParams {
+        private float x, y;
+        private String title;
+        private String type;
+        private String id;
+        private boolean closable;
 
-        public NodeHandle() {
+        private Map<String, Object> attributes;
+
+        NodeParams() {
+
         }
 
-        public NodeHandle(String title, boolean closable) {
+        public NodeParams(String title, boolean closable) {
             this(title, closable, null);
         }
 
-        public NodeHandle(String title, boolean closable, String name) {
-            this(0, 0, title, name, closable);
+        public NodeParams(String title, boolean closable, String type) {
+            this(0, 0, title, type, closable, new HashMap<>());
         }
 
-        public NodeHandle(float x, float y, String title, String name, boolean closable) {
+        public NodeParams(float x, float y, String title, String type, boolean closable, Map<String, Object> attributes) {
             this.x = x;
             this.y = y;
             this.title = title;
-            this.name = name;
+            this.type = type;
+            this.attributes = attributes;
             this.id = Project.createID().toString();
             this.closable = closable;
+        }
+
+        public float getX() {
+            return x;
+        }
+
+        public float getY() {
+            return y;
+        }
+
+        public String getTitle() {
+            return title;
+        }
+
+        public String getType() {
+            return type;
+        }
+
+        public String getId() {
+            return id;
+        }
+
+        public boolean isClosable() {
+            return closable;
+        }
+
+        public void addAttr(String key, Object attr) {
+            attributes.put(key, attr);
+        }
+
+        public Object getAttr(String key) {
+            return attributes.get(key);
+        }
+
+        public NodeParams setX(float x) {
+            this.x = x;
+            return this;
+        }
+
+        public NodeParams setY(float y) {
+            this.y = y;
+            return this;
         }
     }
 

@@ -69,6 +69,13 @@ public class VariableManager extends ProjectManager {
                         new RuntimeException("Cannot find varable with title:\"" + name + "\""));
     }
 
+    public List<String> getVariableNames() {
+        return Stream
+                .of(variables)
+                .map(Variable::getName)
+                .toList();
+    }
+
     public String gen(BaseCodeGenerator builder) {
         return Stream.of(variables)
                 .map(variable -> variable.gen(builder))

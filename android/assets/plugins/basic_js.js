@@ -7,9 +7,11 @@ var NativeCell = com.badlogic.gdx.scenes.scene2d.ui.Cell;
 var NativeCell = com.badlogic.gdx.scenes.scene2d.ui.Cell;
 var NativeTextField = com.kotcrab.vis.ui.widget.VisTextField;
 var NativeSelectBox = com.kotcrab.vis.ui.widget.VisSelectBox;
+var NativeVariableManager = com.littleinferno.flowchart.variable.VariableManager;
+var NativeProject = com.littleinferno.flowchart.project.Project;
 
 function exportNodes() {
-    return [ifNode(), beginNode(), printNode(), integerNode(), floatNode(), stringNode(), boolNode()];
+    return [ifNode(), beginNode(), printNode(), integerNode(), floatNode(), stringNode(), boolNode(), variableSetNode()];
 }
 
 function ifNode() {
@@ -189,6 +191,30 @@ function boolNode() {
             var field = new NativeSelectBox();
             field.setName("field");
             field.setItems("True", "False");
+            node.getContainer().add(field).colspan(2).growX();
+            node.pack();
+        },
+        gen: function (node, codegen) {
+            return node.findActor("field").getSelectedIndex() == 0 ? "true" : "false";
+        },
+        pins: [
+            {
+                name: "data",
+                type: NativeType.BOOL,
+                connection: NativeConnection.OUTPUT
+            }
+        ],
+    }
+}
+
+function variableSetNode() {
+    return {
+        name: "variable set node",
+        title: "set variable",
+        init: function (node) {
+            var field = new NativeSelectBox();
+            field.setName("field");
+            field.setItems(NativeProject.instance().getVariableManager().getVariableNames().toArray());
             node.getContainer().add(field).colspan(2).growX();
             node.pack();
         },

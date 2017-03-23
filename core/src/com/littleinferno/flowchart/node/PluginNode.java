@@ -15,8 +15,8 @@ public class PluginNode extends Node {
         handle.init.call(this);
     }
 
-    public PluginNode(NodeHandle nodeHandle) {
-        super(nodeHandle);
+    public PluginNode(NodeParams nodeParams) {
+        super(nodeParams);
     }
 
     @Override

@@ -12,11 +12,11 @@ public class ArrayGetNode extends Node {
     private Pin item;
 
     public ArrayGetNode() {
-        this(new NodeHandle("Get", true));
+        this(new NodeParams("Get", true));
     }
 
-    public ArrayGetNode(NodeHandle nodeHandle) {
-        super(nodeHandle);
+    public ArrayGetNode(NodeParams nodeParams) {
+        super(nodeParams);
 
         array = addDataInputPin("array", Pin.DEFAULT_CONVERT);
         index = addDataInputPin("index", DataType.INT);

@@ -10,11 +10,11 @@ public class PrintArrayNode extends Node {
     private Pin value;
 
     public PrintArrayNode() {
-        this(new NodeHandle("print array", true));
+        this(new NodeParams("print array", true));
     }
 
-    public PrintArrayNode(NodeHandle nodeHandle) {
-        super(nodeHandle);
+    public PrintArrayNode(NodeParams nodeParams) {
+        super(nodeParams);
 
         next = addExecutionOutputPin();
         addExecutionInputPin();

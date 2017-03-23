@@ -13,11 +13,11 @@ public class ArrayAddNode extends Node {
     private Pin length;
 
     public ArrayAddNode() {
-        this(new NodeHandle("Add", true));
+        this(new NodeParams("Add", true));
     }
 
-    public ArrayAddNode(NodeHandle nodeHandle) {
-        super(nodeHandle);
+    public ArrayAddNode(NodeParams nodeParams) {
+        super(nodeParams);
 
         next = addExecutionOutputPin();
         addExecutionInputPin();

@@ -2,6 +2,8 @@ package com.littleinferno.flowchart.project;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.kotcrab.vis.ui.VisUI;
 import com.littleinferno.flowchart.JsonManger;
 import com.littleinferno.flowchart.codegen.BaseCodeExecution;
@@ -11,12 +13,14 @@ import com.littleinferno.flowchart.codegen.JSCodeGenerator;
 import com.littleinferno.flowchart.function.FunctionManager;
 import com.littleinferno.flowchart.gui.ProjectScreen;
 import com.littleinferno.flowchart.gui.UIScene;
+import com.littleinferno.flowchart.node.VariableSetNode;
 import com.littleinferno.flowchart.plugin.NodePluginManager;
 import com.littleinferno.flowchart.scene.MainScene;
 import com.littleinferno.flowchart.scene.Scene;
 import com.littleinferno.flowchart.scene.SceneManager;
 import com.littleinferno.flowchart.util.ProjectException;
 import com.littleinferno.flowchart.util.managers.BaseManager;
+import com.littleinferno.flowchart.variable.Variable;
 import com.littleinferno.flowchart.variable.VariableManager;
 
 import java.util.UUID;
@@ -72,6 +76,9 @@ public class Project extends BaseManager {
 
         this.uiScene = new UIScene(this);
         this.projectScreen = new ProjectScreen(uiScene);
+
+        Variable variable = variableManager.createVariable();
+        sceneManager.getMainScene().getNodeManager().createNode(VariableSetNode.class, variable).setPosition(300, 300);
     }
 
     public Project(ProjectHandle projectHandle) {
@@ -165,7 +172,13 @@ public class Project extends BaseManager {
         jsonManger.save(functionManager.getHandle(), functions);
 
         FileHandle scenes = location.child("scenes.json");
-        jsonManger.save(sceneManager, scenes);
+        //     jsonManger.save(sceneManager, scenes);
+
+        Gson gson = new GsonBuilder().setPrettyPrinting().create();
+
+        FileHandle scenes2 = location.child("scenes2.json");
+        String s = gson.toJson(sceneManager.getMainScene().getHandle());
+        scenes2.writeString(s, false);
 
     }
 

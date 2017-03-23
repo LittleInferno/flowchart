@@ -19,11 +19,11 @@ public class MakeArrayNode extends Node {
 
 
     public MakeArrayNode() {
-        this(new NodeHandle("make array", true));
+        this(new NodeParams("make array", true));
     }
 
-    public MakeArrayNode(NodeHandle nodeHandle) {
-        super(nodeHandle);
+    public MakeArrayNode(NodeParams nodeParams) {
+        super(nodeParams);
 
         array = addDataOutputPin("array", Pin.DEFAULT_CONVERT);
         array.setArray(true);
