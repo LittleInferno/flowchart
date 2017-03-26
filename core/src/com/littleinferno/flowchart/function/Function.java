@@ -103,16 +103,24 @@ public class Function {
 
     public void init() {
         if (scene != null) {
-         //   scene.getNodeManager().createNode(FunctionBeginNode.class, this).setPosition(350, 250);
+            //   scene.getNodeManager().createNode(FunctionBeginNode.class, this).setPosition(350, 250);
 
-        //    FunctionReturnNode node = scene.getNodeManager().createNode(FunctionReturnNode.class, this);
-          //  node.setPosition(600, 250);
-          //  node.removeCloseButton();
+            //    FunctionReturnNode node = scene.getNodeManager().createNode(FunctionReturnNode.class, this);
+            //  node.setPosition(600, 250);
+            //  node.removeCloseButton();
         }
     }
 
     public List<FunctionParameter> getParameters() {
         return parameters;
+    }
+
+    public List<FunctionParameter> getInputParameters() {
+        return Stream.of(parameters).filter(value -> value.getConnection() == Connection.INPUT).toList();
+    }
+
+    public List<FunctionParameter> getOutputParameters() {
+        return Stream.of(parameters).filter(value -> value.getConnection() == Connection.OUTPUT).toList();
     }
 
     public String getName() {

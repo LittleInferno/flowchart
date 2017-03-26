@@ -30,6 +30,7 @@ public abstract class Node extends VisWindow implements CodeGen {
 
     private NodeParams nodeParams;
 
+    @Deprecated
     public Node(NodeParams nodeParams) {
         super("");
 
@@ -70,7 +71,7 @@ public abstract class Node extends VisWindow implements CodeGen {
         top();
     }
 
-    Node initFromHandle(NodeParams nodeParams) {
+    Node setParams(NodeParams nodeParams) {
         this.nodeParams = nodeParams;
         setPosition(nodeParams.x, nodeParams.y);
         setName(nodeParams.title);
@@ -201,7 +202,9 @@ public abstract class Node extends VisWindow implements CodeGen {
             }
         }
 
-        getStage().getNodeManager().deleteNode(this);
+        Scene stage = getStage();
+        if (stage != null)
+            stage.getNodeManager().deleteNode(this);
 
         super.close();
     }
@@ -210,7 +213,7 @@ public abstract class Node extends VisWindow implements CodeGen {
         return container;
     }
 
-    public NodeParams getHandle() {
+    public NodeParams getParams() {
         nodeParams.setX(getX());
         nodeParams.setY(getY());
         return nodeParams;

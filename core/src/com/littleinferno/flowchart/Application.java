@@ -9,6 +9,7 @@ import com.littleinferno.flowchart.codegen.JSCodeExecution;
 import com.littleinferno.flowchart.codegen.JSCodeGenerator;
 import com.littleinferno.flowchart.project.Project;
 import com.littleinferno.flowchart.screen.ScreenManager;
+import com.littleinferno.flowchart.util.Details;
 
 
 public class Application extends Game {
@@ -21,14 +22,20 @@ public class Application extends Game {
     private final float SCALE = 1.f;
     public static BaseJSEngine jsEngine = null;
 
-    public Application() {
+    public static Details.VariableHelper variableHelper;
+    public static Details.FunctionHelper functionHelper;
+
+    public Application(Details.VariableHelper variableHelper, Details.FunctionHelper functionHelper) {
+        Application.variableHelper = variableHelper;
+  //      Application.functionHelper = functionHelper;
     }
 
     @Override
     public void create() {
 
+        Project.createProject("test", Gdx.files.external("flowchart_projects"), new JSCodeGenerator(), new JSCodeExecution());
 
-        Project project = Project.createProject("test", Gdx.files.external("flowchart_projects"), new JSCodeGenerator(), new JSCodeExecution());
+       // Project project =
 //        Project.load("test", Gdx.files.external("flowchart_projects"));
         setScreen(Project.instance().getProjectScreen());
 

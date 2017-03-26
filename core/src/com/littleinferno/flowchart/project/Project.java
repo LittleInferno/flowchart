@@ -15,19 +15,21 @@ import com.littleinferno.flowchart.gui.ProjectScreen;
 import com.littleinferno.flowchart.gui.UIScene;
 import com.littleinferno.flowchart.node.VariableSetNode;
 import com.littleinferno.flowchart.plugin.NodePluginManager;
+import com.littleinferno.flowchart.plugin.PluginManager;
 import com.littleinferno.flowchart.scene.MainScene;
 import com.littleinferno.flowchart.scene.Scene;
 import com.littleinferno.flowchart.scene.SceneManager;
-import com.littleinferno.flowchart.util.ProjectException;
 import com.littleinferno.flowchart.util.managers.BaseManager;
 import com.littleinferno.flowchart.variable.Variable;
 import com.littleinferno.flowchart.variable.VariableManager;
 
+import java.io.File;
 import java.util.UUID;
 
 public class Project extends BaseManager {
 
     private static Project instance;
+    private static PluginManager pluginManager;
 
     private String name;
     private FileHandle location;
@@ -40,6 +42,22 @@ public class Project extends BaseManager {
     private FunctionManager functionManager;
     private SceneManager sceneManager;
     private NodePluginManager nodePluginManager;
+
+    public static PluginManager pluginManager() {
+        if (pluginManager == null) {
+            pluginManager = new PluginManager();
+            pluginManager.loadNodePlugin(Gdx.files.internal("plugins").child("lib.zip").file());
+        }
+        return pluginManager;
+    }
+
+    public static PluginManager pluginManager(File file) {
+        if (pluginManager == null) {
+            pluginManager = new PluginManager();
+            pluginManager.loadNodePlugin(file);
+        }
+        return pluginManager;
+    }
 
     private JsonManger jsonManger;
 
@@ -63,8 +81,9 @@ public class Project extends BaseManager {
         this.location.child("lib").mkdirs();
 
         this.nodePluginManager = new NodePluginManager();
-        this.nodePluginManager.addPlugins(Gdx.files.internal("plugins"));
+        //   this.nodePluginManager.addPlugins(Gdx.files.internal("plugins"));
 
+        pluginManager();
 
         this.codeGenerator = codeGenerator;
         this.codeExecution = codeExecution;
@@ -93,6 +112,8 @@ public class Project extends BaseManager {
 
         this.name = projectHandle.name;
         this.location = projectHandle.location;
+
+        pluginManager = new PluginManager();
 
         this.nodePluginManager = new NodePluginManager();
         this.nodePluginManager.addPlugins(Gdx.files.internal("plugins"));
@@ -152,8 +173,10 @@ public class Project extends BaseManager {
 
 
     public static Project instance() {
-        if (instance == null)
-            throw new ProjectException("project not loaded");
+        if (instance == null) {
+            //throw new ProjectException("project not loaded");
+            Project.createProject("test", Gdx.files.external("flowchart_projects"), new JSCodeGenerator(), new JSCodeExecution());
+        }
 
         return instance;
     }

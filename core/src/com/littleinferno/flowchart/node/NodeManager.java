@@ -4,6 +4,7 @@ import com.annimon.stream.Optional;
 import com.annimon.stream.Stream;
 import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonValue;
+import com.littleinferno.flowchart.plugin.NodePluginHandle;
 import com.littleinferno.flowchart.plugin.NodePluginManager;
 import com.littleinferno.flowchart.project.Project;
 import com.littleinferno.flowchart.scene.Scene;
@@ -22,8 +23,8 @@ public class NodeManager {
         this.scene = scene;
         this.nodes = new ArrayList<>();
 
-        Stream.of(nodeManagerHandle.nodes)
-                .forEach(handle -> createNode(handle.getType(), handle));
+//        Stream.of(nodeManagerHandle.nodes)
+//                .forEach(handle -> createNode(handle.getType(), handle));
     }
 
     public NodeManager() {
@@ -47,43 +48,57 @@ public class NodeManager {
 
 
     public Optional<Node> createNode(String type) {
-        return createNode(scene.getProject().getNodePluginManager().getNodeHandle(type, scene.getType()));
+        NodePluginHandle.PluginNodeHandle handle = Stream.of(Project.pluginManager().getLoadedNodePlugins())
+                .flatMap(nph -> Stream.of(nph.getNodes()))
+                .filter(val -> val.getName().equals(type))
+                .findFirst()
+                .orElseThrow(() -> new RuntimeException("Cannot find node: " + type));
+
+        return createNode(handle);
     }
 
-    private Node createNode(String type, Node.NodeParams nodeParams) {
-        return createNode(Project.instance().getNodePluginManager().getNodeHandle(type, scene.getType()), nodeParams);
-    }
+    private Optional<Node> createNode(NodePluginHandle.PluginNodeHandle nodeHandle) {
+        String s = nodeHandle
+                .getAttribute("sceneType")
+                .map(String.class::cast)
+                .orElse("any");
 
-    private Optional<Node> createNode(NodePluginManager.PluginNodeHandle handle) {
-        if (scene.getType().equals(handle.sceneType) || handle.sceneType.equals("any"))
-            return Optional.of(createNode(handle, new Node.NodeParams(handle.title, handle.closable, handle.name)));
+        if (s.equals(scene.getType()) || s.equals("any"))
+            return Optional.of(registerNode(getIfSingle(nodeHandle)));
         return Optional.empty();
     }
 
-    private Node createNode(NodePluginManager.PluginNodeHandle pluginHandle, Node.NodeParams nodeParams) {
-        return registerNode(getIfSingle(pluginHandle, nodeParams));
-    }
-
-    private Node getIfSingle(NodePluginManager.PluginNodeHandle pluginHandle, Node.NodeParams nodeParams) {
-        return pluginHandle.single
-                ? getOrCreateNode(pluginHandle, nodeParams)
-                : create(pluginHandle).initFromHandle(nodeParams);
-    }
-
-    private Node getOrCreateNode(NodePluginManager.PluginNodeHandle handle, Node.NodeParams nodeParams) {
-        return Stream.of(nodes)
-                .filter(value -> value instanceof PluginNode) // TODO renmove it
-                .map(PluginNode.class::cast) // TODO renmove it
-                .filter(value -> value.getPluginHandle().name.equals(handle.name))
-                .limit(1)
-                .findFirst()
-                .map(Node.class::cast) // TODO renmove it
-                .orElseGet(() -> create(handle).initFromHandle(nodeParams));
+    private Node createNode2(NodePluginHandle.PluginNodeHandle pluginNodeHandle, Node.NodeParams nodeParams) {
+        PluginNode pluginNode = new PluginNode(pluginNodeHandle);
+        pluginNode.setParams(nodeParams);
+        registerNode(pluginNode);
+        return pluginNode;
     }
 
     private PluginNode create(NodePluginManager.PluginNodeHandle pluginHandle) {
         return new PluginNode(pluginHandle);
     }
+
+    private Node getIfSingle(NodePluginHandle.PluginNodeHandle nodeHandle) {
+        return nodeHandle.getAttribute("single").map(Boolean.class::cast).orElse(false)
+                ? getOrCreateNode(nodeHandle)
+                : create(nodeHandle);
+    }
+
+    private Node getOrCreateNode(NodePluginHandle.PluginNodeHandle nodeHandle) {
+        return Stream.of(nodes)
+                .map(PluginNode.class::cast) // TODO renmove it
+                .filter(value -> value.getHandle().getName().equals(nodeHandle.getName()))
+                .limit(1)
+                .findFirst()
+                .map(Node.class::cast) // TODO renmove it
+                .orElseGet(() -> create(nodeHandle));
+    }
+
+    private PluginNode create(NodePluginHandle.PluginNodeHandle pluginNodeHandle) {
+        return new PluginNode(pluginNodeHandle);
+    }
+
 
     private <T extends Node> T registerNode(T node) {
         nodes.add(node);
@@ -115,7 +130,7 @@ public class NodeManager {
     }
 
     public NodeManagerHandle getHandle() {
-        return new NodeManagerHandle(Stream.of(nodes).map(Node::getHandle).toList());
+        return new NodeManagerHandle(Stream.of(nodes).map(Node::getParams).toList());
     }
 
 
@@ -140,7 +155,7 @@ public class NodeManager {
 
             json.writeValue("nodes", Stream.of(object.nodes)
                     .filter(value -> value instanceof PluginNode)
-                    .map(Node::getHandle)
+                    .map(Node::getParams)
                     .toArray());
 
 
@@ -155,7 +170,7 @@ public class NodeManager {
             //noinspection unchecked
             List<Node.NodeParams> list = json.readValue(List.class, Node.NodeParams.class, jsonData.child());
 
-            Stream.of(list).forEach(f -> nodeManager.createNode(f.getType(), f));
+        //    Stream.of(list).forEach(f -> nodeManager.createNode(f.getType(), f));
 
             return nodeManager;
         }

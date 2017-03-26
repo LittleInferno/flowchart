@@ -1,5 +1,7 @@
 package com.littleinferno.flowchart.gui;
 
+import com.annimon.stream.Collectors;
+import com.annimon.stream.Stream;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.utils.DragAndDrop;
 import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
@@ -8,9 +10,11 @@ import com.kotcrab.vis.ui.util.adapter.ArrayListAdapter;
 import com.kotcrab.vis.ui.widget.ListView;
 import com.kotcrab.vis.ui.widget.VisLabel;
 import com.kotcrab.vis.ui.widget.VisTable;
+import com.littleinferno.flowchart.plugin.NodePluginHandle;
+import com.littleinferno.flowchart.project.Project;
 
 import java.util.ArrayList;
-import java.util.Collections;
+import java.util.List;
 
 class NodeTable extends VisTable {
 
@@ -19,7 +23,14 @@ class NodeTable extends VisTable {
     NodeTable(UIScene sceneUi) {
         super(true);
         this.sceneUi = sceneUi;
-        String[] nodeList = sceneUi.getProject().getNodePluginManager().getNodeList();
+//        String[] nodeList = sceneUi.getProject().getNodePluginManager().getNodeList();
+
+        List<NodePluginHandle> loadedNodePlugins = Project.pluginManager().getLoadedNodePlugins();
+
+        ArrayList<String> collect = Stream.of(loadedNodePlugins)
+                .flatMap(nph -> Stream.of(nph.getNodes()))
+                .map(NodePluginHandle.PluginNodeHandle::getName)
+                .collect(Collectors.toCollection(ArrayList<String>::new));
 
 //        String[] items = new String[]{
 //                MakeArrayNode.class.getName(),
@@ -29,10 +40,10 @@ class NodeTable extends VisTable {
 //                PrintArrayNode.class.getName(),
 //        };
 
-        ArrayList<String> array = new ArrayList<>();
-        Collections.addAll(array, nodeList);
+//        ArrayList<String> array = new ArrayList<>();
+//        Collections.addAll(array, nodeList);
 
-        NodeAdapter adapter = new NodeAdapter(array);
+        NodeAdapter adapter = new NodeAdapter(collect);
         ListView<String> view = new ListView<>(adapter);
 
         add(view.getMainTable()).grow().row();

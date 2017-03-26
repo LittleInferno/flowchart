@@ -10,12 +10,9 @@ import com.badlogic.gdx.backends.android.AndroidFragmentApplication;
 
 public class ProjectFragment extends AndroidFragmentApplication {
 
-    public ProjectFragment() {
-    }
-
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
-        return initializeForView(new Application());
+        return initializeForView(new Application(null, null));
     }
 }

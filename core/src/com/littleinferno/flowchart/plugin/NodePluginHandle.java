@@ -1,5 +1,7 @@
 package com.littleinferno.flowchart.plugin;
 
+import com.annimon.stream.Optional;
+
 import org.mozilla.javascript.Context;
 import org.mozilla.javascript.Function;
 import org.mozilla.javascript.NativeArray;
@@ -70,8 +72,10 @@ public class NodePluginHandle extends BasePluginHandle {
         //noinspection unchecked
         NativeArray attributes = (NativeArray) object.get("attributes");
 
-        for (Object o : attributes) {
-            addAttrib(nodeHandle, (NativeObject) o);
+        if (attributes != null) {
+            for (Object o : attributes) {
+                addAttrib(nodeHandle, (NativeObject) o);
+            }
         }
 
         handles.add(nodeHandle);
@@ -88,11 +92,15 @@ public class NodePluginHandle extends BasePluginHandle {
         Context.exit();
     }
 
+    public List<PluginNodeHandle> getNodes() {
+        return handles;
+    }
+
     public static class PluginNodeHandle {
-        public String title;
-        public String name;
-        public ScriptFun codegen;
-        public ScriptFun init;
+        String title;
+        String name;
+        ScriptFun codegen;
+        ScriptFun init;
 
         private Map<String, Object> attributes;
 
@@ -107,12 +115,28 @@ public class NodePluginHandle extends BasePluginHandle {
             attributes.put(key, attr);
         }
 
-        public Object getAttribute(String key) {
-            return attributes.get(key);
+        public Optional<Object> getAttribute(String key) {
+            return containsAttribute(key) ? Optional.of(attributes.get(key)) : Optional.empty();
         }
 
         public boolean containsAttribute(String key) {
             return attributes.containsKey(key);
+        }
+
+        public String getTitle() {
+            return title;
+        }
+
+        public String getName() {
+            return name;
+        }
+
+        public ScriptFun getCodegen() {
+            return codegen;
+        }
+
+        public ScriptFun getInit() {
+            return init;
         }
     }
 

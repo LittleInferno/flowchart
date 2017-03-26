@@ -5,6 +5,7 @@ import com.annimon.stream.Stream;
 import com.kotcrab.vis.ui.util.adapter.ArrayListAdapter;
 import com.kotcrab.vis.ui.widget.ListView;
 import com.kotcrab.vis.ui.widget.VisTable;
+import com.littleinferno.flowchart.Application;
 import com.littleinferno.flowchart.codegen.BaseCodeGenerator;
 import com.littleinferno.flowchart.project.Project;
 import com.littleinferno.flowchart.util.BaseHandle;
@@ -124,6 +125,18 @@ public class FunctionManager extends ProjectManager {
                 detailsTable.add(item.getTable()).grow();
                 Project.instance().getUiScene().pinToTabbedPane(item.getScene().getUiTab());
             });
+
+            if (Application.functionHelper == null) {
+                view.setItemClickListener(item -> {
+                    detailsTable.clearChildren();
+                    detailsTable.add(item.getTable()).grow();
+                    Project.instance().getUiScene().pinToTabbedPane(item.getScene().getUiTab());
+                });
+            } else {
+                view.setItemClickListener(item -> {
+                    Application.functionHelper.call(item);
+                });
+            }
 
             funTable.add(view.getMainTable()).grow().row();
         }

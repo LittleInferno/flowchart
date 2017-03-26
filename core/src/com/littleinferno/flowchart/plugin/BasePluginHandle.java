@@ -34,7 +34,7 @@ public abstract class BasePluginHandle {
         List<ZipEntry> entries = Collections.list((Enumeration<ZipEntry>) file.entries());
 
         ZipEntry entry = Stream.of(entries)
-                .filter(value -> value.getName().equals(pluginJson))
+                .filter(value -> value.getName().equals(fileName))
                 .findSingle()
                 .orElseThrow(() -> new FileNotFoundException("cannot find:" + pluginJson));
 

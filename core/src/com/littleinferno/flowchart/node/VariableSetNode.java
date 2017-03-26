@@ -26,7 +26,7 @@ public class VariableSetNode extends Node {
     }
 
     private void init(Node.NodeParams nodeParams) {
-        initFromHandle(nodeParams);
+        setParams(nodeParams);
         variable = Project
                 .instance()
                 .getVariableManager()

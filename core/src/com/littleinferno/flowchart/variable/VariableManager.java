@@ -5,6 +5,7 @@ import com.annimon.stream.Stream;
 import com.kotcrab.vis.ui.util.adapter.ArrayListAdapter;
 import com.kotcrab.vis.ui.widget.ListView;
 import com.kotcrab.vis.ui.widget.VisTable;
+import com.littleinferno.flowchart.Application;
 import com.littleinferno.flowchart.DataType;
 import com.littleinferno.flowchart.codegen.BaseCodeGenerator;
 import com.littleinferno.flowchart.project.Project;
@@ -124,10 +125,16 @@ public class VariableManager extends ProjectManager {
 
             ListView<Variable> view = new ListView<>(variableAdapter);
 
-            view.setItemClickListener(item -> {
-                detailsTable.clearChildren();
-                detailsTable.add(item.getTable()).grow();
-            });
+            if (Application.variableHelper == null) {
+                view.setItemClickListener(item -> {
+                    detailsTable.clearChildren();
+                    detailsTable.add(item.getTable()).grow();
+                });
+            } else {
+                view.setItemClickListener(item -> {
+                    Application.variableHelper.call(item);
+                });
+            }
 
             varTable.add(view.getMainTable()).grow().row();
         }
