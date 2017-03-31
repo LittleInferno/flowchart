@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <item name="Bool" type="color">#2196F3</item>
+    <item name="Float" type="color">#F44336</item>
+    <item name="Int" type="color">#4CAF50</item>
+    <item name="String" type="color">#673AB7</item>
+    <item name="Universal" type="color">#FFEB3B</item>
+</resources>

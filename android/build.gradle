@@ -26,6 +26,9 @@ android {
         targetCompatibility 1.8
         sourceCompatibility 1.8
     }
+    dataBinding {
+        enabled = true
+    }
 }
 
 // called every time gradle gets executed, takes the native dependencies of
@@ -76,4 +79,7 @@ task run(type: Exec) {
     def adb = path + "/platform-tools/adb"
     commandLine "$adb", 'shell', 'am', 'start', '-n',
             'com.littleinferno.app/com.littleinferno.app.AndroidLauncher'
+}
+dependencies {
+    compile 'com.android.support.constraint:constraint-layout:1.0.2'
 }
