@@ -26,6 +26,9 @@
         <activity
             android:name=".ProjectActivity"
             android:screenOrientation="landscape" />
+        <activity
+            android:name=".CreateNewProjectDialog"
+            android:screenOrientation="landscape" />
     </application>
 
 </manifest>

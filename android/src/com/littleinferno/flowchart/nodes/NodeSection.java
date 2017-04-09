@@ -1,11 +1,19 @@
 package com.littleinferno.flowchart.nodes;
 
+import android.content.ClipData;
+import android.support.constraint.ConstraintLayout;
 import android.support.v7.widget.RecyclerView;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import com.littleinferno.flowchart.FlowchartProject;
 import com.littleinferno.flowchart.R;
+import com.littleinferno.flowchart.Scene;
+import com.littleinferno.flowchart.node.BaseNode;
+import com.littleinferno.flowchart.plugin.AndroidNodePluginHandle;
 
 import java.util.List;
 
@@ -16,10 +24,10 @@ public class NodeSection extends StatelessSection {
 
     private SectionedRecyclerViewAdapter adapter;
     private String name;
-    private List<ItemNode> nodes;
+    private List<AndroidNodePluginHandle.NodeHandle> nodes;
     private boolean expanded;
 
-    public NodeSection(SectionedRecyclerViewAdapter adapter, String name, List<ItemNode> nodes) {
+    public NodeSection(SectionedRecyclerViewAdapter adapter, String name, List<AndroidNodePluginHandle.NodeHandle> nodes) {
         super(R.layout.section_node_header, R.layout.item_node_layout);
         this.adapter = adapter;
         this.name = name;
@@ -40,7 +48,7 @@ public class NodeSection extends StatelessSection {
     public void onBindItemViewHolder(RecyclerView.ViewHolder holder, int position) {
         final ItemViewHolder itemHolder = (ItemViewHolder) holder;
 
-        //  itemHolder.title.setText(name);
+        itemHolder.nodeName.setText(nodes.get(position).getName());
     }
 
     @Override
@@ -80,12 +88,42 @@ public class NodeSection extends StatelessSection {
 
     class ItemViewHolder extends RecyclerView.ViewHolder {
 
-        private final ImageView imgItem;
+        private final TextView nodeName;
+        private final View root;
 
         public ItemViewHolder(View view) {
             super(view);
 
-            imgItem = (ImageView) view.findViewById(R.id.iv_item_node);
+            root = view;
+            nodeName = (TextView) view.findViewById(R.id.node_name);
+            root.setOnTouchListener((v, e) -> {
+
+                switch (e.getAction()) {
+
+                    case MotionEvent.ACTION_DOWN: {
+                        Scene currentScene = FlowchartProject.getProject().getCurrentScene();
+
+                        BaseNode baseNode = new BaseNode(currentScene);
+                        ConstraintLayout.LayoutParams lparams = new ConstraintLayout.LayoutParams(
+                                RelativeLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.WRAP_CONTENT);
+
+                        baseNode.setLayoutParams(lparams);
+                        baseNode.setScaleX(currentScene.getScaleFactor());
+                        baseNode.setScaleY(currentScene.getScaleFactor());
+
+                        baseNode.setVisibility(View.INVISIBLE);
+                        currentScene.addView(baseNode);
+                        baseNode.post(() -> {
+                            baseNode.setPoint(baseNode.getWidth() / 2, baseNode.getY() / 2);
+
+                            ClipData clipData = ClipData.newPlainText("QWE", "EWQ");
+                            BaseNode.ShadowBuilder shadowBuilder = new BaseNode.ShadowBuilder(baseNode, baseNode.getPoint());
+                            baseNode.startDrag(clipData, shadowBuilder, baseNode, 0);
+                        });
+                    }
+                }
+                return true;
+            });
         }
     }
 }

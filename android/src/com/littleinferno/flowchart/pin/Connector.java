@@ -1,6 +1,5 @@
 package com.littleinferno.flowchart.pin;
 
-import android.content.Context;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -12,6 +11,7 @@ import com.littleinferno.flowchart.DataType;
 import com.littleinferno.flowchart.R;
 import com.littleinferno.flowchart.node.BaseNode;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
@@ -22,7 +22,7 @@ public class Connector extends LinearLayout {
 
     private final Connection connection;
     private DataType type;
-    private boolean isConnect;
+    private boolean connect;
     private boolean isArray;
 
     private final BaseNode node;
@@ -31,6 +31,8 @@ public class Connector extends LinearLayout {
     private Optional<List<Connector>> connectedPins;
 
     private final Optional<Set<DataType>> possibleConvert;
+
+    private static Optional<Connector> connector = Optional.empty();
 
     public Connector(BaseNode node, LayoutParams params, Connection connection, String name, boolean isArray, Optional<Set<DataType>> possibleConvert, DataType type) {
         super(node.getContext());
@@ -54,6 +56,13 @@ public class Connector extends LinearLayout {
         this.node.invalidate();
         this.possibleConvert = possibleConvert;
 
+        image.setOnClickListener(v -> {
+            connector.ifPresentOrElse(c -> c.connect((Connector) v.getParent()),
+                    () -> connector = Optional.of((Connector) v.getParent())
+            );
+        });
+
+
         // = image.mutate();
         //mWrappedDrawable = DrawableCompat.wrap(mWrappedDrawable);
         //DrawableCompat.setTint(mWrappedDrawable, mColor);
@@ -67,10 +76,6 @@ public class Connector extends LinearLayout {
         setName(name);
         setArray(isArray);
         setType(type);
-    }
-
-    private void init(Context context) {
-        inflate(context, R.layout.pin_output_layout, this);
     }
 
     public void setName(String name) {
@@ -117,6 +122,82 @@ public class Connector extends LinearLayout {
         });
     }
 
+    public DataType getType() {
+        return type;
+    }
+
+    public Connection getConnection() {
+        return connection;
+    }
+
+    public boolean isConnect() {
+        return connect;
+    }
+
+    public boolean connect(final Connector pin) {
+
+        if (!possibleConnect(pin))
+            return false;
+
+        DataType pinType = pin.getType();
+        DataType thisType = getType();
+
+        if (isSingle())
+            connectPin(pin);
+        else
+            connectPins(pin);
+
+        return true;
+    }
+
+    private void connectPin(final Connector pin) {
+
+        connectedPin.ifPresent(c -> c.disconnect(this));
+
+        pin.connectedPins
+                .executeIfAbsent(() -> pin.connectedPins = Optional.of(new ArrayList<>()))
+                .ifPresent(connectors -> connectors.add(this));
+
+        connectedPin = Optional.of(pin);
+
+        node.getScene().addWire(this, pin);
+    }
+
+    private void connectPins(final Connector pin) {
+        pin.connectPin(this);
+    }
+
+    public void disconnect(final Connector pin) {
+        if (isSingle()) {
+            disconnectPin();
+        } else {
+            disconnectPins(pin);
+        }
+    }
+
+    private void disconnectPin() {
+        connectedPin.ifPresent(c -> c.connectedPins.ifPresent(l -> l.remove(this)));
+        connectedPin = Optional.empty();
+    }
+
+    private void disconnectPins(final Connector pin) {
+        pin.disconnect(this);
+    }
+
+
+    private boolean possibleConnect(Connector pin) {
+        return !(pin.getConnection() == getConnection()
+                || pin.getParent() == getParent()
+                || pin.isArray() != isArray());
+    }
+
+
+    private boolean isSingle() {
+        return (getType() == DataType.EXECUTION && getConnection() == Connection.OUTPUT) ||
+                (getType() != DataType.EXECUTION && getConnection() == Connection.INPUT);
+    }
+
+
     private void setColor(DataType type) {
 
         switch (type) {
@@ -140,4 +221,5 @@ public class Connector extends LinearLayout {
         }
 
     }
+
 }

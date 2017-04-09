@@ -44,6 +44,10 @@ public class MenuActivity extends AppCompatActivity {
         layout.projectLayout.projectList.setLayoutManager(layoutManager);
         layout.projectLayout.projectList.setItemAnimator(new DefaultItemAnimator());
         layout.projectLayout.projectList.setAdapter(adapter);
+
+
+        layout.addNewProject
+                .setOnClickListener(v -> startActivity(new Intent(MenuActivity.this, CreateNewProjectDialog.class)));
     }
 
     @Override

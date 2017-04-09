@@ -29,6 +29,12 @@ public abstract class BasePluginHandle {
         pluginParams = pluginParamsFromJson();
     }
 
+
+    public int getFileCount() {
+        return file.size();
+    }
+
+
     public String readFile(String fileName) throws IOException {
         //noinspection unchecked
         List<ZipEntry> entries = Collections.list((Enumeration<ZipEntry>) file.entries());
@@ -36,7 +42,7 @@ public abstract class BasePluginHandle {
         ZipEntry entry = Stream.of(entries)
                 .filter(value -> value.getName().equals(fileName))
                 .findSingle()
-                .orElseThrow(() -> new FileNotFoundException("cannot find:" + pluginJson));
+                .orElseThrow(() -> new FileNotFoundException("cannot find:" + fileName));
 
         Scanner scanner = new java.util.Scanner(file.getInputStream(entry)).useDelimiter("\\A");
         return scanner.hasNext() ? scanner.next() : "";

@@ -2,8 +2,12 @@ var NativeNode = com.littleinferno.flowchart.node.PluginNode;
 var NativeType = com.littleinferno.flowchart.DataType;
 var NativeConnection = com.littleinferno.flowchart.Connection;
 var NativeGenerator = com.littleinferno.flowchart.codegen.JSCodeGenerator;
-
+var PluginParams = com.littleinferno.flowchart.plugin.AndroidBasePluginHandle.PluginParams;
 var codegen = new NativeGenerator();
+
+function pluginParams() {
+    return new PluginParams("basic", "basic plugin for test", "0.0.1", 400);
+}
 
 function exportNodes() {
     return [addNode(), subNode(), mulNode(), divNode(), equalNode(), lessNode(), greatNode()];
@@ -28,9 +32,10 @@ function addNode() {
     return {
         name: "add node",
         title: "add",
+        category: "arithmetic",
         gen: gen,
         init: init,
-        typeAlwaysEqual: ["a", "b", "result"]
+        attributes: [{ "sceneType": "any" }],
     }
 }
 
@@ -53,9 +58,9 @@ function subNode() {
     return {
         name: "sub node",
         title: "sub",
+        category: "arithmetic",
         gen: gen,
         init: init,
-        typeAlwaysEqual: ["a", "b", "result"]
     }
 }
 
@@ -78,9 +83,9 @@ function mulNode() {
     return {
         name: "mul node",
         title: "mul",
+        category: "arithmetic",
         gen: gen,
         init: init,
-        typeAlwaysEqual: ["a", "b", "result"]
     }
 }
 
@@ -103,9 +108,9 @@ function divNode() {
     return {
         name: "div node",
         title: "div",
+        category: "arithmetic",
         gen: gen,
         init: init,
-        typeAlwaysEqual: ["a", "b", "result"]
     }
 }
 
@@ -128,9 +133,9 @@ function equalNode() {
     return {
         name: "equal node",
         title: "equal",
+        category: "arithmetic",
         gen: gen,
         init: init,
-        typeAlwaysEqual: ["a", "b"]
     }
 }
 
@@ -153,9 +158,9 @@ function lessNode() {
     return {
         name: "less node",
         title: "less",
+        category: "arithmetic",
         gen: gen,
         init: init,
-        typeAlwaysEqual: ["a", "b"]
     }
 }
 
@@ -178,8 +183,8 @@ function greatNode() {
     return {
         name: "great node",
         title: "great",
+        category: "arithmetic",
         gen: gen,
         init: init,
-        typeAlwaysEqual: ["a", "b"]
     }
 }

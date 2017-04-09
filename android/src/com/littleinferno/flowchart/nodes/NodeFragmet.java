@@ -11,13 +11,10 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.annimon.stream.Stream;
 import com.littleinferno.flowchart.R;
-import com.littleinferno.flowchart.plugin.NodePluginHandle;
-import com.littleinferno.flowchart.project.Project;
+import com.littleinferno.flowchart.plugin.AndroidPluginManager;
 
 import java.io.File;
-import java.util.List;
 
 import io.github.luizgrp.sectionedrecyclerviewadapter.SectionedRecyclerViewAdapter;
 
@@ -35,18 +32,23 @@ public class NodeFragmet extends Fragment {
 
         String string = Environment.getExternalStorageDirectory().toString();
 
-        File file = new File(string + "/flowchart_projects/lib.zip");
 
-        List<NodePluginHandle> loadedNodePlugins = Project.pluginManager(file).getLoadedNodePlugins();
+        AndroidPluginManager manager = new AndroidPluginManager();
 
-        List<ItemNode> nodes = Stream.of(loadedNodePlugins)
-                .flatMap(nph -> Stream.of(nph.getNodes()))
-                .map(NodePluginHandle.PluginNodeHandle::getName)
-                .map(ItemNode::new)
-                .toList();
+        manager.loadNodePlugin(new File(string + "/flowchart_projects/plugins/new.js"));
 
-        sectionAdapter.addSection(new NodeSection(sectionAdapter, "f", nodes));
-        sectionAdapter.addSection(new NodeSection(sectionAdapter, "A", nodes));
+
+
+//        List<NodePluginHandle> loadedNodePlugins = Project.pluginManager(file).getLoadedNodePlugins();
+
+//        List<ItemNode> nodes = Stream.of(loadedNodePlugins)
+//                .flatMap(nph -> Stream.of(nph.getNodes()))
+//                .map(NodePluginHandle.NodeHandle::getName)
+//                .map(ItemNode::new)
+//                .toList();
+//
+        sectionAdapter.addSection(new NodeSection(sectionAdapter, "Nodes", manager.getLoadedNodeHandles()));
+//        sectionAdapter.addSection(new NodeSection(sectionAdapter, "A", nodes));
 
 
         RecyclerView recyclerView = (RecyclerView) view.findViewById(R.id.rv_nodes);

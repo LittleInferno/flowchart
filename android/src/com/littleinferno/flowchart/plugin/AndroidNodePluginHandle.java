@@ -6,54 +6,23 @@ import org.mozilla.javascript.Context;
 import org.mozilla.javascript.Function;
 import org.mozilla.javascript.NativeArray;
 import org.mozilla.javascript.NativeObject;
-import org.mozilla.javascript.Scriptable;
 import org.mozilla.javascript.ScriptableObject;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class NodePluginHandle extends BasePluginHandle {
+public class AndroidNodePluginHandle extends AndroidBasePluginHandle {
 
-    private final Context rhino;
-    private final Scriptable scope;
-    private final List<PluginNodeHandle> handles;
+    private final List<NodeHandle> handles;
 
-    public final int apiVersion = 300;
-
-    public NodePluginHandle(File pluginFile) {
+    public AndroidNodePluginHandle(File pluginFile) {
         super(pluginFile);
-
-        if (getPluginParams().getApiVersion() < apiVersion)
-            throw new RuntimeException("plugin api(" +
-                    getPluginParams().getApiVersion() +
-                    ") < plugin handle api(" + apiVersion + ")");
-
-        rhino = Context.enter();
-        rhino.setOptimizationLevel(-1);
-
-        scope = rhino.initStandardObjects();
-
         handles = new ArrayList<>();
-    }
 
-    @Override
-    public void onLoad() {
-
-        String str = null;
-        try {
-            str = readFile(getPluginParams().getSrcFileName());
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        rhino.evaluateString(scope, str, "JavaScript", 1, null);
-        Function fct = (Function) scope.get("exportNodes", scope);
-        NativeArray result = (NativeArray) fct.call(rhino, scope, scope, new Object[]{});
-        registerNodes(result);
+        registerNodes((NativeArray) createScriptFun("exportNodes").call());
     }
 
     private void registerNodes(NativeArray object) {
@@ -66,11 +35,11 @@ public class NodePluginHandle extends BasePluginHandle {
         String title = (String) object.get("title");
         String category = (String) object.get("category");
 
-        ScriptFun codegen = new ScriptFun(rhino, scope, (Function) object.get("gen"));
-        ScriptFun init = new ScriptFun(rhino, scope, (Function) object.get("init"));
+        ScriptFun codegen = createScriptFun((Function) object.get("gen"));
+        ScriptFun init = createScriptFun((Function) object.get("init"));
 
-        PluginNodeHandle nodeHandle = new PluginNodeHandle(name, title, category, codegen, init);
-        //noinspection unchecked
+        NodeHandle nodeHandle = new NodeHandle(name, title, category, codegen, init);
+
         NativeArray attributes = (NativeArray) object.get("attributes");
 
         if (attributes != null) {
@@ -82,10 +51,10 @@ public class NodePluginHandle extends BasePluginHandle {
         handles.add(nodeHandle);
     }
 
-    private void addAttrib(PluginNodeHandle pluginNodeHandle, NativeObject object) {
+    private void addAttrib(NodeHandle nodeHandle, NativeObject object) {
         String name = (String) object.get(0);
         Object attr = object.get(1);
-        pluginNodeHandle.addAttribute(name, attr);
+        nodeHandle.addAttribute(name, attr);
     }
 
     @Override
@@ -93,11 +62,16 @@ public class NodePluginHandle extends BasePluginHandle {
         Context.exit();
     }
 
-    public List<PluginNodeHandle> getNodes() {
+    @Override
+    public int getApiVersion() {
+        return 400;
+    }
+
+    public List<NodeHandle> getNodes() {
         return handles;
     }
 
-    public static class PluginNodeHandle {
+    public static class NodeHandle {
         final String name;
         final String title;
         final String category;
@@ -106,8 +80,7 @@ public class NodePluginHandle extends BasePluginHandle {
 
         private Map<String, Object> attributes;
 
-
-        PluginNodeHandle(final String name, final String title, final String category, final ScriptFun codegen, final ScriptFun init) {
+        NodeHandle(final String name, final String title, final String category, final ScriptFun codegen, final ScriptFun init) {
             this.name = name;
             this.title = title;
             this.category = category;
@@ -143,24 +116,6 @@ public class NodePluginHandle extends BasePluginHandle {
 
         public ScriptFun getInit() {
             return init;
-        }
-    }
-
-    public static class ScriptFun {
-        private final Context context;
-        private final Scriptable scope;
-        private final Function function;
-
-        ScriptFun(final Context context, final Scriptable scope, final Function function) {
-            this.context = context;
-            this.scope = scope;
-            this.function = function;
-        }
-
-        public Object call(Object... args) {
-            if (function != null)
-                return Context.jsToJava(function.call(context, scope, scope, args), Object.class);
-            return null;
         }
     }
 }

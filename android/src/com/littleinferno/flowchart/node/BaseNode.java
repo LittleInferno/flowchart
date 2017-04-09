@@ -1,10 +1,14 @@
 package com.littleinferno.flowchart.node;
 
+import android.content.ClipData;
 import android.content.Context;
+import android.graphics.Canvas;
+import android.graphics.Point;
 import android.graphics.PointF;
 import android.support.v7.widget.CardView;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
+import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 
@@ -12,6 +16,7 @@ import com.annimon.stream.Optional;
 import com.annimon.stream.Stream;
 import com.littleinferno.flowchart.Connection;
 import com.littleinferno.flowchart.DataType;
+import com.littleinferno.flowchart.Scene;
 import com.littleinferno.flowchart.databinding.NodeLayoutBinding;
 import com.littleinferno.flowchart.pin.Connector;
 
@@ -20,21 +25,29 @@ import java.util.HashSet;
 import java.util.List;
 
 public class BaseNode extends CardView {
-    PointF DownPT = new PointF(); // Record Mouse Position When Pressed Down
-    PointF StartPT = new PointF();
+
+
+    private PointF delta = new PointF();
 
     NodeLayoutBinding layout;
-    private float oldX;
-    private float oldY;
-    private int mActivePointerId;
+    private Scene scene;
+    private PointF point;
 
-    public BaseNode(Context context) {
-        super(context);
-        init(context);
+    public BaseNode(View view) {
+        super(view.getContext());
+        layout = NodeLayoutBinding.inflate((LayoutInflater) getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE), this, true);
+        setElevation(8);
+        bringToFront();
+        view.invalidate();
+    }
+
+    public BaseNode(Scene scene) {
+        this((View) scene);
+
+        this.scene = scene;
     }
 
     private void init(Context context) {
-        layout = NodeLayoutBinding.inflate((LayoutInflater) getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE), this, true);
     }
 
     public Connector addDataInputPin(final String name, final boolean isArray, final DataType... possibleConvert) {
@@ -91,7 +104,6 @@ public class BaseNode extends CardView {
         return pins;
     }
 
-
     LinearLayout.LayoutParams createLayoutParams() {
         return new LinearLayout.LayoutParams(
                 RelativeLayout.LayoutParams.MATCH_PARENT, RelativeLayout.LayoutParams.WRAP_CONTENT);
@@ -101,29 +113,83 @@ public class BaseNode extends CardView {
         return layout;
     }
 
+    public Scene getScene() {
+        return scene;
+    }
+
+    public PointF getDelta() {
+        return delta;
+    }
+
+    public void setScene(Scene scene) {
+        this.scene = scene;
+    }
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {
-        int eid = event.getAction();
-        switch (eid)
-        {
-            case MotionEvent.ACTION_MOVE :
-                PointF mv = new PointF( event.getX() - DownPT.x, event.getY() - DownPT.y);
-                setX((int)(StartPT.x+mv.x));
-                setY((int)(StartPT.y+mv.y));
-                StartPT = new PointF( getX(), getY() );
+
+        switch (event.getAction()) {
+            case MotionEvent.ACTION_DOWN: {
+                ClipData clipData = ClipData.newPlainText("", "");
+
+                setPoint(event.getX(), event.getY());
+
+                ShadowBuilder shadowBuilder = new ShadowBuilder(this, getPoint());
+                startDrag(clipData, shadowBuilder, this, 0);
+                setVisibility(View.INVISIBLE);
+//                delta.set(getX() - event.getRawX(), getY() - event.getRawY());
+//                setElevation(50);
                 break;
-            case MotionEvent.ACTION_DOWN :
-                DownPT.x = event.getX();
-                DownPT.y = event.getY();
-                StartPT = new PointF( getX(), getY() );
+            }
+            case MotionEvent.ACTION_MOVE: {
+                //       setX(event.getRawX() + delta.x);
+                //       setY(event.getRawY() + delta.y);
                 break;
-            case MotionEvent.ACTION_UP :
-                // Nothing have to do
-                break;
-            default :
-                break;
+            }
+            case MotionEvent.ACTION_UP: {
+                // setElevation(8);
+            }
         }
+
         return true;
+    }
+
+    public void setPoint(float x, float y) {
+        point = new PointF(x, y);
+        point.x *= getScaleX();
+        point.y *= getScaleY();
+    }
+
+    public PointF getPoint() {
+        return point;
+    }
+
+    public static class ShadowBuilder extends View.DragShadowBuilder {
+
+        private final PointF touchPoint;
+
+        public ShadowBuilder(View view, PointF touchPoint) {
+            super(view);
+            this.touchPoint = touchPoint;
+        }
+
+        @Override
+        public void onProvideShadowMetrics(Point outShadowSize, Point outShadowTouchPoint) {
+            int width;
+            int height;
+            width = (int) (getView().getWidth() * getView().getScaleX());
+
+            height = (int) (getView().getHeight() * getView().getScaleY());
+
+            outShadowSize.set(width, height);
+
+            outShadowTouchPoint.set((int) touchPoint.x, (int) touchPoint.y);
+        }
+
+        @Override
+        public void onDrawShadow(Canvas canvas) {
+            canvas.scale(getView().getScaleX(), getView().getScaleY());
+            getView().draw(canvas);
+        }
     }
 }
