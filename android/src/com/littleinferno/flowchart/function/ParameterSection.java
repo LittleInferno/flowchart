@@ -10,10 +10,10 @@ import io.github.luizgrp.sectionedrecyclerviewadapter.StatelessSection;
 
 public class ParameterSection extends StatelessSection {
 
-    private final Function function;
+    private final AndroidFunction function;
     private final boolean isInput;
 
-    public ParameterSection(Function function, boolean isInput) {
+    public ParameterSection(AndroidFunction function, boolean isInput) {
         super(0/*R.id.rv_parameters*/, R.layout.function_parameter_layout);
         this.function = function;
         this.isInput = isInput;

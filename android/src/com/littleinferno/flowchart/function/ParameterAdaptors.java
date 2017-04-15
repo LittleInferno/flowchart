@@ -10,9 +10,9 @@ import com.littleinferno.flowchart.R;
 
 public class ParameterAdaptors extends RecyclerView.Adapter<ParameterViewHolder> {
 
-    private Function function;
+    private AndroidFunction function;
 
-    public ParameterAdaptors(Function function) {
+    public ParameterAdaptors(AndroidFunction function) {
         this.function = function;
     }
 

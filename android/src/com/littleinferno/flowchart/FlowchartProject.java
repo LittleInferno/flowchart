@@ -1,8 +1,9 @@
 package com.littleinferno.flowchart;
 
+import android.os.Environment;
 import android.support.constraint.ConstraintLayout;
 
-import com.littleinferno.flowchart.plugin.PluginManager;
+import com.littleinferno.flowchart.plugin.AndroidPluginManager;
 
 import java.io.File;
 
@@ -13,16 +14,18 @@ public class FlowchartProject {
 
     private Scene currentScene;
     private ConstraintLayout layout;
+    private AndroidPluginManager pluginManager;
 
     public FlowchartProject() {
+        pluginManager = new AndroidPluginManager();
 
+        String string = Environment.getExternalStorageDirectory().toString();
+        pluginManager.loadNodePlugins(new File(string + "/flowchart_projects/plugins/"));
     }
 
     public static FlowchartProject getProject() {
         return project;
     }
-
-    private PluginManager pluginManager;
 
     FlowchartProject(String name) {
         projectFolder = Files.newProjectFolder(name);
@@ -32,7 +35,6 @@ public class FlowchartProject {
     void loadNodePlugins(File file) {
         pluginManager.loadNodePlugins(file);
     }
-
 
     static FlowchartProject createNew(String name) {
         return project = new FlowchartProject(name);
@@ -56,5 +58,9 @@ public class FlowchartProject {
 
     public void setLayout(ConstraintLayout layout) {
         this.layout = layout;
+    }
+
+    public AndroidPluginManager getPluginManager() {
+        return pluginManager;
     }
 }

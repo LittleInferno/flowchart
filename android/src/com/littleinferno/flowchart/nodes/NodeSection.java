@@ -1,18 +1,16 @@
 package com.littleinferno.flowchart.nodes;
 
-import android.content.ClipData;
-import android.support.constraint.ConstraintLayout;
 import android.support.v7.widget.RecyclerView;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.ImageView;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import com.annimon.stream.Optional;
 import com.littleinferno.flowchart.FlowchartProject;
 import com.littleinferno.flowchart.R;
 import com.littleinferno.flowchart.Scene;
-import com.littleinferno.flowchart.node.BaseNode;
+import com.littleinferno.flowchart.node.AndroidNode;
 import com.littleinferno.flowchart.plugin.AndroidNodePluginHandle;
 
 import java.util.List;
@@ -98,29 +96,31 @@ public class NodeSection extends StatelessSection {
             nodeName = (TextView) view.findViewById(R.id.node_name);
             root.setOnTouchListener((v, e) -> {
 
-                switch (e.getAction()) {
+                if (e.getAction() == MotionEvent.ACTION_DOWN) {
 
-                    case MotionEvent.ACTION_DOWN: {
-                        Scene currentScene = FlowchartProject.getProject().getCurrentScene();
+                    Scene currentScene = FlowchartProject.getProject().getCurrentScene();
 
-                        BaseNode baseNode = new BaseNode(currentScene);
-                        ConstraintLayout.LayoutParams lparams = new ConstraintLayout.LayoutParams(
-                                RelativeLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.WRAP_CONTENT);
+                    Optional<AndroidNode> node = currentScene.getNodeManager().createNode(nodeName.getText().toString());
 
-                        baseNode.setLayoutParams(lparams);
-                        baseNode.setScaleX(currentScene.getScaleFactor());
-                        baseNode.setScaleY(currentScene.getScaleFactor());
+                    node.ifPresent(androidNode -> {
 
-                        baseNode.setVisibility(View.INVISIBLE);
-                        currentScene.addView(baseNode);
-                        baseNode.post(() -> {
-                            baseNode.setPoint(baseNode.getWidth() / 2, baseNode.getY() / 2);
+                        Integer i = androidNode
+                                .getNodeHandle()
+                                .getAttribute("limit")
+                                .map(Integer.class::cast)
+                                .orElse(0);
 
-                            ClipData clipData = ClipData.newPlainText("QWE", "EWQ");
-                            BaseNode.ShadowBuilder shadowBuilder = new BaseNode.ShadowBuilder(baseNode, baseNode.getPoint());
-                            baseNode.startDrag(clipData, shadowBuilder, baseNode, 0);
+                        if (i > 0)
+                            root.setEnabled(false);
+
+                        androidNode.setVisibility(View.INVISIBLE);
+                        currentScene.addView(androidNode);
+
+                        androidNode.post(() -> {
+                            androidNode.setPoint(androidNode.getWidth() / 2, androidNode.getHeight() / 2);
+                            androidNode.drag();
                         });
-                    }
+                    });
                 }
                 return true;
             });

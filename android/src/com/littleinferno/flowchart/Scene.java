@@ -16,6 +16,7 @@ import android.view.View;
 import android.widget.RelativeLayout;
 
 import com.annimon.stream.Stream;
+import com.littleinferno.flowchart.node.AndroidNodeManager;
 import com.littleinferno.flowchart.node.BaseNode;
 import com.littleinferno.flowchart.pin.Connector;
 
@@ -28,10 +29,15 @@ public class Scene extends RelativeLayout {
     private FlowchartProject project;
     private float scaleFactor = 1;
     private PointF delta;
-    private boolean update;
+    private String sceneType;
+    private final AndroidNodeManager nodeManager;
 
     public FlowchartProject getProject() {
         return project;
+    }
+
+    public String getSceneType() {
+        return sceneType;
     }
 
     private static class Wire {
@@ -45,6 +51,10 @@ public class Scene extends RelativeLayout {
 
     ArrayList<Wire> wires = new ArrayList<>();
 
+    public AndroidNodeManager getNodeManager() {
+        return nodeManager;
+    }
+
     public Scene(Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
         paint = new Paint();
@@ -52,6 +62,9 @@ public class Scene extends RelativeLayout {
         scaleDetector = new ScaleGestureDetector(context, new ScaleListener());
         setWillNotDraw(false);
         delta = new PointF();
+        project = FlowchartProject.load();
+        nodeManager = new AndroidNodeManager(this);
+        sceneType = "main";
     }
 
     @Override
@@ -83,15 +96,14 @@ public class Scene extends RelativeLayout {
     private class GestureListener extends GestureDetector.SimpleOnGestureListener {
         @Override
         public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX, float distanceY) {
-            // scrollBy((int) distanceX, (int) distanceY);
-
-            update = true;
-            delta.set(distanceX, distanceY);
-
+            scrollBy((int) distanceX, (int) distanceY);
             return true;
         }
+    }
 
-
+    public RelativeLayout.LayoutParams createLayoutParams() {
+        return new RelativeLayout.LayoutParams(
+                LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.WRAP_CONTENT);
     }
 
     public float getScaleFactor() {
@@ -174,13 +186,14 @@ public class Scene extends RelativeLayout {
 
         if (event.getAction() == DragEvent.ACTION_DRAG_ENDED) {
             dragView.setVisibility(View.VISIBLE);
+            dragView.bringToFront();
             return true;
         }
         if (event.getAction() == DragEvent.ACTION_DRAG_LOCATION) {
             //if (!event.getResult()) {
 
-            dragView.setX(event.getX() - dragView.getPoint().x / dragView.getScaleX());
-            dragView.setY(event.getY() - dragView.getPoint().y / dragView.getScaleY());
+            dragView.setX(event.getX() - dragView.getPoint().x/* / dragView.getScaleX()*/);
+            dragView.setY(event.getY() - dragView.getPoint().y/* / dragView.getScaleY()*/);
             //   }
         }
 

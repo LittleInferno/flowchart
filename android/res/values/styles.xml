@@ -1,16 +1,22 @@
 <resources>
 
-    <style parent="android:Theme" type="GdxTheme">
-        <item type="android:windowBackground">@android:color/transparent</item>
-        <item type="android:colorBackgroundCacheHint">@null</item>
-        <item type="android:windowAnimationStyle">@android:style/Animation</item>
-        <item type="android:windowNoTitle">true</item>
-        <item type="android:windowContentOverlay">@null</item>
-        <item type="android:windowFullscreen">true</item>
-    </style>
-
     <style name="AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
 
     <style name="PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
+
+    <style name="DialogList" parent="android:Theme.Material.Light.Dialog">
+        <item name="android:windowIsTranslucent">true</item>
+        <item name="android:layout_margin">20dp</item>
+        <item name="android:background">@android:color/transparent</item>
+        <!--<item name="android:windowContentOverlay">@null</item>-->
+        <item name="android:windowNoTitle">true</item>
+        <item name="android:backgroundDimEnabled">false</item>
+        <!--<item name="android:windowIsFloating">false</item>-->
+    </style>
+
+    <style name="DialogDetails" parent="Theme.AppCompat.Light.NoActionBar">
+        <item name="android:windowMinWidthMajor">80%</item>
+        <item name="android:windowMinWidthMinor">80%</item>
+    </style>
 
 </resources>

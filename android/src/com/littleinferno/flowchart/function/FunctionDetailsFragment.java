@@ -29,7 +29,7 @@ public class FunctionDetailsFragment extends DialogFragment {
 //    @BindView(R.id.rv_parameters)
 //    RecyclerView parameters;
 
-    private Optional<Function> function;
+    private Optional<AndroidFunction> function;
     private SectionedRecyclerViewAdapter sectionAdapter;
 
     public FunctionDetailsFragment() {
@@ -82,7 +82,7 @@ public class FunctionDetailsFragment extends DialogFragment {
         super.onResume();
     }
 
-    public void setFunction(Function function) {
+    public void setFunction(AndroidFunction function) {
         this.function = Optional.of(function);
     }
 }

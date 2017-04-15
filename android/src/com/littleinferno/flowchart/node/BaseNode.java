@@ -5,6 +5,7 @@ import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Point;
 import android.graphics.PointF;
+import android.os.Build;
 import android.support.v7.widget.CardView;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
@@ -43,6 +44,10 @@ public class BaseNode extends CardView {
 
     public BaseNode(Scene scene) {
         this((View) scene);
+        setLayoutParams(scene.createLayoutParams());
+
+        setScaleX(scene.getScaleFactor());
+        setScaleY(scene.getScaleFactor());
 
         this.scene = scene;
     }
@@ -121,8 +126,14 @@ public class BaseNode extends CardView {
         return delta;
     }
 
-    public void setScene(Scene scene) {
-        this.scene = scene;
+    public void drag() {
+        ClipData data = ClipData.newPlainText("", "");
+        ShadowBuilder shadowBuilder = new ShadowBuilder(this);
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N)
+            startDragAndDrop(data, shadowBuilder, this, 0);
+        else
+            startDrag(data, shadowBuilder, this, 0);
     }
 
     @Override
@@ -130,12 +141,8 @@ public class BaseNode extends CardView {
 
         switch (event.getAction()) {
             case MotionEvent.ACTION_DOWN: {
-                ClipData clipData = ClipData.newPlainText("", "");
-
                 setPoint(event.getX(), event.getY());
-
-                ShadowBuilder shadowBuilder = new ShadowBuilder(this, getPoint());
-                startDrag(clipData, shadowBuilder, this, 0);
+                drag();
                 setVisibility(View.INVISIBLE);
 //                delta.set(getX() - event.getRawX(), getY() - event.getRawY());
 //                setElevation(50);
@@ -156,8 +163,6 @@ public class BaseNode extends CardView {
 
     public void setPoint(float x, float y) {
         point = new PointF(x, y);
-        point.x *= getScaleX();
-        point.y *= getScaleY();
     }
 
     public PointF getPoint() {
@@ -168,20 +173,23 @@ public class BaseNode extends CardView {
 
         private final PointF touchPoint;
 
-        public ShadowBuilder(View view, PointF touchPoint) {
-            super(view);
-            this.touchPoint = touchPoint;
+        public ShadowBuilder(BaseNode node) {
+            super(node);
+            this.touchPoint = node.getPoint();
         }
 
         @Override
         public void onProvideShadowMetrics(Point outShadowSize, Point outShadowTouchPoint) {
             int width;
             int height;
-            width = (int) (getView().getWidth() * getView().getScaleX());
 
+            width = (int) (getView().getWidth() * getView().getScaleX());
             height = (int) (getView().getHeight() * getView().getScaleY());
 
             outShadowSize.set(width, height);
+
+            touchPoint.x *= getView().getScaleX();
+            touchPoint.y *= getView().getScaleY();
 
             outShadowTouchPoint.set((int) touchPoint.x, (int) touchPoint.y);
         }

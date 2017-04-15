@@ -2,7 +2,6 @@ package com.littleinferno.flowchart.plugin;
 
 import com.annimon.stream.Optional;
 
-import org.mozilla.javascript.Context;
 import org.mozilla.javascript.Function;
 import org.mozilla.javascript.NativeArray;
 import org.mozilla.javascript.NativeObject;
@@ -59,7 +58,7 @@ public class AndroidNodePluginHandle extends AndroidBasePluginHandle {
 
     @Override
     public void onUnload() {
-        Context.exit();
+
     }
 
     @Override
