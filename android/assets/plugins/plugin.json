@@ -1,8 +1,0 @@
-{
-  "pluginName": "basic",
-  "pluginDescription": "basic plugin for test",
-  "pluginVersion": "0.0.1",
-  "apiVersion": "300",
-  "srcFileName": "new.js",
-  "drawableFiles": []
-}

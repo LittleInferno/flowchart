@@ -2,25 +2,27 @@ package com.littleinferno.flowchart.function;
 
 import com.annimon.stream.Collectors;
 import com.annimon.stream.Stream;
+import com.littleinferno.flowchart.FlowchartProject;
 import com.littleinferno.flowchart.codegen.BaseCodeGenerator;
-import com.littleinferno.flowchart.project.Project;
-import com.littleinferno.flowchart.util.managers.ProjectManager;
+import com.littleinferno.flowchart.project.ProjectModule;
 
 import java.util.ArrayList;
+import java.util.List;
 
-public class AndroidFunctionManager extends ProjectManager {
+public class AndroidFunctionManager implements ProjectModule {
 
-    private ArrayList<AndroidFunction> functions;
+    private List<AndroidFunction> functions;
     private int counter;
+    private FlowchartProject project;
 
-    public AndroidFunctionManager(Project project) {
-        super(project);
+    public AndroidFunctionManager(final FlowchartProject project) {
+        this.project = project;
         functions = new ArrayList<>();
         counter = 0;
     }
 
 
-    private AndroidFunction createFunction(String name) {
+    public AndroidFunction createFunction(String name) {
         AndroidFunction function = new AndroidFunction(this, name);
 
         functions.add(function);
@@ -55,8 +57,12 @@ public class AndroidFunctionManager extends ProjectManager {
                 .collect(Collectors.joining());
     }
 
-    @Override
-    public void dispose() {
+    public List<AndroidFunction> getFunctions() {
+        return functions;
+    }
 
+    @Override
+    public FlowchartProject getProject() {
+        return project;
     }
 }

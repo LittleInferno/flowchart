@@ -4,6 +4,7 @@ import android.os.Environment;
 import android.support.constraint.ConstraintLayout;
 
 import com.littleinferno.flowchart.plugin.AndroidPluginManager;
+import com.littleinferno.flowchart.scene.AndroidScene;
 
 import java.io.File;
 
@@ -12,7 +13,7 @@ public class FlowchartProject {
     static FlowchartProject project;
     private File projectFolder;
 
-    private Scene currentScene;
+    private AndroidScene currentScene;
     private ConstraintLayout layout;
     private AndroidPluginManager pluginManager;
 
@@ -44,11 +45,11 @@ public class FlowchartProject {
         return project = new FlowchartProject();
     }
 
-    public Scene getCurrentScene() {
+    public AndroidScene getCurrentScene() {
         return currentScene;
     }
 
-    public void setCurrentScene(Scene currentScene) {
+    public void setCurrentScene(AndroidScene currentScene) {
         this.currentScene = currentScene;
     }
 

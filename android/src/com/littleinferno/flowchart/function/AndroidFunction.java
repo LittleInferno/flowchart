@@ -3,8 +3,10 @@ package com.littleinferno.flowchart.function;
 import com.annimon.stream.Stream;
 import com.littleinferno.flowchart.Connection;
 import com.littleinferno.flowchart.DataType;
+import com.littleinferno.flowchart.FlowchartProject;
 import com.littleinferno.flowchart.codegen.BaseCodeGenerator;
 import com.littleinferno.flowchart.node.FunctionReturnNode;
+import com.littleinferno.flowchart.project.ProjectModule;
 import com.littleinferno.flowchart.util.DestroyListener;
 import com.littleinferno.flowchart.util.NameChangedListener;
 
@@ -12,7 +14,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 
-public class AndroidFunction {
+public class AndroidFunction implements ProjectModule{
 
     private final AndroidFunctionManager functionManager;
 
@@ -29,6 +31,7 @@ public class AndroidFunction {
     private GenerateListener generateListener;
 
     public AndroidFunction(AndroidFunctionManager functionManager, String name) {
+
         this.functionManager = functionManager;
         this.name = name;
 
@@ -145,6 +148,11 @@ public class AndroidFunction {
 
     void destroy() {
         notifyListenersDestroed();
+    }
+
+    @Override
+    public FlowchartProject getProject() {
+        return functionManager.getProject();
     }
 
     public interface GenerateListener {

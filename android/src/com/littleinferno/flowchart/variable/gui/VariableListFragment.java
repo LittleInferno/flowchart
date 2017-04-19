@@ -16,6 +16,7 @@ import com.littleinferno.flowchart.variable.AndroidVariableManager;
 
 public class VariableListFragment extends DialogFragment {
 
+    public static final String VARIABLE_MANAGER_TAG = "VARIABLE_MANAGER";
     LayoutVariableListBinding layout;
 
     private AndroidVariableManager variableManager;
@@ -24,47 +25,38 @@ public class VariableListFragment extends DialogFragment {
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
-        final Context themeWrapper = new ContextThemeWrapper(getActivity(), R.style.DialogList);
+        final Context themeWrapper = new ContextThemeWrapper(getActivity(), R.style.DialogDetails);
         layout = LayoutVariableListBinding.inflate(inflater.cloneInContext(themeWrapper), container, false);
-
-        layout = LayoutVariableListBinding.inflate(inflater, container, false);
-        layout.addVariable.setOnClickListener(this::createNewVariable);
-
-        variableListAdapter = new VariableListAdapter(variableManager.getVariables());
-        variableListAdapter.setEventListener(new EventListener());
-        layout.include.variableList.setAdapter(variableListAdapter);
-        layout.include.variableList.setLayoutManager(new LinearLayoutManager(getContext()));
 
         return layout.getRoot();
     }
 
     private void createNewVariable(View view) {
         VariableDetailsFragment variableDetails = new VariableDetailsFragment();
-        variableDetails.setVariableManager(variableManager);
-        variableDetails.setVariableListAdapter(variableListAdapter);
+        Bundle bundle = new Bundle();
+        bundle.putParcelable(VariableDetailsFragment.VARIABLE_MANAGER_TAG, variableManager);
+        variableDetails.setArguments(bundle);
         variableDetails.show(getFragmentManager(), "create");
+        variableListAdapter.notifyDataSetChanged();
     }
 
-    public AndroidVariableManager getVariableManager() {
-        return variableManager;
-    }
+    @Override
+    public void onStart() {
+        super.onStart();
 
-    public void setVariableManager(AndroidVariableManager variableManager) {
-        this.variableManager = variableManager;
-    }
+        Bundle bundle = getArguments();
 
-    private class EventListener implements VariableListAdapter.EventListener {
-        @Override
-        public void onItemRemoved(int position) {
+        if (bundle != null) {
+            variableManager = (AndroidVariableManager) bundle.get(VARIABLE_MANAGER_TAG);
         }
 
-        @Override
-        public void onItemPinned(int position) {
-        }
+        if (variableManager == null)
+            throw new RuntimeException("variable manager cannot be null");
 
-        @Override
-        public void onItemViewClicked(View v, boolean pinned) {
+        layout.addVariable.setOnClickListener(this::createNewVariable);
 
-        }
+        variableListAdapter = new VariableListAdapter(variableManager, getFragmentManager());
+        layout.include.variableList.setAdapter(variableListAdapter);
+        layout.include.variableList.setLayoutManager(new LinearLayoutManager(getContext()));
     }
 }

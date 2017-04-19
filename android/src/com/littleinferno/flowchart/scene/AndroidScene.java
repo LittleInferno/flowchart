@@ -1,4 +1,4 @@
-package com.littleinferno.flowchart;
+package com.littleinferno.flowchart.scene;
 
 import android.content.Context;
 import android.graphics.Canvas;
@@ -16,20 +16,23 @@ import android.view.View;
 import android.widget.RelativeLayout;
 
 import com.annimon.stream.Stream;
+import com.littleinferno.flowchart.Connection;
+import com.littleinferno.flowchart.FlowchartProject;
+import com.littleinferno.flowchart.R;
 import com.littleinferno.flowchart.node.AndroidNodeManager;
 import com.littleinferno.flowchart.node.BaseNode;
 import com.littleinferno.flowchart.pin.Connector;
 
 import java.util.ArrayList;
 
-public class Scene extends RelativeLayout {
+public class AndroidScene extends RelativeLayout {
     private final Paint paint;
     private final GestureDetector gestureDetector;
     private final ScaleGestureDetector scaleDetector;
     private FlowchartProject project;
     private float scaleFactor = 1;
     private PointF delta;
-    private String sceneType;
+    private final String sceneType;
     private final AndroidNodeManager nodeManager;
 
     public FlowchartProject getProject() {
@@ -55,7 +58,19 @@ public class Scene extends RelativeLayout {
         return nodeManager;
     }
 
-    public Scene(Context context, @Nullable AttributeSet attrs) {
+    public AndroidScene(Context context, String sceneType) {
+        super(context);
+        paint = new Paint();
+        gestureDetector = new GestureDetector(context, new GestureListener());
+        scaleDetector = new ScaleGestureDetector(context, new ScaleListener());
+        setWillNotDraw(false);
+        delta = new PointF();
+        project = FlowchartProject.load();
+        nodeManager = new AndroidNodeManager(this);
+        this.sceneType = sceneType;
+    }
+
+    public AndroidScene(Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
         paint = new Paint();
         gestureDetector = new GestureDetector(context, new GestureListener());
@@ -74,9 +89,7 @@ public class Scene extends RelativeLayout {
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {
-
-
-        gestureDetector.onTouchEvent(event);
+        //gestureDetector.onTouchEvent(event);
         scaleDetector.onTouchEvent(event);
         return true;
     }
@@ -119,7 +132,7 @@ public class Scene extends RelativeLayout {
             scaleFactor = Math.max(0.5f, Math.min(scaleFactor, 1.5f));
 
             Stream.range(0, getChildCount())
-                    .map(Scene.this::getChildAt)
+                    .map(AndroidScene.this::getChildAt)
                     .peek(v -> v.setPivotX(0))
                     .peek(v -> v.setPivotY(0))
                     .peek(v -> v.setScaleX(scaleFactor))
@@ -184,7 +197,7 @@ public class Scene extends RelativeLayout {
 
         BaseNode dragView = (BaseNode) event.getLocalState();
 
-        if (event.getAction() == DragEvent.ACTION_DRAG_ENDED) {
+        if (event.getAction() == DragEvent.ACTION_DRAG_ENDED || event.getAction() == DragEvent.ACTION_DROP) {
             dragView.setVisibility(View.VISIBLE);
             dragView.bringToFront();
             return true;

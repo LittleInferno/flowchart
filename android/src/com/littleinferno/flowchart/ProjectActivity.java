@@ -155,7 +155,9 @@ public class ProjectActivity extends AppCompatActivity implements NavigationView
             case R.id.variable: {
 
                 VariableListFragment variableListFragment = new VariableListFragment();
-                variableListFragment.setVariableManager(variableManager);
+                Bundle bundle = new Bundle();
+                bundle.putParcelable(VariableListFragment.VARIABLE_MANAGER_TAG, variableManager);
+                variableListFragment.setArguments(bundle);
                 variableListFragment.show(getFragmentManager(), "variable");
                 break;
             }

@@ -17,7 +17,7 @@ import com.annimon.stream.Optional;
 import com.annimon.stream.Stream;
 import com.littleinferno.flowchart.Connection;
 import com.littleinferno.flowchart.DataType;
-import com.littleinferno.flowchart.Scene;
+import com.littleinferno.flowchart.scene.AndroidScene;
 import com.littleinferno.flowchart.databinding.NodeLayoutBinding;
 import com.littleinferno.flowchart.pin.Connector;
 
@@ -31,7 +31,7 @@ public class BaseNode extends CardView {
     private PointF delta = new PointF();
 
     NodeLayoutBinding layout;
-    private Scene scene;
+    private AndroidScene scene;
     private PointF point;
 
     public BaseNode(View view) {
@@ -42,7 +42,7 @@ public class BaseNode extends CardView {
         view.invalidate();
     }
 
-    public BaseNode(Scene scene) {
+    public BaseNode(AndroidScene scene) {
         this((View) scene);
         setLayoutParams(scene.createLayoutParams());
 
@@ -118,7 +118,7 @@ public class BaseNode extends CardView {
         return layout;
     }
 
-    public Scene getScene() {
+    public AndroidScene getScene() {
         return scene;
     }
 

@@ -9,7 +9,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 
-import com.annimon.stream.Optional;
 import com.jakewharton.rxbinding2.view.RxView;
 import com.jakewharton.rxbinding2.widget.RxAdapterView;
 import com.jakewharton.rxbinding2.widget.RxCompoundButton;
@@ -17,10 +16,15 @@ import com.jakewharton.rxbinding2.widget.RxTextView;
 import com.littleinferno.flowchart.DataType;
 import com.littleinferno.flowchart.R;
 import com.littleinferno.flowchart.databinding.LayoutVariableDetailsBinding;
+import com.littleinferno.flowchart.util.Objects;
 import com.littleinferno.flowchart.variable.AndroidVariable;
 import com.littleinferno.flowchart.variable.AndroidVariableManager;
 
 public class VariableDetailsFragment extends DialogFragment {
+
+    public static final String VARIABLE_MANAGER_TAG = "VARIABLE_MANAGER";
+    public static final String VARIABLE_TAG = "VARIABLE";
+    public static final String VARIABLE_ADAPTER_TAG = "VARIABLE_ADAPTER";
 
     LayoutVariableDetailsBinding layout;
 
@@ -28,13 +32,11 @@ public class VariableDetailsFragment extends DialogFragment {
     private DataType dataTypeBuffer;
     private String nameBuffer;
 
-    private Optional<AndroidVariable> variable;
+    private AndroidVariable variable;
 
     private AndroidVariableManager variableManager;
-    private Optional<VariableListAdapter> variableListAdapter;
 
     public VariableDetailsFragment() {
-        this.variable = Optional.empty();
     }
 
     @Override
@@ -42,6 +44,27 @@ public class VariableDetailsFragment extends DialogFragment {
         final Context themeWrapper = new ContextThemeWrapper(getActivity(), R.style.DialogDetails);
         layout = LayoutVariableDetailsBinding.inflate(inflater.cloneInContext(themeWrapper), container, false);
 
+        return layout.getRoot();
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+
+        Bundle bundle = getArguments();
+
+        if (bundle != null) {
+            variableManager = bundle.getParcelable(VARIABLE_MANAGER_TAG);
+            variable = bundle.getParcelable(VARIABLE_TAG);
+        }
+
+        if (variableManager == null)
+            throw new RuntimeException("variable manager cannot be null");
+
+        init();
+    }
+
+    private void init() {
         RxTextView
                 .textChanges(layout.variableName)
                 .map(String::valueOf)
@@ -69,33 +92,22 @@ public class VariableDetailsFragment extends DialogFragment {
         RxView.clicks(layout.btDiscard).subscribe(v -> dismiss());
 
         RxView.clicks(layout.btOk).subscribe(v -> {
-            variable.ifPresentOrElse(this::changeVariable, this::addVariable);
+            if (Objects.nonNull(variable))
+                changeVariable(variable);
+            else
+                addVariable();
+
             dismiss();
         });
 
-        variable.ifPresent(var ->
-        {
-            layout.variableName.setText(var.getName());
-            layout.chkIsArray.setChecked(var.isArray());
+        if (variable != null) {
+            layout.variableName.setText(variable.getName());
+            layout.chkIsArray.setChecked(variable.isArray());
 
             //noinspection unchecked
             layout.spnDataType.setSelection(((ArrayAdapter<DataType>)
-                    layout.spnDataType.getAdapter()).getPosition(var.getDataType()));
-        });
-
-        return layout.getRoot();
-    }
-
-    public void setVariable(AndroidVariable variable) {
-        this.variable = Optional.of(variable);
-    }
-
-    public void setVariableManager(AndroidVariableManager variableManager) {
-        this.variableManager = variableManager;
-    }
-
-    public AndroidVariableManager getVariableManager() {
-        return variableManager;
+                    layout.spnDataType.getAdapter()).getPosition(variable.getDataType()));
+        }
     }
 
     private boolean checkName(String sequence) {
@@ -118,17 +130,7 @@ public class VariableDetailsFragment extends DialogFragment {
         var.setName(nameBuffer);
     }
 
-    public void setVariableListAdapter(VariableListAdapter variableListAdapter) {
-        this.variableListAdapter = Optional.of(variableListAdapter);
-    }
-
     private void addVariable() {
-        AndroidVariable var = variableManager.createVariable(dataTypeBuffer, nameBuffer, isArrayBuffer);
-        this.variable = Optional.of(var);
-
-        VariableListAdapter adapter = this.variableListAdapter
-                .orElseThrow(() -> new RuntimeException("adapter not set"));
-
-        adapter.notifyItemInserted(adapter.getItemCount());
+        this.variable = variableManager.createVariable(nameBuffer, dataTypeBuffer, isArrayBuffer);
     }
 }
