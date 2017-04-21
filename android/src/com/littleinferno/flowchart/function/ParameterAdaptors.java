@@ -27,10 +27,10 @@ public class ParameterAdaptors extends RecyclerView.Adapter<ParameterViewHolder>
 
     @Override
     public void onBindViewHolder(ParameterViewHolder holder, int position) {
-        FunctionParameter parameter = function.getParameters().get(position);
-        holder.parameterName.setText(parameter.getName());
-        holder.parameterType.setText("data type: " + parameter.getName());
-        holder.isArray.setText("is array: " + parameter.isArray());
+       // FunctionParameter parameter = function.getParameters().get(position);
+//        holder.parameterName.setText(parameter.getName());
+//        holder.parameterType.setText("data type: " + parameter.getName());
+//        holder.isArray.setText("is array: " + parameter.isArray());
     }
 
     @Override

@@ -18,6 +18,7 @@ import android.widget.RelativeLayout;
 
 import com.annimon.stream.Optional;
 import com.littleinferno.flowchart.databinding.ActivityProjectBinding;
+import com.littleinferno.flowchart.function.AndroidFunctionManager;
 import com.littleinferno.flowchart.function.gui.FunctionListFragment;
 import com.littleinferno.flowchart.node.AndroidNode;
 import com.littleinferno.flowchart.node.BaseNode;
@@ -33,6 +34,7 @@ public class ProjectActivity extends AppCompatActivity implements NavigationView
 
     ActivityProjectBinding layout;
     private AndroidVariableManager variableManager;
+    private AndroidFunctionManager functionManager;
 
     @Override
     protected void onDestroy() {
@@ -82,6 +84,13 @@ public class ProjectActivity extends AppCompatActivity implements NavigationView
         });
 
         variableManager = new AndroidVariableManager(FlowchartProject.getProject());
+
+
+        functionManager = new AndroidFunctionManager(FlowchartProject.getProject());
+        functionManager.createFunction("func1");
+        functionManager.createFunction("func2");
+        functionManager.createFunction("fun1");
+        functionManager.createFunction("fun9");
 
 //        BaseNode tv = new BaseNode(layout.projectMain.projectLayout.projectFrame);
 //        tv.setLayoutParams(lparams);
@@ -164,7 +173,10 @@ public class ProjectActivity extends AppCompatActivity implements NavigationView
             case R.id.function: {
 
                 FunctionListFragment functionListFragment = new FunctionListFragment();
-//                functionListFragment.setVariableManager(variableManager);
+                Bundle bundle = new Bundle();
+                bundle.putParcelable(FunctionListFragment.FUNCTION_MANAGER_TAG, functionManager);
+                functionListFragment.setArguments(bundle);
+
                 functionListFragment.show(getFragmentManager(), "function");
                 break;
             }

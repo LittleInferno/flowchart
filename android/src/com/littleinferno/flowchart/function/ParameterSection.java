@@ -32,7 +32,7 @@ public class ParameterSection extends StatelessSection {
 
     @Override
     public void onBindItemViewHolder(RecyclerView.ViewHolder holder, int position) {
-        FunctionParameter parameter = function.getParameters().get(position);
+        AndroidFunctionParameter parameter = function.getParameters().get(position);
 
         ParameterViewHolder parameterHolder = (ParameterViewHolder) holder;
 

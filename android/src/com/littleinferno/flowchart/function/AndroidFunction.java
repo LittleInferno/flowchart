@@ -1,5 +1,8 @@
 package com.littleinferno.flowchart.function;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
 import com.annimon.stream.Stream;
 import com.littleinferno.flowchart.Connection;
 import com.littleinferno.flowchart.DataType;
@@ -14,12 +17,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 
-public class AndroidFunction implements ProjectModule{
+public class AndroidFunction implements ProjectModule, Parcelable {
 
     private final AndroidFunctionManager functionManager;
 
     private String name;
-    private List<FunctionParameter> parameters;
+    private List<AndroidFunctionParameter> parameters;
 
     private List<FunctionReturnNode> returnNodes;
 
@@ -47,16 +50,37 @@ public class AndroidFunction implements ProjectModule{
 
     }
 
-    public List<FunctionParameter> getParameters() {
+    protected AndroidFunction(Parcel in) {
+        functionManager = in.readParcelable(AndroidFunctionManager.class.getClassLoader());
+        name = in.readString();
+        parameters = new ArrayList<>();
+        in.readList(parameters, AndroidFunctionParameter.class.getClassLoader());
+    }
+
+    public static final Creator<AndroidFunction> CREATOR = new Creator<AndroidFunction>() {
+        @Override
+        public AndroidFunction createFromParcel(Parcel in) {
+            return new AndroidFunction(in);
+        }
+
+        @Override
+        public AndroidFunction[] newArray(int size) {
+            return new AndroidFunction[size];
+        }
+    };
+
+    public List<AndroidFunctionParameter> getParameters() {
         return parameters;
     }
 
-    public List<FunctionParameter> getInputParameters() {
-        return Stream.of(parameters).filter(value -> value.getConnection() == Connection.INPUT).toList();
+    public List<AndroidFunctionParameter> getInputParameters() {
+        // return Stream.of(parameters).filter(value -> value.getConnection() == Connection.INPUT).toList();
+        return null;
     }
 
-    public List<FunctionParameter> getOutputParameters() {
-        return Stream.of(parameters).filter(value -> value.getConnection() == Connection.OUTPUT).toList();
+    public List<AndroidFunctionParameter> getOutputParameters() {
+        //    return Stream.of(parameters).filter(value -> value.getConnection() == Connection.OUTPUT).toList();
+        return null;
     }
 
     public String getName() {
@@ -75,15 +99,9 @@ public class AndroidFunction implements ProjectModule{
             returnNodes.get(0).removeCloseButton();
     }
 
-    private void addParameter(FunctionParameter.FunctionParameterHandle parameterHandle) {
-        addParameter(parameterHandle.name, parameterHandle.dataType,
-                parameterHandle.connection, parameterHandle.isArray);
-    }
-
-    public FunctionParameter addParameter(String name, DataType type, Connection connection, boolean isArray) {
-        FunctionParameter parameter =
-                new FunctionParameter(new FunctionParameter
-                        .FunctionParameterHandle(name, type, connection, isArray));
+    public AndroidFunctionParameter addParameter(Connection connection, String name, DataType type, boolean isArray) {
+        AndroidFunctionParameter parameter =
+                new AndroidFunctionParameter(this, connection, type, name, isArray);
 
         notifyListenersParameterAdded(parameter);
         parameters.add(parameter);
@@ -121,8 +139,8 @@ public class AndroidFunction implements ProjectModule{
         Stream.of(destroyListeners).forEach(DestroyListener::destroyed);
     }
 
-    private void notifyListenersParameterAdded(FunctionParameter parameter) {
-        Stream.of(parameterAddedListeners).forEach(var -> var.add(parameter));
+    private void notifyListenersParameterAdded(AndroidFunctionParameter parameter) {
+        //Stream.of(parameterAddedListeners).forEach(var -> var.add(parameter));
     }
 
     private void notifyListenersParameterRemoved(FunctionParameter parameter) {
@@ -135,10 +153,10 @@ public class AndroidFunction implements ProjectModule{
     }
 
     public void applyParameters() {
-        if (!parameterAddedListeners.isEmpty()) {
-            FunctionParameter.Added listener = parameterAddedListeners.get(parameterAddedListeners.size() - 1);
-            Stream.of(parameters).forEach(listener::add);
-        }
+//        if (!parameterAddedListeners.isEmpty()) {
+//            FunctionParameter.Added listener = parameterAddedListeners.get(parameterAddedListeners.size() - 1);
+//            Stream.of(parameters).forEach(listener::add);
+//        }
     }
 
     public String gen(BaseCodeGenerator builder) {
@@ -150,9 +168,32 @@ public class AndroidFunction implements ProjectModule{
         notifyListenersDestroed();
     }
 
+
+    public String checkParameterName(String name) {
+        String result = functionManager.checkFunctionName(name);
+
+        if (result == null) {
+            if (Stream.of(parameters).map(AndroidFunctionParameter::getName).anyMatch(name::equals))
+                return "This name is already taken";
+        }
+
+        return result;
+    }
+
     @Override
     public FlowchartProject getProject() {
         return functionManager.getProject();
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeParcelable(functionManager, flags);
+        dest.writeString(name);
     }
 
     public interface GenerateListener {

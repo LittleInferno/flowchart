@@ -31,15 +31,6 @@ public class VariableListFragment extends DialogFragment {
         return layout.getRoot();
     }
 
-    private void createNewVariable(View view) {
-        VariableDetailsFragment variableDetails = new VariableDetailsFragment();
-        Bundle bundle = new Bundle();
-        bundle.putParcelable(VariableDetailsFragment.VARIABLE_MANAGER_TAG, variableManager);
-        variableDetails.setArguments(bundle);
-        variableDetails.show(getFragmentManager(), "create");
-        variableListAdapter.notifyDataSetChanged();
-    }
-
     @Override
     public void onStart() {
         super.onStart();
@@ -58,5 +49,13 @@ public class VariableListFragment extends DialogFragment {
         variableListAdapter = new VariableListAdapter(variableManager, getFragmentManager());
         layout.include.variableList.setAdapter(variableListAdapter);
         layout.include.variableList.setLayoutManager(new LinearLayoutManager(getContext()));
+    }
+
+    private void createNewVariable(View view) {
+        VariableDetailsFragment variableDetails = new VariableDetailsFragment();
+        Bundle bundle = new Bundle();
+        bundle.putParcelable(VariableDetailsFragment.VARIABLE_MANAGER_TAG, variableManager);
+        variableDetails.setArguments(bundle);
+        variableDetails.show(getFragmentManager(), "create");
     }
 }
