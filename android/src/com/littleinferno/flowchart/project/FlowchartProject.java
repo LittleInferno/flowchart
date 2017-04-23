@@ -1,10 +1,11 @@
-package com.littleinferno.flowchart;
+package com.littleinferno.flowchart.project;
 
 import android.os.Environment;
 import android.support.constraint.ConstraintLayout;
 
+import com.littleinferno.flowchart.Files;
 import com.littleinferno.flowchart.plugin.AndroidPluginManager;
-import com.littleinferno.flowchart.scene.AndroidScene;
+import com.littleinferno.flowchart.scene.AndroidSceneLayout;
 
 import java.io.File;
 
@@ -13,7 +14,7 @@ public class FlowchartProject {
     static FlowchartProject project;
     private File projectFolder;
 
-    private AndroidScene currentScene;
+    private AndroidSceneLayout currentScene;
     private ConstraintLayout layout;
     private AndroidPluginManager pluginManager;
 
@@ -21,7 +22,9 @@ public class FlowchartProject {
         pluginManager = new AndroidPluginManager();
 
         String string = Environment.getExternalStorageDirectory().toString();
-        pluginManager.loadNodePlugins(new File(string + "/flowchart_projects/plugins/"));
+        pluginManager.loadNodePlugins(new File(string + "/flowchart_projects/plugins/nodes"));
+
+        pluginManager.loadCodeGeneratorPlugin(new File(string + "/flowchart_projects/plugins/codegen.js"));
     }
 
     public static FlowchartProject getProject() {
@@ -37,7 +40,7 @@ public class FlowchartProject {
         pluginManager.loadNodePlugins(file);
     }
 
-    static FlowchartProject createNew(String name) {
+    public static FlowchartProject createNew(String name) {
         return project = new FlowchartProject(name);
     }
 
@@ -45,11 +48,11 @@ public class FlowchartProject {
         return project = new FlowchartProject();
     }
 
-    public AndroidScene getCurrentScene() {
+    public AndroidSceneLayout getCurrentScene() {
         return currentScene;
     }
 
-    public void setCurrentScene(AndroidScene currentScene) {
+    public void setCurrentScene(AndroidSceneLayout currentScene) {
         this.currentScene = currentScene;
     }
 

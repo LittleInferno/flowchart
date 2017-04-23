@@ -6,7 +6,7 @@ import android.os.Parcelable;
 import com.annimon.stream.Stream;
 import com.littleinferno.flowchart.Connection;
 import com.littleinferno.flowchart.DataType;
-import com.littleinferno.flowchart.FlowchartProject;
+import com.littleinferno.flowchart.project.FlowchartProject;
 import com.littleinferno.flowchart.codegen.BaseCodeGenerator;
 import com.littleinferno.flowchart.node.FunctionReturnNode;
 import com.littleinferno.flowchart.project.ProjectModule;
@@ -18,6 +18,8 @@ import java.util.List;
 
 
 public class AndroidFunction implements ProjectModule, Parcelable {
+
+    public static final String TAG = "FUNCTION";
 
     private final AndroidFunctionManager functionManager;
 

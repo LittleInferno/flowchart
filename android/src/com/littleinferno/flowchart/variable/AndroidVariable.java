@@ -5,7 +5,7 @@ import android.os.Parcelable;
 
 import com.annimon.stream.Stream;
 import com.littleinferno.flowchart.DataType;
-import com.littleinferno.flowchart.FlowchartProject;
+import com.littleinferno.flowchart.project.FlowchartProject;
 import com.littleinferno.flowchart.project.ProjectModule;
 import com.littleinferno.flowchart.util.DestroyListener;
 import com.littleinferno.flowchart.util.NameChangedListener;
@@ -16,6 +16,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class AndroidVariable implements ProjectModule, Parcelable {
+
+    public static final String TAG = "VARIABLE";
 
     private final AndroidVariableManager variableManager;
 

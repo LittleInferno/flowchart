@@ -1,15 +1,19 @@
 package com.littleinferno.flowchart.function.gui;
 
 import android.app.FragmentManager;
+import android.os.Bundle;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.jakewharton.rxbinding2.view.RxView;
 import com.littleinferno.flowchart.R;
 import com.littleinferno.flowchart.function.AndroidFunction;
 import com.littleinferno.flowchart.function.AndroidFunctionParameter;
+import com.littleinferno.flowchart.util.ResUtil;
 
 class FunctionParameterListAdapter extends RecyclerView.Adapter<FunctionParameterListAdapter.ViewHolder> {
     private final AndroidFunction function;
@@ -31,9 +35,10 @@ class FunctionParameterListAdapter extends RecyclerView.Adapter<FunctionParamete
     public void onBindViewHolder(FunctionParameterListAdapter.ViewHolder holder, int position) {
         AndroidFunctionParameter afp = function.getParameters().get(position);
         holder.name.setText(afp.getName());
-        holder.isArray.setText(String.valueOf(afp.isArray()));
-        holder.connection.setText(afp.getConnection().toString());
-        holder.type.setText(afp.getDataType().toString());
+        holder.type.setText(afp.getDataType().toString().toLowerCase());
+        holder.type.setTextColor(ResUtil.getDataTypeColor(holder.type.getContext(), afp.getDataType()));
+
+        holder.isArray.setImageDrawable(ResUtil.getArrayDrawable(holder.isArray.getContext(), afp.isArray()));
     }
 
     @Override
@@ -44,17 +49,28 @@ class FunctionParameterListAdapter extends RecyclerView.Adapter<FunctionParamete
     class ViewHolder extends RecyclerView.ViewHolder {
 
         private final TextView name;
-        private final TextView isArray;
         private final TextView type;
-        private final TextView connection;
+        private final ImageView isArray;
 
-        public ViewHolder(View itemView) {
+        ViewHolder(View itemView) {
             super(itemView);
 
             name = (TextView) itemView.findViewById(R.id.parameter_name);
-            isArray = (TextView) itemView.findViewById(R.id.parameter_array);
             type = (TextView) itemView.findViewById(R.id.parameter_type);
-            connection = (TextView) itemView.findViewById(R.id.parameter_connection);
+            isArray = (ImageView) itemView.findViewById(R.id.parameter_is_array);
+
+            RxView.clicks(itemView).subscribe(o -> {
+                Bundle bundle = new Bundle();
+                bundle.putParcelable(AndroidFunction.TAG, function);
+
+                bundle.putParcelable(AndroidFunctionParameter.TAG, function.getParameters().get(getLayoutPosition()));
+
+                FunctionParameterDetailsFragment function = new FunctionParameterDetailsFragment();
+                function.setArguments(bundle);
+                function.show(fragmentManager, "DETAILS");
+                notifyDataSetChanged();
+            });
+
         }
     }
 }

@@ -22,10 +22,6 @@ import com.littleinferno.flowchart.variable.AndroidVariableManager;
 
 public class VariableDetailsFragment extends DialogFragment {
 
-    public static final String VARIABLE_MANAGER_TAG = "VARIABLE_MANAGER";
-    public static final String VARIABLE_TAG = "VARIABLE";
-    public static final String VARIABLE_ADAPTER_TAG = "VARIABLE_ADAPTER";
-
     LayoutVariableDetailsBinding layout;
 
     private boolean isArrayBuffer;
@@ -54,8 +50,8 @@ public class VariableDetailsFragment extends DialogFragment {
         Bundle bundle = getArguments();
 
         if (bundle != null) {
-            variableManager = bundle.getParcelable(VARIABLE_MANAGER_TAG);
-            variable = bundle.getParcelable(VARIABLE_TAG);
+            variableManager = bundle.getParcelable(AndroidVariableManager.TAG);
+            variable = bundle.getParcelable(AndroidVariable.TAG);
         }
 
         if (variableManager == null)
@@ -111,17 +107,17 @@ public class VariableDetailsFragment extends DialogFragment {
     }
 
     private boolean checkName(String sequence) {
-        boolean result = variableManager.checkVariableName(sequence);
+        String result = variableManager.checkVariableName(sequence);
 
-        if (result) {
+        if (result == null || (variable != null && variable.getName().equals(sequence))) {
             nameBuffer = sequence;
             layout.variableNameLayout.setErrorEnabled(false);
         } else {
-            layout.variableNameLayout.setError(variableManager.getError());
+            layout.variableNameLayout.setError(result);
             layout.variableNameLayout.setErrorEnabled(true);
         }
 
-        return result;
+        return result == null;
     }
 
     private void changeVariable(AndroidVariable var) {

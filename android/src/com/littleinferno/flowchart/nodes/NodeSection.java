@@ -7,9 +7,9 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.annimon.stream.Optional;
-import com.littleinferno.flowchart.FlowchartProject;
+import com.littleinferno.flowchart.project.FlowchartProject;
 import com.littleinferno.flowchart.R;
-import com.littleinferno.flowchart.scene.AndroidScene;
+import com.littleinferno.flowchart.scene.AndroidSceneLayout;
 import com.littleinferno.flowchart.node.AndroidNode;
 import com.littleinferno.flowchart.plugin.AndroidNodePluginHandle;
 
@@ -98,7 +98,7 @@ public class NodeSection extends StatelessSection {
 
                 if (e.getAction() == MotionEvent.ACTION_DOWN) {
 
-                    AndroidScene currentScene = FlowchartProject.getProject().getCurrentScene();
+                    AndroidSceneLayout currentScene = FlowchartProject.getProject().getCurrentScene();
 
                     Optional<AndroidNode> node = currentScene.getNodeManager().createNode(nodeName.getText().toString());
 

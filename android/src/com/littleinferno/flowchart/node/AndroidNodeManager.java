@@ -1,8 +1,8 @@
 package com.littleinferno.flowchart.node;
 
 import com.annimon.stream.Optional;
-import com.littleinferno.flowchart.FlowchartProject;
-import com.littleinferno.flowchart.scene.AndroidScene;
+import com.littleinferno.flowchart.project.FlowchartProject;
+import com.littleinferno.flowchart.scene.AndroidSceneLayout;
 import com.littleinferno.flowchart.plugin.AndroidNodePluginHandle;
 
 import java.util.ArrayList;
@@ -11,10 +11,10 @@ import java.util.List;
 public class AndroidNodeManager {
 
     final private FlowchartProject project;
-    final private AndroidScene scene;
+    final private AndroidSceneLayout scene;
     final private List<AndroidNode> nodes;
 
-    public AndroidNodeManager(AndroidScene scene) {
+    public AndroidNodeManager(AndroidSceneLayout scene) {
         this.scene = scene;
         project = scene.getProject();
         nodes = new ArrayList<>();

@@ -5,7 +5,7 @@ import android.os.Parcelable;
 
 import com.annimon.stream.Collectors;
 import com.annimon.stream.Stream;
-import com.littleinferno.flowchart.FlowchartProject;
+import com.littleinferno.flowchart.project.FlowchartProject;
 import com.littleinferno.flowchart.codegen.BaseCodeGenerator;
 import com.littleinferno.flowchart.project.ProjectModule;
 
@@ -15,27 +15,11 @@ import java.util.List;
 
 public class AndroidFunctionManager implements ProjectModule, Parcelable {
 
+    public static final String TAG = "FUNCTION_MANAGER";
+
     private List<AndroidFunction> functions;
     private int counter;
     private FlowchartProject project;
-
-    private final String[] keyWords = new String[]{
-            "abstract", "arguments", "await", "boolean",
-            "break", "byte", "case", "catch",
-            "char", "class", "const", "continue",
-            "debugger", "default", "delete", "do",
-            "double", "else", "enum", "eval",
-            "export", "extends", "false", "final",
-            "finally", "float", "for", "function",
-            "goto", "if", "implements", "import",
-            "in", "instanceof", "int", "interface",
-            "let", "long", "native", "new",
-            "null", "package", "private", "protected",
-            "public", "return", "short", "static",
-            "super", "switch", "synchronized", "this",
-            "throw", "throws", "transient", "true",
-            "try", "typeof", "var", "void",
-            "volatile", "while", "with", "yield"};
 
     public AndroidFunctionManager(final FlowchartProject project) {
         this.project = project;
@@ -111,7 +95,7 @@ public class AndroidFunctionManager implements ProjectModule, Parcelable {
             return "Unacceptable symbols";
         } else if (Stream.of(functions).map(AndroidFunction::getName).anyMatch(name::equals)) {
             return "This name is already taken";
-        } else if (Stream.of(keyWords).anyMatch(name::equals))
+        } else if (project.getPluginManager().getCodeGenerator().containsWord(name))
             return "Invalid name";
 
         return null;

@@ -23,7 +23,7 @@ public class Files {
         return Stream.of(listOfFiles).filter(File::isDirectory).map(File::getName).toList();
     }
 
-    static File newProjectFolder(String name) {
+    public static File newProjectFolder(String name) {
         File file = new File(Environment.getExternalStorageDirectory().toString() + projectLocation + "/" + name);
         file.mkdir();
         return file;

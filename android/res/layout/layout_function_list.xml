@@ -8,9 +8,13 @@
         android:baselineAligned="false">
 
         <android.support.design.widget.CoordinatorLayout
-            android:layout_width="wrap_content"
+            android:id="@+id/coordinatorLayout"
+            android:layout_width="128dp"
             android:layout_height="match_parent"
-            android:layout_margin="8dp">
+            android:layout_margin="8dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
 
             <include
                 android:id="@+id/fun"
@@ -24,25 +28,26 @@
                 android:layout_height="wrap_content"
                 android:layout_margin="10dp"
                 android:clickable="true"
-                app:fabSize="mini"
-                app:layout_anchor="@id/fun"
+                android:visibility="visible"
+                app:fabSize="normal"
+                app:layout_anchor="@+id/fun"
                 app:layout_anchorGravity="bottom|left"
+                app:layout_behavior="com.littleinferno.flowchart.util.ScrollFABBehavior"
                 app:srcCompat="@drawable/ic_add_black_24dp" />
 
         </android.support.design.widget.CoordinatorLayout>
 
-        <FrameLayout
+        <RelativeLayout
             android:id="@+id/function_details_layout"
-            android:layout_width="0dp"
+            android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_margin="8dp"
-            android:layout_weight="1"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintLeft_toRightOf="@+id/frameLayout"
+            app:layout_constraintLeft_toRightOf="@+id/coordinatorLayout"
             app:layout_constraintRight_toRightOf="parent"
             app:layout_constraintTop_toTopOf="parent">
 
-        </FrameLayout>
+        </RelativeLayout>
 
     </LinearLayout>
 

@@ -15,6 +15,8 @@ import java.util.List;
 
 public class AndroidFunctionParameter implements Parcelable {
 
+    public static final String TAG = "FUNCTION_PARAMETER";
+
     private final AndroidFunction function;
     private String name;
     private DataType dataType;

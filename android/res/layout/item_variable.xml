@@ -1,38 +1,76 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content">
 
-    <LinearLayout
+    <android.support.v7.widget.CardView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical">
+        android:layout_height="match_parent"
+        android:layout_marginBottom="0dp"
+        android:elevation="8dp">
 
-        <TextView
-            android:id="@+id/variable_name"
+        <android.support.constraint.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="variable name" />
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_margin="4dp"
             android:orientation="horizontal">
+
+
+            <TextView
+                android:id="@+id/variable_name"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="8dp"
+                android:layout_marginTop="8dp"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:text="variable name"
+                android:textSize="18sp"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintRight_toLeftOf="@+id/variable_is_array"
+                android:layout_marginRight="8dp"
+                app:layout_constraintHorizontal_bias="0.0"
+                android:layout_marginBottom="8dp"
+                app:layout_constraintBottom_toTopOf="@+id/variable_type"
+                app:layout_constraintVertical_bias="0.0" />
 
             <TextView
                 android:id="@+id/variable_type"
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
+                android:layout_marginBottom="8dp"
+                android:layout_marginLeft="8dp"
                 android:layout_weight="1"
-                android:text="var type" />
+                android:gravity="center"
+                android:text="var type"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintRight_toLeftOf="@+id/variable_is_array"
+                android:layout_marginRight="8dp"
+                app:layout_constraintHorizontal_bias="0.0" />
 
-            <TextView
-                android:id="@+id/variable_array"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="is array" />
-        </LinearLayout>
-    </LinearLayout>
 
+            <ImageView
+                android:id="@+id/variable_is_array"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:layout_marginBottom="8dp"
+                android:layout_marginRight="8dp"
+                android:layout_marginTop="8dp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintRight_toRightOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintVertical_bias="0.464"
+                app:srcCompat="@drawable/ic_array_false"
+                tools:layout_conversion_absoluteHeight="24dp"
+                tools:layout_conversion_absoluteWidth="24dp"
+                tools:layout_conversion_absoluteX="114dp"
+                tools:layout_conversion_absoluteY="4dp" />
+
+        </android.support.constraint.ConstraintLayout>
+
+    </android.support.v7.widget.CardView>
 </FrameLayout>

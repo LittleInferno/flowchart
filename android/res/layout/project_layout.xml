@@ -28,7 +28,7 @@
 
         </android.support.v7.widget.CardView>
 
-        <com.littleinferno.flowchart.scene.AndroidScene
+        <com.littleinferno.flowchart.scene.AndroidSceneLayout
             android:id="@+id/project_frame"
             android:layout_width="0dp"
             android:layout_height="0dp"

@@ -8,6 +8,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 
 import com.littleinferno.flowchart.databinding.NewProjectLayoutBinding;
+import com.littleinferno.flowchart.project.FlowchartProject;
 
 
 public class CreateNewProjectDialog extends AppCompatActivity {

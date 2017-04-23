@@ -11,10 +11,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.littleinferno.flowchart.project.FlowchartProject;
 import com.littleinferno.flowchart.R;
-import com.littleinferno.flowchart.plugin.AndroidPluginManager;
-
-import java.io.File;
 
 import io.github.luizgrp.sectionedrecyclerviewadapter.SectionedRecyclerViewAdapter;
 
@@ -32,13 +30,6 @@ public class NodeFragmet extends Fragment {
 
         String string = Environment.getExternalStorageDirectory().toString();
 
-
-        AndroidPluginManager manager = new AndroidPluginManager();
-
-        manager.loadNodePlugin(new File(string + "/flowchart_projects/plugins/new.js"));
-
-
-
 //        List<NodePluginHandle> loadedNodePlugins = Project.pluginManager(file).getLoadedNodePlugins();
 
 //        List<ItemNode> nodes = Stream.of(loadedNodePlugins)
@@ -47,7 +38,7 @@ public class NodeFragmet extends Fragment {
 //                .map(ItemNode::new)
 //                .toList();
 //
-        sectionAdapter.addSection(new NodeSection(sectionAdapter, "Nodes", manager.getLoadedNodeHandles()));
+        sectionAdapter.addSection(new NodeSection(sectionAdapter, "Nodes", FlowchartProject.getProject().getPluginManager().getLoadedNodeHandles()));
 //        sectionAdapter.addSection(new NodeSection(sectionAdapter, "A", nodes));
 
 

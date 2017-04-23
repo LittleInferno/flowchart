@@ -11,6 +11,8 @@ public class AndroidPluginManager {
 
 
     private List<AndroidNodePluginHandle> nodePluginHandles;
+    private CodeGeneratorPluginHandle codeGeneratorPluginHandle;
+
     private int pluginsCount;
 
     public AndroidPluginManager() {
@@ -23,7 +25,6 @@ public class AndroidPluginManager {
     }
 
     public void loadNodePlugins(final File pluginsLocation) {
-
         File[] files = pluginsLocation.listFiles();
         Stream.of(files).forEach(this::loadNodePlugin);
     }
@@ -31,6 +32,16 @@ public class AndroidPluginManager {
 
     public void loadNodePlugin(final File file) {
         nodePluginHandles.add(new AndroidNodePluginHandle(file));
+    }
+
+    public void loadCodeGeneratorPlugin(final File file) {
+        if (codeGeneratorPluginHandle != null)
+            unloadCodeGeneratorPlugin(codeGeneratorPluginHandle);
+        codeGeneratorPluginHandle = new CodeGeneratorPluginHandle(file);
+    }
+
+    private void unloadCodeGeneratorPlugin(CodeGeneratorPluginHandle codeGeneratorPluginHandle) {
+        codeGeneratorPluginHandle.unload();
     }
 
     public void unloadNodePlugin(final String pluginName) {
@@ -69,6 +80,10 @@ public class AndroidPluginManager {
                 .flatMap(nph -> Stream.of(nph.getNodes()))
                 .filter(value -> value.getName().equals(nodeName))
                 .findFirst();
+    }
+
+    public CodeGeneratorPluginHandle.CodeGenerator getCodeGenerator() {
+        return codeGeneratorPluginHandle.getCodeGenerator();
     }
 
     public int getPluginsCount() {

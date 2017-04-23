@@ -15,7 +15,6 @@ import com.littleinferno.flowchart.function.AndroidFunctionManager;
 public class NewFunctionDialog extends DialogFragment {
 
     LayoutCreateNewFunctionBinding layout;
-    public static final String FUNCTION_MANAGER_TAG = "FUNCTION_MANAGER";
     private AndroidFunctionManager functionManager;
     private String nameBuffer;
 
@@ -36,7 +35,7 @@ public class NewFunctionDialog extends DialogFragment {
         Bundle bundle = getArguments();
 
         if (bundle != null)
-            functionManager = bundle.getParcelable(FUNCTION_MANAGER_TAG);
+            functionManager = bundle.getParcelable(AndroidFunctionManager.TAG);
 
         RxTextView
                 .textChanges(layout.functionName)

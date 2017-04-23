@@ -22,9 +22,6 @@ import com.littleinferno.flowchart.function.AndroidFunctionParameter;
 import com.littleinferno.flowchart.util.Objects;
 
 public class FunctionParameterDetailsFragment extends DialogFragment {
-    public static final String FUNCTION_TAG = "FUNCTION_TAG";
-    public static final String PARAMETER_TAG = "PARAMETER_TAG";
-
 
     LayoutFunctionParameterDetailsBinding layout;
 
@@ -55,12 +52,12 @@ public class FunctionParameterDetailsFragment extends DialogFragment {
         Bundle bundle = getArguments();
 
         if (bundle != null) {
-            function = bundle.getParcelable(FUNCTION_TAG);
-            parameter = bundle.getParcelable(PARAMETER_TAG);
+            function = bundle.getParcelable(AndroidFunction.TAG);
+            parameter = bundle.getParcelable(AndroidFunctionParameter.TAG);
         }
 
         if (function == null)
-            throw new RuntimeException("function manager cannot be null");
+            throw new RuntimeException("function cannot be null");
 
         init();
     }
@@ -131,7 +128,7 @@ public class FunctionParameterDetailsFragment extends DialogFragment {
     private boolean checkName(String sequence) {
         String result = function.checkParameterName(sequence);
 
-        if (result == null) {
+        if (result == null || (parameter != null && parameter.getName().equals(sequence))) {
             nameBuffer = sequence;
             layout.variableNameLayout.setErrorEnabled(false);
         } else {

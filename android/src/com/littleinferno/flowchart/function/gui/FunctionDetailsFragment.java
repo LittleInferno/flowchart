@@ -33,7 +33,6 @@ public class FunctionDetailsFragment extends Fragment {
     public void onStart() {
         super.onStart();
 
-
         Bundle bundle = getArguments();
 
         if (bundle != null) {
@@ -54,16 +53,13 @@ public class FunctionDetailsFragment extends Fragment {
         parameterListAdapter = new FunctionParameterListAdapter(function, getFragmentManager());
         layout.parameters.items.setAdapter(parameterListAdapter);
         layout.parameters.items.setLayoutManager(new LinearLayoutManager(getContext()));
-
     }
 
     private void createNewParameter(View view) {
         FunctionParameterDetailsFragment parameterDetails = new FunctionParameterDetailsFragment();
         Bundle bundle = new Bundle();
-        bundle.putParcelable(FunctionParameterDetailsFragment.FUNCTION_TAG, function);
+        bundle.putParcelable(AndroidFunction.TAG, function);
         parameterDetails.setArguments(bundle);
         parameterDetails.show(getFragmentManager(), "create");
     }
-
-
 }

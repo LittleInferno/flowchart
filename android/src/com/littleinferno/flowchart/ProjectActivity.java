@@ -24,6 +24,7 @@ import com.littleinferno.flowchart.node.AndroidNode;
 import com.littleinferno.flowchart.node.BaseNode;
 import com.littleinferno.flowchart.nodes.NodeFragmet;
 import com.littleinferno.flowchart.pin.Connector;
+import com.littleinferno.flowchart.project.FlowchartProject;
 import com.littleinferno.flowchart.variable.AndroidVariableManager;
 import com.littleinferno.flowchart.variable.gui.VariableListFragment;
 
@@ -153,8 +154,10 @@ public class ProjectActivity extends AppCompatActivity implements NavigationView
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
-
         inflater.inflate(R.menu.project_actions, menu);
+
+
+
         return true;
     }
 
@@ -165,7 +168,7 @@ public class ProjectActivity extends AppCompatActivity implements NavigationView
 
                 VariableListFragment variableListFragment = new VariableListFragment();
                 Bundle bundle = new Bundle();
-                bundle.putParcelable(VariableListFragment.VARIABLE_MANAGER_TAG, variableManager);
+                bundle.putParcelable(AndroidVariableManager.TAG, variableManager);
                 variableListFragment.setArguments(bundle);
                 variableListFragment.show(getFragmentManager(), "variable");
                 break;
@@ -174,7 +177,7 @@ public class ProjectActivity extends AppCompatActivity implements NavigationView
 
                 FunctionListFragment functionListFragment = new FunctionListFragment();
                 Bundle bundle = new Bundle();
-                bundle.putParcelable(FunctionListFragment.FUNCTION_MANAGER_TAG, functionManager);
+                bundle.putParcelable(AndroidFunctionManager.TAG, functionManager);
                 functionListFragment.setArguments(bundle);
 
                 functionListFragment.show(getFragmentManager(), "function");

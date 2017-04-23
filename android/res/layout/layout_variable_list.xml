@@ -22,9 +22,10 @@
                 android:layout_gravity="top|left"
                 android:layout_margin="10dp"
                 android:clickable="true"
-                app:fabSize="mini"
+                app:fabSize="normal"
                 app:layout_anchor="@+id/include"
                 app:layout_anchorGravity="bottom|right"
+                app:layout_behavior="com.littleinferno.flowchart.util.ScrollFABBehavior"
                 app:srcCompat="@drawable/ic_add_black_24dp" />
 
         </android.support.design.widget.CoordinatorLayout>

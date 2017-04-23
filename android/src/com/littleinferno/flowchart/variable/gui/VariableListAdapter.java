@@ -6,9 +6,12 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.jakewharton.rxbinding2.view.RxView;
 import com.littleinferno.flowchart.R;
+import com.littleinferno.flowchart.util.ResUtil;
 import com.littleinferno.flowchart.variable.AndroidVariable;
 import com.littleinferno.flowchart.variable.AndroidVariableManager;
 
@@ -38,8 +41,10 @@ public class VariableListAdapter
     public void onBindViewHolder(ViewHolder holder, int position) {
         AndroidVariable variable = variableManager.getVariables().get(position);
         holder.varName.setText(variable.getName());
-        holder.varType.setText(variable.getDataType().toString());
-        holder.varArray.setText(String.valueOf(variable.isArray()));
+        holder.varType.setText(variable.getDataType().toString().toLowerCase());
+        holder.varType.setTextColor(ResUtil.getDataTypeColor(holder.varType.getContext(), variable.getDataType()));
+
+        holder.varArray.setImageDrawable(ResUtil.getArrayDrawable(holder.varArray.getContext(), variable.isArray()));
     }
 
     @Override
@@ -51,17 +56,18 @@ public class VariableListAdapter
 
         private final TextView varName;
         private final TextView varType;
-        private final TextView varArray;
+        private final ImageView varArray;
 
-        public ViewHolder(View v) {
-            super(v);
-            varName = (TextView) v.findViewById(R.id.variable_name);
-            varType = (TextView) v.findViewById(R.id.variable_type);
-            varArray = (TextView) v.findViewById(R.id.variable_array);
+        public ViewHolder(View itemView) {
+            super(itemView);
+            varName = (TextView) itemView.findViewById(R.id.variable_name);
+            varType = (TextView) itemView.findViewById(R.id.variable_type);
+            varArray = (ImageView) itemView.findViewById(R.id.variable_is_array);
 
-            v.setOnClickListener(v1 -> {
+            RxView.clicks(itemView).subscribe(o -> {
                 Bundle bundle = new Bundle();
-                bundle.putParcelable(VariableDetailsFragment.VARIABLE_MANAGER_TAG, variableManager);
+                bundle.putParcelable(AndroidVariableManager.TAG, variableManager);
+                bundle.putParcelable(AndroidVariable.TAG, variableManager.getVariables().get(getLayoutPosition()));
 
                 VariableDetailsFragment variable = new VariableDetailsFragment();
                 variable.setArguments(bundle);
