@@ -3,6 +3,7 @@ package com.littleinferno.flowchart.project;
 import android.os.Environment;
 import android.support.constraint.ConstraintLayout;
 
+import com.annimon.stream.Stream;
 import com.littleinferno.flowchart.Files;
 import com.littleinferno.flowchart.plugin.AndroidPluginManager;
 import com.littleinferno.flowchart.scene.AndroidSceneLayout;
@@ -22,22 +23,24 @@ public class FlowchartProject {
         pluginManager = new AndroidPluginManager();
 
         String string = Environment.getExternalStorageDirectory().toString();
-        pluginManager.loadNodePlugins(new File(string + "/flowchart_projects/plugins/nodes"));
 
-        pluginManager.loadCodeGeneratorPlugin(new File(string + "/flowchart_projects/plugins/codegen.js"));
+
+        pluginManager
+                .loadNodePlugins(Stream.of(new File(string + "/flowchart_projects/plugins/nodes")
+                        .listFiles())
+                        .map(Files::readToString)
+                        .toArray(String[]::new));
+
+        pluginManager
+                .loadCodeGeneratorPlugin(Files.readToString(new File(string + "/flowchart_projects/plugins/codegen.js")));
     }
 
     public static FlowchartProject getProject() {
         return project;
     }
 
-    FlowchartProject(String name) {
+    private FlowchartProject(String name) {
         projectFolder = Files.newProjectFolder(name);
-    }
-
-
-    void loadNodePlugins(File file) {
-        pluginManager.loadNodePlugins(file);
     }
 
     public static FlowchartProject createNew(String name) {

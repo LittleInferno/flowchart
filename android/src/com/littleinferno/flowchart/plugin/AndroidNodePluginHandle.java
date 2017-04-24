@@ -7,7 +7,6 @@ import org.mozilla.javascript.NativeArray;
 import org.mozilla.javascript.NativeObject;
 import org.mozilla.javascript.ScriptableObject;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -17,8 +16,8 @@ public class AndroidNodePluginHandle extends AndroidBasePluginHandle {
 
     private final List<NodeHandle> handles;
 
-    public AndroidNodePluginHandle(File pluginFile) {
-        super(pluginFile);
+    public AndroidNodePluginHandle(String plugin) {
+        super(plugin);
         handles = new ArrayList<>();
 
         registerNodes((NativeArray) createScriptFun("exportNodes").call());

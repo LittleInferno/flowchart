@@ -1,5 +1,6 @@
 package com.littleinferno.flowchart.pin;
 
+import android.support.v4.content.ContextCompat;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -56,21 +57,15 @@ public class Connector extends LinearLayout {
         this.node.invalidate();
         this.possibleConvert = possibleConvert;
 
-        image.setOnClickListener(v -> {
-            connector.ifPresentOrElse(c -> c.connect((Connector) v.getParent()),
-                    () -> connector = Optional.of((Connector) v.getParent())
-            );
-        });
+        image.setOnClickListener(v -> connector.ifPresentOrElse(c -> c.connect((Connector) v.getParent()),
+                () -> connector = Optional.of((Connector) v.getParent())
+        ));
 
-
-        // = image.mutate();
-        //mWrappedDrawable = DrawableCompat.wrap(mWrappedDrawable);
-        //DrawableCompat.setTint(mWrappedDrawable, mColor);
-        //DrawableCompat.setTintMode(mWrappedDrawable, PorterDuff.Mode.SRC_IN);
+        if (isArray)
+            image.setImageDrawable(ContextCompat.getDrawable(getContext(), R.drawable.ic_pin_array_connect_false));
 
         connectedPin = Optional.empty();
         connectedPins = Optional.empty();
-
 
         setLayoutParams(params);
         setName(name);
@@ -90,7 +85,20 @@ public class Connector extends LinearLayout {
         if (this.isArray == isArray)
             return;
 
+        setImage();
+
         this.isArray = isArray;
+    }
+
+    private void setImage() {
+        int i;
+
+        if (isArray)
+            i = connect ? R.drawable.ic_pin_array_connect_true : R.drawable.ic_pin_array_connect_false;
+        else
+            i = connect ? R.drawable.ic_pin_connect_true : R.drawable.ic_pin_connect_false;
+
+        image.setImageDrawable(ContextCompat.getDrawable(getContext(), i));
     }
 
     public boolean isArray() {
@@ -112,9 +120,9 @@ public class Connector extends LinearLayout {
                         .of(connectors)
                         .forEach(connector -> connector.setType(type)));
 
-//                Stream.of(parent.getPins())
-//                        .filter(Pin::isUniversal)
-//                        .forEach(pin -> pin.setType(newType));
+                Stream.of(node.getPins())
+                        .filter(pin -> pin.getType() == DataType.UNIVERSAL)
+                        .forEach(pin -> pin.setType(type));
             }
         }, () -> {
             this.type = type;
@@ -135,12 +143,28 @@ public class Connector extends LinearLayout {
     }
 
     public boolean connect(final Connector pin) {
+        connector = Optional.empty();
 
         if (!possibleConnect(pin))
             return false;
 
         DataType pinType = pin.getType();
         DataType thisType = getType();
+
+        if (pinType != thisType) {
+            boolean success = false;
+
+            if (pinType == DataType.UNIVERSAL) {
+                pin.setType(thisType);
+                success = pin.getType() == thisType;
+
+            } else if (thisType == DataType.UNIVERSAL) {
+                setType(pinType);
+                success = getType() == pinType;
+            }
+
+            if (!success) return false;
+        }
 
         if (isSingle())
             connectPin(pin);
@@ -159,6 +183,10 @@ public class Connector extends LinearLayout {
                 .ifPresent(connectors -> connectors.add(this));
 
         connectedPin = Optional.of(pin);
+        pin.connect = true;
+        connect = true;
+        setImage();
+        pin.setImage();
 
         node.getScene().addWire(this, pin);
     }
@@ -176,12 +204,19 @@ public class Connector extends LinearLayout {
     }
 
     private void disconnectPin() {
-        connectedPin.ifPresent(c -> c.connectedPins.ifPresent(l -> l.remove(this)));
+        connect = false;
+        connect = true;
+
+        connectedPin.ifPresent(c -> {
+            c.connect = false;
+            c.connectedPins.ifPresent(l -> l.remove(this));
+        });
+
         connectedPin = Optional.empty();
     }
 
     private void disconnectPins(final Connector pin) {
-        pin.disconnect(this);
+        pin.disconnectPin();
     }
 
 

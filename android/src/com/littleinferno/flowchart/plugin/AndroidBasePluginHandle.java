@@ -1,12 +1,8 @@
 package com.littleinferno.flowchart.plugin;
 
-import com.littleinferno.flowchart.Files;
-
 import org.mozilla.javascript.Context;
 import org.mozilla.javascript.Function;
 import org.mozilla.javascript.Scriptable;
-
-import java.io.File;
 
 public abstract class AndroidBasePluginHandle {
 
@@ -14,13 +10,12 @@ public abstract class AndroidBasePluginHandle {
     private final Context rhino;
     private final Scriptable scope;
 
-    public AndroidBasePluginHandle(File pluginFile) {
+    public AndroidBasePluginHandle(String plugin) {
         rhino = Context.enter();
         rhino.setOptimizationLevel(-1);
 
         scope = rhino.initStandardObjects();
-        String string = Files.readToString(pluginFile);
-        rhino.evaluateString(scope, string, "JavaScript", 1, null);
+        rhino.evaluateString(scope, plugin, "JavaScript", 1, null);
 
         PluginParams params = new ScriptFun(rhino, scope, "pluginParams").call(PluginParams.class);
         if (params.getApiVersion() != getApiVersion())

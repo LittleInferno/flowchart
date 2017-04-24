@@ -5,14 +5,12 @@ import com.annimon.stream.Stream;
 import org.mozilla.javascript.Context;
 import org.mozilla.javascript.ScriptableObject;
 
-import java.io.File;
-
 public class CodeGeneratorPluginHandle extends AndroidBasePluginHandle {
 
     private CodeGenerator codeGenerator;
 
-    public CodeGeneratorPluginHandle(File pluginFile) {
-        super(pluginFile);
+    public CodeGeneratorPluginHandle(final String plugin) {
+        super(plugin);
 
         readRules((ScriptableObject) createScriptFun("exportRules").call());
     }

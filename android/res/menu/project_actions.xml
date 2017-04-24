@@ -4,11 +4,13 @@
 
     <item
         android:id="@+id/function"
-        android:icon="@drawable/function_action"
-        app:showAsAction="always" />
+        android:icon="@drawable/ic_function_action"
+        app:showAsAction="always"
+        android:title="" />
+
     <item
         android:id="@+id/variable"
-        android:icon="@drawable/variable_action"
+        android:icon="@drawable/ic_variable_action"
         app:showAsAction="always"
         android:title="" />
 </menu>

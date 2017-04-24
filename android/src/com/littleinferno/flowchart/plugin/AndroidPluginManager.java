@@ -24,20 +24,18 @@ public class AndroidPluginManager {
         pluginsCount = files.length;
     }
 
-    public void loadNodePlugins(final File pluginsLocation) {
-        File[] files = pluginsLocation.listFiles();
-        Stream.of(files).forEach(this::loadNodePlugin);
+    public void loadNodePlugins(final String[] plugins) {
+        Stream.of(plugins).forEach(this::loadNodePlugin);
     }
 
-
-    public void loadNodePlugin(final File file) {
-        nodePluginHandles.add(new AndroidNodePluginHandle(file));
+    public void loadNodePlugin(final String plugin) {
+        nodePluginHandles.add(new AndroidNodePluginHandle(plugin));
     }
 
-    public void loadCodeGeneratorPlugin(final File file) {
+    public void loadCodeGeneratorPlugin(final String plugin) {
         if (codeGeneratorPluginHandle != null)
             unloadCodeGeneratorPlugin(codeGeneratorPluginHandle);
-        codeGeneratorPluginHandle = new CodeGeneratorPluginHandle(file);
+        codeGeneratorPluginHandle = new CodeGeneratorPluginHandle(plugin);
     }
 
     private void unloadCodeGeneratorPlugin(CodeGeneratorPluginHandle codeGeneratorPluginHandle) {
