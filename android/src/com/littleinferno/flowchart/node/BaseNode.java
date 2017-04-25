@@ -27,6 +27,9 @@ import java.util.List;
 
 public class BaseNode extends CardView {
 
+    public enum Align {
+        LEFT, RIGHT, CENTER
+    }
 
     private PointF delta = new PointF();
 
@@ -114,8 +117,19 @@ public class BaseNode extends CardView {
                 RelativeLayout.LayoutParams.MATCH_PARENT, RelativeLayout.LayoutParams.WRAP_CONTENT);
     }
 
-    public NodeLayoutBinding getLayout() {
-        return layout;
+    public void addView(View view, Align align) {
+        view.setLayoutParams(createLayoutParams());
+        switch (align) {
+            case LEFT:
+                layout.nodeLeft.addView(view);
+                break;
+            case RIGHT:
+                layout.nodeRight.addView(view);
+                break;
+            case CENTER:
+                layout.container.addView(view);
+                break;
+        }
     }
 
     public AndroidSceneLayout getScene() {

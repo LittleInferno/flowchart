@@ -20,6 +20,8 @@ import com.littleinferno.flowchart.util.Objects;
 import com.littleinferno.flowchart.variable.AndroidVariable;
 import com.littleinferno.flowchart.variable.AndroidVariableManager;
 
+import io.reactivex.disposables.Disposable;
+
 public class VariableDetailsFragment extends DialogFragment {
 
     LayoutVariableDetailsBinding layout;
@@ -31,6 +33,11 @@ public class VariableDetailsFragment extends DialogFragment {
     private AndroidVariable variable;
 
     private AndroidVariableManager variableManager;
+    private Disposable varName;
+    private Disposable dataType;
+    private Disposable isArray;
+    private Disposable discard;
+    private Disposable ok;
 
     public VariableDetailsFragment() {
     }
@@ -60,8 +67,19 @@ public class VariableDetailsFragment extends DialogFragment {
         init();
     }
 
+    @Override
+    public void onStop() {
+        super.onStop();
+
+        varName.dispose();
+        dataType.dispose();
+        isArray.dispose();
+        discard.dispose();
+        ok.dispose();
+    }
+
     private void init() {
-        RxTextView
+        varName = RxTextView
                 .textChanges(layout.variableName)
                 .map(String::valueOf)
                 .map(this::checkName)
@@ -74,20 +92,20 @@ public class VariableDetailsFragment extends DialogFragment {
 
         layout.spnDataType.setAdapter(adapter);
 
-        RxAdapterView
+        dataType = RxAdapterView
                 .itemSelections(layout.spnDataType)
                 .map(i -> layout.spnDataType.getSelectedItem())
                 .map(Object::toString)
                 .map(DataType::valueOf)
                 .subscribe(dataType -> dataTypeBuffer = dataType);
 
-        RxCompoundButton
+        isArray = RxCompoundButton
                 .checkedChanges(layout.chkIsArray)
                 .subscribe(o -> isArrayBuffer = o);
 
-        RxView.clicks(layout.btDiscard).subscribe(v -> dismiss());
+        discard = RxView.clicks(layout.btDiscard).subscribe(v -> dismiss());
 
-        RxView.clicks(layout.btOk).subscribe(v -> {
+        ok = RxView.clicks(layout.btOk).subscribe(v -> {
             if (Objects.nonNull(variable))
                 changeVariable(variable);
             else

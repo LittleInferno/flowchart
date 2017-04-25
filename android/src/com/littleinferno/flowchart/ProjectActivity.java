@@ -16,14 +16,10 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.RelativeLayout;
 
-import com.annimon.stream.Optional;
 import com.littleinferno.flowchart.databinding.ActivityProjectBinding;
 import com.littleinferno.flowchart.function.AndroidFunctionManager;
 import com.littleinferno.flowchart.function.gui.FunctionListFragment;
-import com.littleinferno.flowchart.node.AndroidNode;
-import com.littleinferno.flowchart.node.BaseNode;
 import com.littleinferno.flowchart.nodes.NodeFragmet;
-import com.littleinferno.flowchart.pin.Connector;
 import com.littleinferno.flowchart.project.FlowchartProject;
 import com.littleinferno.flowchart.variable.AndroidVariableManager;
 import com.littleinferno.flowchart.variable.gui.VariableListFragment;
@@ -75,46 +71,13 @@ public class ProjectActivity extends AppCompatActivity implements NavigationView
         flowchartProject.setCurrentScene(layout.projectMain.projectLayout.projectFrame);
         flowchartProject.setLayout(layout.projectMain.projectLayout.projectLayout);
 
-        Optional<AndroidNode> node1 = flowchartProject.getCurrentScene().getNodeManager().createNode("add node");
-
-        node1.ifPresent(androidNode -> {
-            flowchartProject.getCurrentScene().addView(androidNode);
-            androidNode.setX(500);
-            androidNode.setY(400);
-
-        });
-
         variableManager = new AndroidVariableManager(FlowchartProject.getProject());
-
 
         functionManager = new AndroidFunctionManager(FlowchartProject.getProject());
         functionManager.createFunction("func1");
         functionManager.createFunction("func2");
         functionManager.createFunction("fun1");
         functionManager.createFunction("fun9");
-
-//        BaseNode tv = new BaseNode(layout.projectMain.projectLayout.projectFrame);
-//        tv.setLayoutParams(lparams);
-//        tv.setX(10);
-//        tv.setY(400);
-//        tv.addDataInputPin("cc", false, DataType.BOOL);
-//        tv.addDataOutputPin("gg", true, DataType.BOOL, DataType.INT);
-//        tv.addDataOutputPin("dfg", true, DataType.INT);
-//        Connector ff1 = tv.addDataOutputPin("bvc", true, DataType.FLOAT);
-//        tv.addDataOutputPin("ff", true, DataType.STRING);
-//        layout.projectMain.projectLayout.projectFrame.addView(tv);
-
-        BaseNode node = new BaseNode(layout.projectMain.projectLayout.projectFrame);
-        node.setLayoutParams(lparams);
-        node.setX(500);
-        node.setY(400);
-        node.addDataInputPin("aa", false, DataType.BOOL);
-        node.addDataInputPin("ff", true, DataType.BOOL, DataType.INT);
-        node.addDataInputPin("ff", true, DataType.INT);
-        Connector ff = node.addDataInputPin("ff", true, DataType.FLOAT);
-        node.addDataInputPin("ff", true, DataType.STRING);
-        layout.projectMain.projectLayout.projectFrame.addView(node);
-        //   ff.connect(ff1);
 
     }
 
@@ -155,6 +118,8 @@ public class ProjectActivity extends AppCompatActivity implements NavigationView
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.project_actions, menu);
+
+
 
 
 

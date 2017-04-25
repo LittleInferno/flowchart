@@ -5,8 +5,8 @@ import android.os.Parcelable;
 
 import com.annimon.stream.Collectors;
 import com.annimon.stream.Stream;
-import com.littleinferno.flowchart.project.FlowchartProject;
 import com.littleinferno.flowchart.codegen.BaseCodeGenerator;
+import com.littleinferno.flowchart.project.FlowchartProject;
 import com.littleinferno.flowchart.project.ProjectModule;
 
 import java.util.ArrayList;
@@ -91,7 +91,7 @@ public class AndroidFunctionManager implements ProjectModule, Parcelable {
 
         if (name.isEmpty()) {
             return "Name can not be empty";
-        } else if (!name.matches("[$a-zA-Z_][0-9a-zA-Z_$]*")) {
+        } else if (!project.getPluginManager().getCodeGenerator().checkPattern(name)) {
             return "Unacceptable symbols";
         } else if (Stream.of(functions).map(AndroidFunction::getName).anyMatch(name::equals)) {
             return "This name is already taken";
@@ -113,3 +113,4 @@ public class AndroidFunctionManager implements ProjectModule, Parcelable {
         dest.writeList(Collections.singletonList(getProject()));//TODO remove hack
     }
 }
+//"[$a-zA-Z_][0-9a-zA-Z_$]*"

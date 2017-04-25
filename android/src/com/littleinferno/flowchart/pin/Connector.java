@@ -1,29 +1,31 @@
 package com.littleinferno.flowchart.pin;
 
+import android.graphics.PorterDuff;
+import android.graphics.drawable.Drawable;
 import android.support.v4.content.ContextCompat;
-import android.widget.ImageView;
+import android.util.TypedValue;
 import android.widget.LinearLayout;
-import android.widget.TextView;
 
 import com.annimon.stream.Optional;
 import com.annimon.stream.Stream;
+import com.jakewharton.rxbinding2.view.RxView;
 import com.littleinferno.flowchart.Connection;
 import com.littleinferno.flowchart.DataType;
 import com.littleinferno.flowchart.R;
 import com.littleinferno.flowchart.node.BaseNode;
+import com.littleinferno.flowchart.util.Destroyable;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
-public class Connector extends LinearLayout {
+import io.reactivex.disposables.Disposable;
 
-    TextView text;
-    ImageView image;
+public class Connector extends android.support.v7.widget.AppCompatTextView implements Destroyable {
 
     private final Connection connection;
+    private final Disposable click;
     private DataType type;
-    private boolean connect;
     private boolean isArray;
 
     private final BaseNode node;
@@ -35,50 +37,47 @@ public class Connector extends LinearLayout {
 
     private static Optional<Connector> connector = Optional.empty();
 
-    public Connector(BaseNode node, LayoutParams params, Connection connection, String name, boolean isArray, Optional<Set<DataType>> possibleConvert, DataType type) {
+    public Connector(BaseNode node, LinearLayout.LayoutParams params, Connection connection, String name, boolean isArray, Optional<Set<DataType>> possibleConvert, DataType type) {
         super(node.getContext());
 
         this.connection = connection;
         this.node = node;
 
-        inflate(node.getContext(),
-                connection == Connection.INPUT ?
-                        R.layout.pin_input_layout :
-                        R.layout.pin_output_layout, this);
-
-        text = (TextView) findViewById(connection == Connection.INPUT ? R.id.tv_pin_in : R.id.tv_pin_out);
-        image = (ImageView) findViewById(connection == Connection.INPUT ? R.id.iv_pin_in : R.id.iv_pin_out);
-
         if (this.connection == Connection.INPUT)
-            this.node.getLayout().nodeLeft.addView(this);
+            this.node.addView(this, BaseNode.Align.LEFT);
         else
-            this.node.getLayout().nodeRight.addView(this);
+            this.node.addView(this, BaseNode.Align.RIGHT);
 
         this.node.invalidate();
         this.possibleConvert = possibleConvert;
 
-        image.setOnClickListener(v -> connector.ifPresentOrElse(c -> c.connect((Connector) v.getParent()),
-                () -> connector = Optional.of((Connector) v.getParent())
-        ));
-
-        if (isArray)
-            image.setImageDrawable(ContextCompat.getDrawable(getContext(), R.drawable.ic_pin_array_connect_false));
+        click = RxView.clicks(this).subscribe(o -> connector.ifPresentOrElse(c -> c.connect(this),
+                () -> connector = Optional.of(this)));
 
         connectedPin = Optional.empty();
         connectedPins = Optional.empty();
 
+        setClickable(true);
+        setBack();
         setLayoutParams(params);
         setName(name);
         setArray(isArray);
+        setImage();
         setType(type);
     }
 
+    private void setBack() {
+        TypedValue value = new TypedValue();
+        getContext().getTheme().resolveAttribute(android.R.attr.selectableItemBackground, value, true);
+        setBackgroundResource(value.resourceId);
+    }
+
     public void setName(String name) {
-        text.setText(name);
+        setText(name);
     }
 
     public String getName() {
-        return String.valueOf(text.getText());
+        return getText().toString();
     }
 
     public void setArray(boolean isArray) {
@@ -94,11 +93,14 @@ public class Connector extends LinearLayout {
         int i;
 
         if (isArray)
-            i = connect ? R.drawable.ic_pin_array_connect_true : R.drawable.ic_pin_array_connect_false;
+            i = isConnect() ? R.drawable.ic_pin_array_connect_true : R.drawable.ic_pin_array_connect_false;
         else
-            i = connect ? R.drawable.ic_pin_connect_true : R.drawable.ic_pin_connect_false;
+            i = isConnect() ? R.drawable.ic_pin_connect_true : R.drawable.ic_pin_connect_false;
 
-        image.setImageDrawable(ContextCompat.getDrawable(getContext(), i));
+        if (getConnection() == Connection.INPUT)
+            setCompoundDrawablesWithIntrinsicBounds(ContextCompat.getDrawable(getContext(), i), null, null, null);
+        else
+            setCompoundDrawablesWithIntrinsicBounds(null, null, ContextCompat.getDrawable(getContext(), i), null);
     }
 
     public boolean isArray() {
@@ -139,7 +141,10 @@ public class Connector extends LinearLayout {
     }
 
     public boolean isConnect() {
-        return connect;
+        if (isSingle())
+            return connectedPin.isPresent();
+
+        return connectedPins.isPresent() && connectedPins.get().size() > 0;
     }
 
     public boolean connect(final Connector pin) {
@@ -178,13 +183,10 @@ public class Connector extends LinearLayout {
 
         connectedPin.ifPresent(c -> c.disconnect(this));
 
-        pin.connectedPins
-                .executeIfAbsent(() -> pin.connectedPins = Optional.of(new ArrayList<>()))
-                .ifPresent(connectors -> connectors.add(this));
+        pin.connectedPins.executeIfAbsent(() -> pin.connectedPins = Optional.of(new ArrayList<>()));
+        pin.connectedPins.ifPresent(connectors -> connectors.add(this));
 
         connectedPin = Optional.of(pin);
-        pin.connect = true;
-        connect = true;
         setImage();
         pin.setImage();
 
@@ -193,6 +195,16 @@ public class Connector extends LinearLayout {
 
     private void connectPins(final Connector pin) {
         pin.connectPin(this);
+    }
+
+    public void disconnectAll() {
+        if (isSingle() && isConnect()) {
+            disconnectPin();
+        } else {
+            connectedPins
+                    .ifPresent(connectors -> Stream.of(connectors)
+                            .forEach(c -> c.disconnect(this)));
+        }
     }
 
     public void disconnect(final Connector pin) {
@@ -204,21 +216,19 @@ public class Connector extends LinearLayout {
     }
 
     private void disconnectPin() {
-        connect = false;
-        connect = true;
 
         connectedPin.ifPresent(c -> {
-            c.connect = false;
             c.connectedPins.ifPresent(l -> l.remove(this));
+            c.setImage();
         });
 
         connectedPin = Optional.empty();
+        setImage();
     }
 
     private void disconnectPins(final Connector pin) {
         pin.disconnectPin();
     }
-
 
     private boolean possibleConnect(Connector pin) {
         return !(pin.getConnection() == getConnection()
@@ -226,35 +236,52 @@ public class Connector extends LinearLayout {
                 || pin.isArray() != isArray());
     }
 
-
     private boolean isSingle() {
         return (getType() == DataType.EXECUTION && getConnection() == Connection.OUTPUT) ||
                 (getType() != DataType.EXECUTION && getConnection() == Connection.INPUT);
     }
 
-
     private void setColor(DataType type) {
-
         switch (type) {
             case EXECUTION:
+                set(R.color.Execution);
                 break;
             case BOOL:
-                image.setColorFilter(getContext().getResources().getColor(R.color.Bool));
+                set(R.color.Bool);
                 break;
             case INT:
-                image.setColorFilter(getContext().getResources().getColor(R.color.Int));
+                set(R.color.Int);
                 break;
             case FLOAT:
-                image.setColorFilter(getContext().getResources().getColor(R.color.Float));
+                set(R.color.Float);
                 break;
             case STRING:
-                image.setColorFilter(getContext().getResources().getColor(R.color.String));
+                set(R.color.String);
                 break;
             case UNIVERSAL:
-                image.setColorFilter(getContext().getResources().getColor(R.color.Universal));
+                set(R.color.Universal);
                 break;
         }
 
     }
 
+    private void set(int id) {
+        Drawable drawable = getImage();
+        if (drawable == null)
+            setImage();
+
+        getImage().setColorFilter(ContextCompat.getColor(getContext(), id), PorterDuff.Mode.DST);
+    }
+
+    public Drawable getImage() {
+        if (getConnection() == Connection.INPUT)
+            return getCompoundDrawables()[0];
+        else
+            return getCompoundDrawables()[2];
+    }
+
+    @Override
+    public void onDestroy() {
+        click.dispose();
+    }
 }

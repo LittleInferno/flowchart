@@ -3,6 +3,10 @@
     xmlns:android="http://schemas.android.com/apk/res/android">
 
     <item
+        android:id="@+id/start"
+        android:icon="@drawable/ic_run_program"
+        app:showAsAction="always" />
+    <item
         android:id="@+id/function"
         android:icon="@drawable/ic_function_action"
         app:showAsAction="always"

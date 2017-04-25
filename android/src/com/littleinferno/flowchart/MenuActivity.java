@@ -36,7 +36,7 @@ public class MenuActivity extends AppCompatActivity {
 ////                    .commit();
 //        });
 
-        ProjectsAdaptor adapter = new ProjectsAdaptor(Stream.of(Files.getProjects()).map(ProjectItem::new).toList());
+        ProjectsAdaptor adapter = new ProjectsAdaptor(Stream.of(Files.getProjects()).map(ProjectItem::new).toList(), getFragmentManager());
 
         LinearLayoutManager layoutManager = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
 

@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <item name="Execution" type="color">#FFFFFF</item>
     <item name="Bool" type="color">#2196F3</item>
     <item name="Float" type="color">#F44336</item>
     <item name="Int" type="color">#4CAF50</item>

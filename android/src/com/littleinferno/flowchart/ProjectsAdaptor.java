@@ -1,6 +1,7 @@
 package com.littleinferno.flowchart;
 
 import android.annotation.SuppressLint;
+import android.app.FragmentManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.TypedArray;
@@ -21,9 +22,11 @@ import java.util.List;
 public class ProjectsAdaptor extends RecyclerView.Adapter<ProjectsAdaptor.ViewHolder> {
 
     private List<ProjectItem> projectItems;
+    private final FragmentManager fm;
 
-    public ProjectsAdaptor(List<ProjectItem> projectItems) {
+    public ProjectsAdaptor(List<ProjectItem> projectItems, FragmentManager fm) {
         this.projectItems = projectItems;
+        this.fm = fm;
     }
 
     @Override
@@ -35,6 +38,11 @@ public class ProjectsAdaptor extends RecyclerView.Adapter<ProjectsAdaptor.ViewHo
                     itemView
                             .getContext()
                             .startActivity(new Intent(itemView.getContext(), ProjectActivity.class));
+
+//                    com.littleinferno.flowchart.project.gui.ProjectLoadDialog
+//                            projectLoadDialog = new com.littleinferno.flowchart.project.gui.ProjectLoadDialog();
+//
+//                    projectLoadDialog.show(fm, "pld");
                 }
         );
 
