@@ -1,4 +1,6 @@
-var NativeNode = com.littleinferno.flowchart.node.AndroidNode;
+// var NativeNode = com.littleinferno.flowchart.node.AndroidNode;
+var NativeNode = com.littleinferno.flowchart.node.BaseNode;
+
 var NativeType = com.littleinferno.flowchart.DataType;
 var NativeConnection = com.littleinferno.flowchart.Connection;
 var NativeGenerator = com.littleinferno.flowchart.codegen.JSCodeGenerator;
@@ -197,7 +199,7 @@ function integerNode() {
     var init = function (node) {
         node.addDataOutputPin("data", false, NativeType.INT);
         editText = EditText.make(node, NativeType.INT);
-        node.addView(editText,NativeNode.Align.CENTER);
+        node.addView(NativeNode.Align.CENTER,editText);
     }
 
     var gen = function (node) {
@@ -220,7 +222,7 @@ function floatNode() {
     var init = function (node) {
         node.addDataOutputPin("data", false, NativeType.FLOAT);
         editText = EditText.make(node, NativeType.FLOAT);
-        node.addView(editText,NativeNode.Align.CENTER);
+  //      node.addView(NativeNode.Align.CENTER,editText);
     }
 
     var gen = function (node) {
@@ -243,7 +245,7 @@ function stringNode() {
     var init = function (node) {
         node.addDataOutputPin("result", false, NativeType.STRING);
         editText = EditText.make(node, NativeType.STRING);
-        node.addView(editText,NativeNode.Align.CENTER);
+        node.addView(NativeNode.Align.CENTER,editText);
     }
 
     var gen = function (node) {

@@ -44,9 +44,9 @@ public class Connector extends android.support.v7.widget.AppCompatTextView imple
         this.node = node;
 
         if (this.connection == Connection.INPUT)
-            this.node.addView(this, BaseNode.Align.LEFT);
+            this.node.addView(BaseNode.Align.LEFT, this);
         else
-            this.node.addView(this, BaseNode.Align.RIGHT);
+            this.node.addView(BaseNode.Align.RIGHT, this);
 
         this.node.invalidate();
         this.possibleConvert = possibleConvert;
@@ -101,6 +101,9 @@ public class Connector extends android.support.v7.widget.AppCompatTextView imple
             setCompoundDrawablesWithIntrinsicBounds(ContextCompat.getDrawable(getContext(), i), null, null, null);
         else
             setCompoundDrawablesWithIntrinsicBounds(null, null, ContextCompat.getDrawable(getContext(), i), null);
+
+        if (getType() != null)
+            setColor(getType());
     }
 
     public boolean isArray() {
@@ -266,11 +269,8 @@ public class Connector extends android.support.v7.widget.AppCompatTextView imple
     }
 
     private void set(int id) {
-        Drawable drawable = getImage();
-        if (drawable == null)
-            setImage();
-
-        getImage().setColorFilter(ContextCompat.getColor(getContext(), id), PorterDuff.Mode.DST);
+        getImage().clearColorFilter();
+        getImage().setColorFilter(ContextCompat.getColor(getContext(), id), PorterDuff.Mode.SRC_IN);
     }
 
     public Drawable getImage() {

@@ -7,11 +7,11 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.annimon.stream.Optional;
-import com.littleinferno.flowchart.project.FlowchartProject;
 import com.littleinferno.flowchart.R;
-import com.littleinferno.flowchart.scene.AndroidSceneLayout;
+import com.littleinferno.flowchart.function.AndroidFunction;
 import com.littleinferno.flowchart.node.AndroidNode;
 import com.littleinferno.flowchart.plugin.AndroidNodePluginHandle;
+import com.littleinferno.flowchart.project.FlowchartProject;
 
 import java.util.List;
 
@@ -98,7 +98,7 @@ public class NodeSection extends StatelessSection {
 
                 if (e.getAction() == MotionEvent.ACTION_DOWN) {
 
-                    AndroidSceneLayout currentScene = FlowchartProject.getProject().getCurrentScene();
+                    AndroidFunction currentScene = FlowchartProject.getProject().getCurrentScene();
 
                     Optional<AndroidNode> node = currentScene.getNodeManager().createNode(nodeName.getText().toString());
 
@@ -114,7 +114,6 @@ public class NodeSection extends StatelessSection {
                             root.setEnabled(false);
 
                         androidNode.setVisibility(View.INVISIBLE);
-                        currentScene.addView(androidNode);
 
                         androidNode.post(() -> {
                             androidNode.setPoint(androidNode.getWidth() / 2, androidNode.getHeight() / 2);

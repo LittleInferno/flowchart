@@ -10,7 +10,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.annimon.stream.Stream;
-import com.littleinferno.flowchart.databinding.ProjectLoadLayoutBinding;
+import com.littleinferno.flowchart.databinding.LayoutProjectLoadBinding;
 import com.littleinferno.flowchart.plugin.BasePluginHandle;
 import com.littleinferno.flowchart.plugin.NodePluginHandle;
 
@@ -19,12 +19,12 @@ import java.util.List;
 
 public class ProjectLoadDialog extends DialogFragment {
 
-    ProjectLoadLayoutBinding layout;
+    LayoutProjectLoadBinding layout;
 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        layout = DataBindingUtil.inflate(inflater, R.layout.project_load_layout, container, false);
+        layout = DataBindingUtil.inflate(inflater, R.layout.layout_project_load, container, false);
 
 
         String string = Environment.getExternalStorageDirectory().toString();

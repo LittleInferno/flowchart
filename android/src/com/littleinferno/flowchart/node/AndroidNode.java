@@ -1,28 +1,27 @@
 package com.littleinferno.flowchart.node;
 
+import android.annotation.SuppressLint;
+import android.content.Context;
 import android.support.annotation.NonNull;
 import android.view.View;
 
-import com.jakewharton.rxbinding2.view.RxView;
 import com.littleinferno.flowchart.pin.Connector;
 import com.littleinferno.flowchart.plugin.AndroidNodePluginHandle;
 import com.littleinferno.flowchart.scene.AndroidSceneLayout;
 import com.littleinferno.flowchart.util.Destroyable;
 
-import io.reactivex.disposables.Disposable;
-
+@SuppressLint("ViewConstructor")
 public class AndroidNode extends BaseNode implements Destroyable {
 
     private final AndroidNodePluginHandle.NodeHandle nodeHandle;
-    private final Disposable close;
 
-    public AndroidNode(@NonNull AndroidSceneLayout scene, @NonNull AndroidNodePluginHandle.NodeHandle nodeHandle) {
-        super(scene);
+    public AndroidNode(final Context context, @NonNull AndroidNodePluginHandle.NodeHandle nodeHandle) {
+        super(context);
         this.nodeHandle = nodeHandle;
         this.nodeHandle.getInit().call(this);
         layout.nodeTitle.setText(this.nodeHandle.getTitle());
 
-        close = RxView.clicks(layout.close).subscribe(v -> {
+        setOnClickListener(v -> {
             onDestroy();
             ((AndroidSceneLayout) getParent()).removeView(this);
         });
@@ -34,8 +33,6 @@ public class AndroidNode extends BaseNode implements Destroyable {
 
     @Override
     public void onDestroy() {
-        close.dispose();
-
         int childCount = layout.nodeLeft.getChildCount();
         for (int i = 0; i < childCount; i++) {
             View child = layout.nodeLeft.getChildAt(i);
@@ -57,5 +54,11 @@ public class AndroidNode extends BaseNode implements Destroyable {
                 c.onDestroy();
             }
         }
+    }
+
+    @Override
+    public void addView(Align align, View view) {
+        super.addView(align, view);
+        //do not remove this
     }
 }

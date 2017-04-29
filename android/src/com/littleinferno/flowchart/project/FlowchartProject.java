@@ -1,12 +1,14 @@
 package com.littleinferno.flowchart.project;
 
+import android.app.FragmentManager;
+import android.content.Context;
 import android.os.Environment;
-import android.support.constraint.ConstraintLayout;
+import android.view.View;
 
 import com.annimon.stream.Stream;
 import com.littleinferno.flowchart.Files;
+import com.littleinferno.flowchart.function.AndroidFunction;
 import com.littleinferno.flowchart.plugin.AndroidPluginManager;
-import com.littleinferno.flowchart.scene.AndroidSceneLayout;
 
 import java.io.File;
 
@@ -15,11 +17,16 @@ public class FlowchartProject {
     static FlowchartProject project;
     private File projectFolder;
 
-    private AndroidSceneLayout currentScene;
-    private ConstraintLayout layout;
+    private AndroidFunction currentScene;
+    private View layout;
     private AndroidPluginManager pluginManager;
+    private Context context;
 
-    public FlowchartProject() {
+    private FragmentManager fragmentManager;
+
+    public FlowchartProject(Context context) {
+        this.context = context;
+
         pluginManager = new AndroidPluginManager();
 
         String string = Environment.getExternalStorageDirectory().toString();
@@ -47,27 +54,39 @@ public class FlowchartProject {
         return project = new FlowchartProject(name);
     }
 
-    public static FlowchartProject load() {
-        return project = new FlowchartProject();
+    public static FlowchartProject load(final Context context) {
+        return project = new FlowchartProject(context);
     }
 
-    public AndroidSceneLayout getCurrentScene() {
+    public AndroidFunction getCurrentScene() {
         return currentScene;
     }
 
-    public void setCurrentScene(AndroidSceneLayout currentScene) {
+    public void setCurrentScene(AndroidFunction currentScene) {
         this.currentScene = currentScene;
     }
 
-    public ConstraintLayout getLayout() {
+    public View getLayout() {
         return layout;
     }
 
-    public void setLayout(ConstraintLayout layout) {
+    public void setLayout(View layout) {
         this.layout = layout;
     }
 
     public AndroidPluginManager getPluginManager() {
         return pluginManager;
+    }
+
+    public Context getContext() {
+        return context;
+    }
+
+    public void setFragmentManager(FragmentManager fragmentManager) {
+        this.fragmentManager = fragmentManager;
+    }
+
+    public FragmentManager getFragmentManager() {
+        return fragmentManager;
     }
 }

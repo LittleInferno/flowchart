@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<layout xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <RelativeLayout
+        android:layout_width="1000dp"
+        android:layout_height="1000dp"
+        android:background="?attr/colorPrimary">
+
+        <com.littleinferno.flowchart.scene.SceneDrag
+            android:id="@+id/project_ui_frame"
+            android:layout_width="800dp"
+            android:layout_height="800dp">
+
+            <com.littleinferno.flowchart.scene.AndroidSceneLayout
+                android:id="@+id/scene"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+            </com.littleinferno.flowchart.scene.AndroidSceneLayout>
+
+        </com.littleinferno.flowchart.scene.SceneDrag>
+    </RelativeLayout>
+</layout>

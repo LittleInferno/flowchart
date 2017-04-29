@@ -6,10 +6,14 @@ import android.os.Parcelable;
 import com.annimon.stream.Stream;
 import com.littleinferno.flowchart.Connection;
 import com.littleinferno.flowchart.DataType;
-import com.littleinferno.flowchart.project.FlowchartProject;
 import com.littleinferno.flowchart.codegen.BaseCodeGenerator;
+import com.littleinferno.flowchart.node.AndroidNode;
+import com.littleinferno.flowchart.node.AndroidNodeManager;
 import com.littleinferno.flowchart.node.FunctionReturnNode;
+import com.littleinferno.flowchart.project.FlowchartProject;
 import com.littleinferno.flowchart.project.ProjectModule;
+import com.littleinferno.flowchart.scene.AndroidSceneLayout;
+import com.littleinferno.flowchart.scene.SceneType;
 import com.littleinferno.flowchart.util.DestroyListener;
 import com.littleinferno.flowchart.util.NameChangedListener;
 
@@ -35,7 +39,10 @@ public class AndroidFunction implements ProjectModule, Parcelable {
     private List<FunctionParameter.Removed> parameterRemovedListeners;
     private GenerateListener generateListener;
 
-    public AndroidFunction(AndroidFunctionManager functionManager, String name) {
+    private AndroidNodeManager nodeManager;
+    private AndroidSceneLayout androidScene;
+
+    AndroidFunction(AndroidFunctionManager functionManager, String name) {
 
         this.functionManager = functionManager;
         this.name = name;
@@ -50,9 +57,10 @@ public class AndroidFunction implements ProjectModule, Parcelable {
 
         returnNodes = new ArrayList<>();
 
+        nodeManager = new AndroidNodeManager(SceneType.FUNCTION, this);
     }
 
-    protected AndroidFunction(Parcel in) {
+    private AndroidFunction(Parcel in) {
         functionManager = in.readParcelable(AndroidFunctionManager.class.getClassLoader());
         name = in.readString();
         parameters = new ArrayList<>();
@@ -196,6 +204,21 @@ public class AndroidFunction implements ProjectModule, Parcelable {
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeParcelable(functionManager, flags);
         dest.writeString(name);
+    }
+
+    public AndroidNodeManager getNodeManager() {
+        return nodeManager;
+    }
+
+    public void bindScene(AndroidSceneLayout androidScene) {
+        this.androidScene = androidScene;
+
+        Stream.of(nodeManager.getNodes()).forEach(
+                androidScene::addView);
+    }
+
+    public void nodeAdded(AndroidNode node) {
+        this.androidScene.addView(node);
     }
 
     public interface GenerateListener {

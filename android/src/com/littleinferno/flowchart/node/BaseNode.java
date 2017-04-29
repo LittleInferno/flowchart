@@ -17,15 +17,16 @@ import com.annimon.stream.Optional;
 import com.annimon.stream.Stream;
 import com.littleinferno.flowchart.Connection;
 import com.littleinferno.flowchart.DataType;
-import com.littleinferno.flowchart.scene.AndroidSceneLayout;
 import com.littleinferno.flowchart.databinding.NodeLayoutBinding;
 import com.littleinferno.flowchart.pin.Connector;
+import com.littleinferno.flowchart.scene.AndroidSceneLayout;
 
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 
 public class BaseNode extends CardView {
+
 
     public enum Align {
         LEFT, RIGHT, CENTER
@@ -37,22 +38,12 @@ public class BaseNode extends CardView {
     private AndroidSceneLayout scene;
     private PointF point;
 
-    public BaseNode(View view) {
-        super(view.getContext());
-        layout = NodeLayoutBinding.inflate((LayoutInflater) getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE), this, true);
+    public BaseNode(final Context context) {
+        super(context);
+        layout = NodeLayoutBinding.inflate((LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE), this, true);
         setElevation(8);
         bringToFront();
-        view.invalidate();
-    }
-
-    public BaseNode(AndroidSceneLayout scene) {
-        this((View) scene);
-        setLayoutParams(scene.createLayoutParams());
-
-        setScaleX(scene.getScaleFactor());
-        setScaleY(scene.getScaleFactor());
-
-        this.scene = scene;
+        setLayoutParams(selfLayoutParams());
     }
 
     private void init(Context context) {
@@ -117,7 +108,12 @@ public class BaseNode extends CardView {
                 RelativeLayout.LayoutParams.MATCH_PARENT, RelativeLayout.LayoutParams.WRAP_CONTENT);
     }
 
-    public void addView(View view, Align align) {
+    RelativeLayout.LayoutParams selfLayoutParams() {
+        return new RelativeLayout.LayoutParams(
+                RelativeLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.WRAP_CONTENT);
+    }
+
+    public void addView(Align align, View view) {
         view.setLayoutParams(createLayoutParams());
         switch (align) {
             case LEFT:

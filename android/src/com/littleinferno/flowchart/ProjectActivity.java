@@ -2,8 +2,6 @@ package com.littleinferno.flowchart;
 
 import android.app.FragmentTransaction;
 import android.databinding.DataBindingUtil;
-import android.graphics.Bitmap;
-import android.graphics.Canvas;
 import android.os.Bundle;
 import android.os.Environment;
 import android.support.annotation.NonNull;
@@ -13,19 +11,18 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.view.View;
 import android.widget.RelativeLayout;
 
 import com.littleinferno.flowchart.databinding.ActivityProjectBinding;
+import com.littleinferno.flowchart.function.AndroidFunction;
 import com.littleinferno.flowchart.function.AndroidFunctionManager;
+import com.littleinferno.flowchart.function.MainFunction;
 import com.littleinferno.flowchart.function.gui.FunctionListFragment;
 import com.littleinferno.flowchart.nodes.NodeFragmet;
 import com.littleinferno.flowchart.project.FlowchartProject;
+import com.littleinferno.flowchart.scene.gui.SceneFragment;
 import com.littleinferno.flowchart.variable.AndroidVariableManager;
 import com.littleinferno.flowchart.variable.gui.VariableListFragment;
-
-import java.io.FileOutputStream;
-import java.io.IOException;
 
 public class ProjectActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
 
@@ -67,9 +64,7 @@ public class ProjectActivity extends AppCompatActivity implements NavigationView
         RelativeLayout.LayoutParams lparams = new RelativeLayout.LayoutParams(
                 RelativeLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.WRAP_CONTENT);
 
-        FlowchartProject flowchartProject = FlowchartProject.getProject();
-        flowchartProject.setCurrentScene(layout.projectMain.projectLayout.projectFrame);
-        flowchartProject.setLayout(layout.projectMain.projectLayout.projectLayout);
+        FlowchartProject flowchartProject = FlowchartProject.load(this);
 
         variableManager = new AndroidVariableManager(FlowchartProject.getProject());
 
@@ -79,48 +74,68 @@ public class ProjectActivity extends AppCompatActivity implements NavigationView
         functionManager.createFunction("fun1");
         functionManager.createFunction("fun9");
 
+        flowchartProject.setLayout(layout.projectMain.projectLayout.sceneFrame);
+        flowchartProject.setFragmentManager(getFragmentManager());
+        MainFunction main = functionManager.createMain();
+        flowchartProject.setCurrentScene(main);
+
+        Bundle bundle = new Bundle();
+        bundle.putParcelable(AndroidFunction.TAG, main);
+        SceneFragment scene = new SceneFragment();
+        scene.setArguments(bundle);
+        getFragmentManager().beginTransaction().replace(R.id.scene_frame, scene).commit();
+
+
+        String string = Environment.getExternalStorageDirectory().toString() + "/flowchart_projects/plugins/codegen.js";
+
+
+//        String str = Files.readToString(new File(string));
+
+//        Codeview.with(getApplicationContext())
+//                .withCode(str)
+//                .setStyle(Settings.WithStyle.DARKULA)
+//                .setLang(Settings.Lang.JAVASCRIPT)
+//                .into(layout.projectMain.projectLayout.codeView);
+
     }
 
-    public static Bitmap loadBitmapFromView(View v) {
-        Bitmap b = Bitmap.createBitmap(v.getWidth(), v.getHeight(), Bitmap.Config.ARGB_8888);
-        Canvas c = new Canvas(b);
-        v.layout(v.getLeft(), v.getTop(), v.getRight(), v.getBottom());
-        v.draw(c);
-        return b;
-    }
+//    public static Bitmap loadBitmapFromView(View v) {
+//        Bitmap b = Bitmap.createBitmap(v.getWidth(), v.getHeight(), Bitmap.Config.ARGB_8888);
+//        Canvas c = new Canvas(b);
+//        v.layout(v.getLeft(), v.getTop(), v.getRight(), v.getBottom());
+//        v.draw(c);
+//        return b;
+//    }
 
-    @Override
-    public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-
-        FileOutputStream out = null;
-        try {
-            out = new FileOutputStream(Environment.getExternalStorageDirectory().toString() + Files.projectLocation + "/f.png");
-
-            Bitmap bitmap = loadBitmapFromView(layout.projectMain.projectLayout.projectFrame);
-
-            bitmap.compress(Bitmap.CompressFormat.PNG, 100, out); // bmp is your Bitmap instance
-            // PNG is a lossless format, the compression factor (100) is ignored
-        } catch (Exception e) {
-            e.printStackTrace();
-        } finally {
-            try {
-                if (out != null) {
-                    out.close();
-                }
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-        return false;
-    }
+//    @Override
+//    public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+//
+//        FileOutputStream out = null;
+//        try {
+//            out = new FileOutputStream(Environment.getExternalStorageDirectory().toString() + Files.projectLocation + "/f.png");
+//
+////            Bitmap bitmap = loadBitmapFromView(layout.projectMain.projectLayout.projectFrame);
+//
+//            bitmap.compress(Bitmap.CompressFormat.PNG, 100, out); // bmp is your Bitmap instance
+//            // PNG is a lossless format, the compression factor (100) is ignored
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        } finally {
+//            try {
+//                if (out != null) {
+//                    out.close();
+//                }
+//            } catch (IOException e) {
+//                e.printStackTrace();
+//            }
+//        }
+//        return false;
+//    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.project_actions, menu);
-
-
-
 
 
         return true;
@@ -148,7 +163,15 @@ public class ProjectActivity extends AppCompatActivity implements NavigationView
                 functionListFragment.show(getFragmentManager(), "function");
                 break;
             }
+
         }
         return true;
     }
+
+    @Override
+    public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+        return false;
+    }
+
+
 }

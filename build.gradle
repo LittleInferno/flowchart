@@ -12,7 +12,6 @@ buildscript {
 }
 
 allprojects {
-    apply plugin: "eclipse"
     apply plugin: "idea"
 
     version = '1.0'
@@ -61,6 +60,7 @@ project(":android") {
 
         compile 'io.github.luizgrp.sectionedrecyclerviewadapter:sectionedrecyclerviewadapter:1.0.4'
         compile 'com.mutualmobile.android:cardstack:0.5.3'
+        compile 'Codeview-1.0.0:webviewcode:1.0.0'
 
         compile 'io.reactivex.rxjava2:rxjava:2.0.8'
         compile 'io.reactivex.rxjava2:rxandroid:2.0.1'
@@ -72,9 +72,6 @@ project(":android") {
         compile ('com.h6ah4i.android.widget.advrecyclerview:advrecyclerview:0.10.5@aar'){
             transitive=true
         }
-
-        compile 'com.jakewharton:butterknife:8.5.1'
-        annotationProcessor 'com.jakewharton:butterknife-compiler:8.5.1'
     }
 }
 
@@ -90,8 +87,4 @@ project(":core") {
         compile 'io.reactivex.rxjava2:rxjava:2.0.7'
         compile group: 'org.mozilla', name: 'rhino', version: '1.7.7.1'
     }
-}
-
-tasks.eclipse.doLast {
-    delete ".project"
 }
