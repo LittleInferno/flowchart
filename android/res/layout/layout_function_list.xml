@@ -17,7 +17,7 @@
             app:layout_constraintTop_toTopOf="parent">
 
             <include
-                android:id="@+id/fun"
+                android:id="@+id/functions"
                 layout="@layout/content_recycler_view"
                 android:layout_width="128dp"
                 android:layout_height="match_parent" />
@@ -30,7 +30,7 @@
                 android:clickable="true"
                 android:visibility="visible"
                 app:fabSize="normal"
-                app:layout_anchor="@+id/fun"
+                app:layout_anchor="@id/functions"
                 app:layout_anchorGravity="bottom|left"
                 app:layout_behavior="com.littleinferno.flowchart.util.ScrollFABBehavior"
                 app:srcCompat="@drawable/ic_add_black_24dp" />

@@ -95,7 +95,7 @@ public class AndroidVariableManager implements Parcelable, ProjectModule {
     @Override
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeList(variables);
-        dest.writeList(Collections.singletonList(getProject()));//TODO remove hack
+        dest.writeList(Collections.singletonList(getProject()));//TODO action hack
     }
 
     @Override

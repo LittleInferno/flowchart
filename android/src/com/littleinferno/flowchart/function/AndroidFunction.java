@@ -213,8 +213,9 @@ public class AndroidFunction implements ProjectModule, Parcelable {
     public void bindScene(AndroidSceneLayout androidScene) {
         this.androidScene = androidScene;
 
-        Stream.of(nodeManager.getNodes()).forEach(
-                androidScene::addView);
+        Stream.of(nodeManager.getNodes())
+                .peek(node -> ((AndroidSceneLayout) node.getParent()).removeView(node))
+                .forEach(androidScene::addView);
     }
 
     public void nodeAdded(AndroidNode node) {

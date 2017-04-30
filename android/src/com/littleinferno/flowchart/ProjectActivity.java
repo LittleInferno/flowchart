@@ -145,22 +145,11 @@ public class ProjectActivity extends AppCompatActivity implements NavigationView
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.variable: {
-
-                VariableListFragment variableListFragment = new VariableListFragment();
-                Bundle bundle = new Bundle();
-                bundle.putParcelable(AndroidVariableManager.TAG, variableManager);
-                variableListFragment.setArguments(bundle);
-                variableListFragment.show(getFragmentManager(), "variable");
+                VariableListFragment.show(variableManager, getFragmentManager());
                 break;
             }
             case R.id.function: {
-
-                FunctionListFragment functionListFragment = new FunctionListFragment();
-                Bundle bundle = new Bundle();
-                bundle.putParcelable(AndroidFunctionManager.TAG, functionManager);
-                functionListFragment.setArguments(bundle);
-
-                functionListFragment.show(getFragmentManager(), "function");
+                FunctionListFragment.show(functionManager, getFragmentManager());
                 break;
             }
 

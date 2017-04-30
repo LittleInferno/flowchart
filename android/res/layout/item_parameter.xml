@@ -1,49 +1,48 @@
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
+<android.support.v7.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools">
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/item_parameter_root"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
 
     <android.support.constraint.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_margin="4dp"
-        android:orientation="horizontal">
-
+        android:background="?attr/selectableItemBackground">
 
         <TextView
             android:id="@+id/parameter_name"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
             android:layout_marginLeft="8dp"
+            android:layout_marginRight="8dp"
             android:layout_marginTop="8dp"
             android:layout_weight="1"
             android:gravity="center"
             android:text="variable name"
             android:textSize="18sp"
-            app:layout_constraintLeft_toLeftOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintRight_toLeftOf="@+id/parameter_is_array"
-            android:layout_marginRight="8dp"
-            app:layout_constraintHorizontal_bias="0.0"
-            android:layout_marginBottom="8dp"
             app:layout_constraintBottom_toTopOf="@+id/parameter_type"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toLeftOf="@+id/parameter_is_array"
+            app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintVertical_bias="0.0" />
 
         <TextView
             android:id="@+id/parameter_type"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="8dp"
+            android:layout_marginBottom="9dp"
             android:layout_marginLeft="8dp"
+            android:layout_marginRight="8dp"
             android:layout_weight="1"
             android:gravity="center"
             android:text="var type"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintLeft_toLeftOf="parent"
-            app:layout_constraintRight_toLeftOf="@+id/parameter_is_array"
-            android:layout_marginRight="8dp"
-            app:layout_constraintHorizontal_bias="0.0" />
+            app:layout_constraintRight_toLeftOf="@+id/parameter_is_array" />
 
 
         <ImageView
@@ -66,4 +65,4 @@
     </android.support.constraint.ConstraintLayout>
 
 
-</FrameLayout>
+</android.support.v7.widget.CardView>

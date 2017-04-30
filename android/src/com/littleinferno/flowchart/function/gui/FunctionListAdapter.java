@@ -68,14 +68,8 @@ class FunctionListAdapter extends RecyclerView.Adapter<FunctionListAdapter.ViewH
         }
 
         private void showDetails(View view) {
-            FunctionDetailsFragment functionDetails = new FunctionDetailsFragment();
-            Bundle detailsBundle = new Bundle();
-            detailsBundle.putParcelable(FunctionDetailsFragment.FUNCTION_MANAGER_TAG, functionManager);
-            detailsBundle.putParcelable(FunctionDetailsFragment.FUNCTION_TAG, functionManager.getFunctions().get(getLayoutPosition()));
-
-            functionDetails.setArguments(detailsBundle);
-
-            fragmentManager.beginTransaction().replace(R.id.function_details_layout, functionDetails).commit();
+            FunctionDetailsFragment.show(functionManager, fragmentManager,
+                    functionManager.getFunctions().get(getLayoutPosition()), R.id.function_details_layout);
         }
     }
 }

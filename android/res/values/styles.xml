@@ -15,4 +15,9 @@
         <item name="android:windowMinWidthMinor">90%</item>
     </style>
 
+    <style name="FragmentAnim" parent="@android:style/Animation.Activity">
+        <item name="android:windowEnterAnimation">@anim/fragment_in</item>
+        <item name="android:windowExitAnimation">@anim/fragment_out</item>
+    </style>
+
 </resources>

@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="com.littleinferno.app.Test">
+
+    <com.ogaclejapan.arclayout.ArcLayout
+        android:id="@+id/arc"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginBottom="32dp"
+        android:layout_marginLeft="32dp"
+        android:layout_marginRight="32dp"
+        android:layout_marginTop="32dp"
+        app:arc_axisRadius="120dp"
+        app:arc_color="#4D000000"
+        app:arc_freeAngle="true"
+        app:arc_origin="center"
+        app:arc_radius="150dp"
+
+        app:arc_reverseAngle="false"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.0">
+
+        <Button
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:background="#03A9F4"
+            android:gravity="center"
+            android:text="A"
+            android:textColor="#FFFFFF"
+            app:arc_angle="80"
+            app:arc_origin="center" />
+
+        <Button
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:background="#00BCD4"
+            android:gravity="center"
+            android:text="B"
+            android:textColor="#FFFFFF"
+            app:arc_angle="140"
+            app:arc_origin="center" />
+
+        <Button
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:background="#009688"
+            android:gravity="center"
+            android:text="C"
+            android:textColor="#FFFFFF"
+            app:arc_angle="200"
+            app:arc_origin="center" />
+
+    </com.ogaclejapan.arclayout.ArcLayout>
+
+</android.support.constraint.ConstraintLayout>

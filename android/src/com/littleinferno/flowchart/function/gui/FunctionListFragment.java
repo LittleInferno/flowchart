@@ -2,7 +2,9 @@ package com.littleinferno.flowchart.function.gui;
 
 
 import android.app.DialogFragment;
+import android.app.FragmentManager;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.LinearLayoutManager;
 import android.view.Gravity;
@@ -13,7 +15,12 @@ import android.view.WindowManager;
 
 import com.littleinferno.flowchart.R;
 import com.littleinferno.flowchart.databinding.LayoutFunctionListBinding;
+import com.littleinferno.flowchart.function.AndroidFunction;
 import com.littleinferno.flowchart.function.AndroidFunctionManager;
+import com.littleinferno.flowchart.project.FlowchartProject;
+import com.littleinferno.flowchart.scene.gui.SceneFragment;
+
+import net.idik.lib.slimadapter.SlimAdapter;
 
 public class FunctionListFragment extends DialogFragment {
 
@@ -25,11 +32,16 @@ public class FunctionListFragment extends DialogFragment {
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
         layout = LayoutFunctionListBinding.inflate(inflater, container, false);
+        return layout.getRoot();
+    }
+
+    @Override
+    public void onActivityCreated(Bundle bundle) {
+        super.onActivityCreated(bundle);
 
         WindowManager.LayoutParams wmlp = getDialog().getWindow().getAttributes();
         wmlp.gravity = Gravity.FILL_HORIZONTAL;
-
-        return layout.getRoot();
+        wmlp.windowAnimations = R.style.FragmentAnim;
     }
 
     @Override
@@ -47,18 +59,38 @@ public class FunctionListFragment extends DialogFragment {
 
         layout.addFunction.setOnClickListener(this::createNewFunction);
 
-        FunctionListAdapter adapter = new FunctionListAdapter(functionManager, getChildFragmentManager());
-        layout.fun.items.setAdapter(adapter);
-        layout.fun.items.setLayoutManager(new LinearLayoutManager(getContext()));
+        layout.functions.items.setLayoutManager(new LinearLayoutManager(getContext()));
+//        FunctionListAdapter adapter = new FunctionListAdapter(functionManager, getChildFragmentManager());
+//        layout.functions.items.setAdapter(adapter);
 
-        FunctionDetailsFragment functionDetails = new FunctionDetailsFragment();
-        Bundle detailsBundle = new Bundle();
-        detailsBundle.putParcelable(FunctionDetailsFragment.FUNCTION_MANAGER_TAG, functionManager);
-        detailsBundle.putParcelable(FunctionDetailsFragment.FUNCTION_TAG, functionManager.getFunctions().get(0));
+        final SlimAdapter slimAdapter = SlimAdapter.create()
+                .registerDefault(R.layout.item_function_card, (o, injector) -> {
+                    AndroidFunction data = (AndroidFunction) o;
+                    injector.text(R.id.function_name_card, data.getName())
+                            .clicked(R.id.card, v ->
+                                    FunctionDetailsFragment.show(functionManager, getChildFragmentManager(),
+                                            data, R.id.function_details_layout))
+                            .longClicked(R.id.card, v -> {
+                                        Bundle b = new Bundle();
+                                        b.putParcelable(AndroidFunction.TAG, data);
 
-        functionDetails.setArguments(detailsBundle);
+                                        SceneFragment scene = new SceneFragment();
+                                        scene.setArguments(b);
+                                        FlowchartProject.getProject()
+                                                .getFragmentManager()
+                                                .beginTransaction().replace(R.id.scene_frame, scene).commit();
 
-        getChildFragmentManager().beginTransaction().replace(R.id.function_details_layout, functionDetails).commit();
+                                        dismiss();
+                                        return true;
+                                    }
+                            );
+
+                })
+                .attachTo(layout.functions.items)
+                .updateData(functionManager.getFunctions());
+
+        FunctionDetailsFragment.show(functionManager, getChildFragmentManager(),
+                functionManager.getFunctions().get(0), R.id.function_details_layout);
     }
 
     private void createNewFunction(View view) {
@@ -66,5 +98,14 @@ public class FunctionListFragment extends DialogFragment {
 
         functionDialog.setArguments(getArguments());
         functionDialog.show(getFragmentManager(), "CREATE");
+    }
+
+    public static void show(@NonNull AndroidFunctionManager functionManager, @NonNull FragmentManager fragmentManager) {
+        Bundle bundle = new Bundle();
+        bundle.putParcelable(AndroidFunctionManager.TAG, functionManager);
+
+        FunctionListFragment functionList = new FunctionListFragment();
+        functionList.setArguments(bundle);
+        functionList.show(fragmentManager, "FUNCTION_LIST");
     }
 }

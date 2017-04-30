@@ -1,8 +1,11 @@
 package com.littleinferno.flowchart.function.gui;
 
 import android.app.DialogFragment;
+import android.app.FragmentManager;
 import android.content.Context;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v7.view.ContextThemeWrapper;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -20,6 +23,9 @@ import com.littleinferno.flowchart.databinding.LayoutFunctionParameterDetailsBin
 import com.littleinferno.flowchart.function.AndroidFunction;
 import com.littleinferno.flowchart.function.AndroidFunctionParameter;
 import com.littleinferno.flowchart.util.Objects;
+import com.littleinferno.flowchart.util.UpdaterHandle;
+
+import io.reactivex.disposables.Disposable;
 
 public class FunctionParameterDetailsFragment extends DialogFragment {
 
@@ -33,6 +39,13 @@ public class FunctionParameterDetailsFragment extends DialogFragment {
 
     private AndroidFunctionParameter parameter;
     private Connection connectionBuffer;
+    private UpdaterHandle updater;
+    private Disposable name;
+    private Disposable type;
+    private Disposable connection;
+    private Disposable discard;
+    private Disposable ok;
+    private Disposable isArray;
 
     public FunctionParameterDetailsFragment() {
     }
@@ -54,6 +67,7 @@ public class FunctionParameterDetailsFragment extends DialogFragment {
         if (bundle != null) {
             function = bundle.getParcelable(AndroidFunction.TAG);
             parameter = bundle.getParcelable(AndroidFunctionParameter.TAG);
+            updater = bundle.getParcelable(UpdaterHandle.TAG);
         }
 
         if (function == null)
@@ -62,8 +76,22 @@ public class FunctionParameterDetailsFragment extends DialogFragment {
         init();
     }
 
+    @Override
+    public void onStop() {
+        super.onStop();
+
+        name.dispose();
+        type.dispose();
+        isArray.dispose();
+        discard.dispose();
+        ok.dispose();
+
+        updater.update();
+    }
+
+
     private void init() {
-        RxTextView
+        name = RxTextView
                 .textChanges(layout.variableName)
                 .map(String::valueOf)
                 .map(this::checkName)
@@ -82,27 +110,27 @@ public class FunctionParameterDetailsFragment extends DialogFragment {
 
         layout.connection.setAdapter(connectionAdapter);
 
-        RxAdapterView
+        type = RxAdapterView
                 .itemSelections(layout.dataType)
                 .map(i -> layout.dataType.getSelectedItem())
                 .map(Object::toString)
                 .map(DataType::valueOf)
                 .subscribe(dataType -> dataTypeBuffer = dataType);
 
-        RxAdapterView
+        connection = RxAdapterView
                 .itemSelections(layout.connection)
                 .map(i -> layout.connection.getSelectedItem())
                 .map(Object::toString)
                 .map(Connection::valueOf)
                 .subscribe(connection -> connectionBuffer = connection);
 
-        RxCompoundButton
+        isArray = RxCompoundButton
                 .checkedChanges(layout.isArray)
                 .subscribe(o -> isArrayBuffer = o);
 
-        RxView.clicks(layout.discard).subscribe(v -> dismiss());
+        discard = RxView.clicks(layout.discard).subscribe(v -> dismiss());
 
-        RxView.clicks(layout.create).subscribe(v -> {
+        ok = RxView.clicks(layout.create).subscribe(v -> {
             if (Objects.nonNull(parameter))
                 changeParameter(parameter);
             else
@@ -131,12 +159,12 @@ public class FunctionParameterDetailsFragment extends DialogFragment {
         if (result == null || (parameter != null && parameter.getName().equals(sequence))) {
             nameBuffer = sequence;
             layout.variableNameLayout.setErrorEnabled(false);
+            return true;
         } else {
             layout.variableNameLayout.setError(result);
             layout.variableNameLayout.setErrorEnabled(true);
+            return false;
         }
-
-        return result == null;
     }
 
     private void changeParameter(AndroidFunctionParameter var) {
@@ -150,5 +178,15 @@ public class FunctionParameterDetailsFragment extends DialogFragment {
         this.parameter = function.addParameter(connectionBuffer, nameBuffer, dataTypeBuffer, isArrayBuffer);
     }
 
+    public static void show(@NonNull AndroidFunction function, @NonNull FragmentManager fragmentManager,
+                            @NonNull UpdaterHandle updaterHandle, @Nullable AndroidFunctionParameter data) {
+        Bundle bundle = new Bundle();
+        bundle.putParcelable(AndroidFunction.TAG, function);
+        bundle.putParcelable(AndroidFunctionParameter.TAG, data);
+        bundle.putParcelable(UpdaterHandle.TAG, updaterHandle);
 
+        FunctionParameterDetailsFragment parameterDetails = new FunctionParameterDetailsFragment();
+        parameterDetails.setArguments(bundle);
+        parameterDetails.show(fragmentManager, "PARAMETER_DETAILS");
+    }
 }
