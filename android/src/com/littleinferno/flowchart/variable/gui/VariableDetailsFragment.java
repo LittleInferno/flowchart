@@ -10,6 +10,7 @@ import android.support.v7.view.ContextThemeWrapper;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
 import android.view.WindowManager;
 import android.widget.ArrayAdapter;
 
@@ -60,8 +61,11 @@ public class VariableDetailsFragment extends DialogFragment {
     public void onActivityCreated(Bundle bundle) {
         super.onActivityCreated(bundle);
 
-        WindowManager.LayoutParams wmlp = getDialog().getWindow().getAttributes();
-        wmlp.windowAnimations = R.style.FragmentAnim;
+        Window window = getDialog().getWindow();
+        if (window != null) {
+            WindowManager.LayoutParams wmlp = window.getAttributes();
+            wmlp.windowAnimations = R.style.FragmentAnim;
+        }
     }
 
     @Override
@@ -89,8 +93,6 @@ public class VariableDetailsFragment extends DialogFragment {
         name.dispose();
         type.dispose();
         isArray.dispose();
-        discard.dispose();
-        ok.dispose();
 
         updater.update();
     }

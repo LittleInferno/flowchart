@@ -3,6 +3,7 @@ package com.littleinferno.flowchart.function;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import com.annimon.stream.Optional;
 import com.annimon.stream.Stream;
 import com.littleinferno.flowchart.Connection;
 import com.littleinferno.flowchart.DataType;
@@ -58,6 +59,23 @@ public class AndroidFunction implements ProjectModule, Parcelable {
         returnNodes = new ArrayList<>();
 
         nodeManager = new AndroidNodeManager(SceneType.FUNCTION, this);
+
+
+        Optional<AndroidNode> node = nodeManager.createNode("function begin node");
+
+        node.ifPresent(n -> {
+                    n.getNodeHandle()
+                            .getAttribute("functionInit")
+                            .ifPresent(o -> {
+                                n.getNodeHandle()
+                                        .getPluginHandle()
+                                        .createScriptFun((String) o)
+                                        .call(this);
+                            });
+                    n.setX(10);
+                    n.setY(400);
+                }
+        );
     }
 
     private AndroidFunction(Parcel in) {
@@ -214,12 +232,14 @@ public class AndroidFunction implements ProjectModule, Parcelable {
         this.androidScene = androidScene;
 
         Stream.of(nodeManager.getNodes())
+                .filter(node -> node.getParent() != null)
                 .peek(node -> ((AndroidSceneLayout) node.getParent()).removeView(node))
                 .forEach(androidScene::addView);
     }
 
     public void nodeAdded(AndroidNode node) {
-        this.androidScene.addView(node);
+        if (androidScene != null)
+            androidScene.addView(node);
     }
 
     public interface GenerateListener {

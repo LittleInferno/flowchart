@@ -193,7 +193,7 @@ public class Connector extends android.support.v7.widget.AppCompatTextView imple
         setImage();
         pin.setImage();
 
-        node.getScene().addWire(this, pin);
+//        node.getScene().addWire(this, pin);
     }
 
     private void connectPins(final Connector pin) {

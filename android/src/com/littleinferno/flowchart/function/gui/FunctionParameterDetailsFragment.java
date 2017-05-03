@@ -153,7 +153,7 @@ public class FunctionParameterDetailsFragment extends DialogFragment {
         }
     }
 
-    private boolean checkName(String sequence) {
+    private boolean checkName(final String sequence) {
         String result = function.checkParameterName(sequence);
 
         if (result == null || (parameter != null && parameter.getName().equals(sequence))) {
@@ -178,8 +178,10 @@ public class FunctionParameterDetailsFragment extends DialogFragment {
         this.parameter = function.addParameter(connectionBuffer, nameBuffer, dataTypeBuffer, isArrayBuffer);
     }
 
-    public static void show(@NonNull AndroidFunction function, @NonNull FragmentManager fragmentManager,
-                            @NonNull UpdaterHandle updaterHandle, @Nullable AndroidFunctionParameter data) {
+    public static void show(@NonNull AndroidFunction function,
+                            @NonNull FragmentManager fragmentManager,
+                            @NonNull UpdaterHandle updaterHandle,
+                            @Nullable AndroidFunctionParameter data) {
         Bundle bundle = new Bundle();
         bundle.putParcelable(AndroidFunction.TAG, function);
         bundle.putParcelable(AndroidFunctionParameter.TAG, data);

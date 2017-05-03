@@ -20,7 +20,6 @@ public class AndroidFunctionManager implements ProjectModule, Parcelable {
     private List<AndroidFunction> functions;
     private int counter;
     private FlowchartProject project;
-    private MainFunction main;
 
     public AndroidFunctionManager(final FlowchartProject project) {
         this.project = project;
@@ -53,7 +52,11 @@ public class AndroidFunctionManager implements ProjectModule, Parcelable {
     }
 
     public MainFunction createMain() {
-        return main = new MainFunction(this);
+        MainFunction function = new MainFunction(this);
+
+        functions.add(function);
+
+        return function;
     }
 
     public AndroidFunction createFunction() {

@@ -2,11 +2,11 @@ package com.littleinferno.flowchart.variable.gui;
 
 import android.app.DialogFragment;
 import android.app.FragmentManager;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.helper.ItemTouchHelper;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -66,7 +66,7 @@ public class VariableListFragment extends DialogFragment {
                 .setOnClickListener(v -> VariableDetailsFragment.show(
                         variableManager, getFragmentManager(), updaterHandle, null));
 
-        layout.variables.items.setLayoutManager(new LinearLayoutManager(getContext()));
+        layout.variables.items.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false));
 
         adapter = SlimAdapter.create().registerDefault(R.layout.item_variable, (o, injector) -> {
             AndroidVariable data = (AndroidVariable) o;
@@ -81,13 +81,15 @@ public class VariableListFragment extends DialogFragment {
                 .attachTo(layout.variables.items)
                 .updateData(variableManager.getVariables());
 
-        Swiper.create(getContext(), ItemTouchHelper.LEFT).register((direction, position) -> {
-            if (direction == ItemTouchHelper.LEFT) {
-                variableManager.getVariables().remove(position);
-                adapter.notifyItemRemoved(position);
-                adapter.notifyItemRangeChanged(position, variableManager.getVariables().size());
-            }
-        })
+        Swiper.create(getContext())
+                .swipeLeft(position -> {
+                    variableManager.getVariables().remove(position);
+                    adapter.notifyItemRemoved(position);
+                    adapter.notifyItemRangeChanged(position, variableManager.getVariables().size());
+                })
+                .icon(R.drawable.ic_delete)
+                .iconColor(Color.WHITE)
+                .backgroundColor(Color.RED)
                 .attachTo(layout.variables.items);
     }
 

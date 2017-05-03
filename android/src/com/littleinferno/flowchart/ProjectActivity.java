@@ -85,6 +85,7 @@ public class ProjectActivity extends AppCompatActivity implements NavigationView
         scene.setArguments(bundle);
         getFragmentManager().beginTransaction().replace(R.id.scene_frame, scene).commit();
 
+        SceneFragment.show(main, getFragmentManager(), R.id.scene_frame);
 
         String string = Environment.getExternalStorageDirectory().toString() + "/flowchart_projects/plugins/codegen.js";
 
@@ -99,13 +100,6 @@ public class ProjectActivity extends AppCompatActivity implements NavigationView
 
     }
 
-//    public static Bitmap loadBitmapFromView(View v) {
-//        Bitmap b = Bitmap.createBitmap(v.getWidth(), v.getHeight(), Bitmap.Config.ARGB_8888);
-//        Canvas c = new Canvas(b);
-//        v.layout(v.getLeft(), v.getTop(), v.getRight(), v.getBottom());
-//        v.draw(c);
-//        return b;
-//    }
 
 //    @Override
 //    public boolean onNavigationItemSelected(@NonNull MenuItem item) {

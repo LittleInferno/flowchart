@@ -20,4 +20,6 @@
         <item name="android:windowExitAnimation">@anim/fragment_out</item>
     </style>
 
+
+
 </resources>

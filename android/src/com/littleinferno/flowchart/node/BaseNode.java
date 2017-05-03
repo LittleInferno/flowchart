@@ -19,7 +19,6 @@ import com.littleinferno.flowchart.Connection;
 import com.littleinferno.flowchart.DataType;
 import com.littleinferno.flowchart.databinding.NodeLayoutBinding;
 import com.littleinferno.flowchart.pin.Connector;
-import com.littleinferno.flowchart.scene.AndroidSceneLayout;
 
 import java.util.Arrays;
 import java.util.HashSet;
@@ -35,7 +34,6 @@ public class BaseNode extends CardView {
     private PointF delta = new PointF();
 
     NodeLayoutBinding layout;
-    private AndroidSceneLayout scene;
     private PointF point;
 
     public BaseNode(final Context context) {
@@ -128,10 +126,6 @@ public class BaseNode extends CardView {
         }
     }
 
-    public AndroidSceneLayout getScene() {
-        return scene;
-    }
-
     public PointF getDelta() {
         return delta;
     }
@@ -149,25 +143,11 @@ public class BaseNode extends CardView {
     @Override
     public boolean onTouchEvent(MotionEvent event) {
 
-        switch (event.getAction()) {
-            case MotionEvent.ACTION_DOWN: {
-                setPoint(event.getX(), event.getY());
-                drag();
-                setVisibility(View.INVISIBLE);
-//                delta.set(getX() - event.getRawX(), getY() - event.getRawY());
-//                setElevation(50);
-                break;
-            }
-            case MotionEvent.ACTION_MOVE: {
-                //       setX(event.getRawX() + delta.x);
-                //       setY(event.getRawY() + delta.y);
-                break;
-            }
-            case MotionEvent.ACTION_UP: {
-                // setElevation(8);
-            }
+        if (event.getAction() == MotionEvent.ACTION_DOWN) {
+            setPoint(event.getX(), event.getY());
+            drag();
+            setVisibility(View.INVISIBLE);
         }
-
         return true;
     }
 

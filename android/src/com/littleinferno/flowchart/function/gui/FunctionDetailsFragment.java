@@ -54,16 +54,23 @@ public class FunctionDetailsFragment extends Fragment {
 
         layout.functionName.setText(function.getName());
 
-        final SlimAdapter slimAdapter = SlimAdapter.create();
+        final SlimAdapter adapter = SlimAdapter.create();
         final UpdaterHandle updaterHandle = new UpdaterHandle(
-                () -> slimAdapter.updateData(function.getParameters()));
+                () -> adapter.updateData(function.getParameters()));
 
         layout.addParameter.setOnClickListener(v -> FunctionParameterDetailsFragment.show(
                 function, getFragmentManager(), updaterHandle, null));
 
+        if (function.getName().equals("MAIN")) {
+            layout.addParameter.setEnabled(false);
+            layout.addParameter.hide();
+
+            layout.functionName.setEnabled(false);
+        }
+
         layout.parameters.items.setLayoutManager(new LinearLayoutManager(getContext()));
 
-        slimAdapter.registerDefault(R.layout.item_parameter, (o, injector) -> {
+        adapter.registerDefault(R.layout.item_parameter, (o, injector) -> {
             AndroidFunctionParameter data = (AndroidFunctionParameter) o;
             injector.text(R.id.parameter_name, data.getName())
                     .text(R.id.parameter_type, data.getDataType().toString().toLowerCase())
@@ -77,8 +84,10 @@ public class FunctionDetailsFragment extends Fragment {
                 .updateData(function.getParameters());
     }
 
-    public static void show(@NonNull AndroidFunctionManager functionManager, @NonNull FragmentManager fragmentManager,
-                            @NonNull AndroidFunction data, @IdRes int layout) {
+    public static void show(@NonNull AndroidFunctionManager functionManager,
+                            @NonNull FragmentManager fragmentManager,
+                            @NonNull AndroidFunction data,
+                            @IdRes int layout) {
         Bundle bundle = new Bundle();
         bundle.putParcelable(AndroidFunctionManager.TAG, functionManager);
         bundle.putParcelable(AndroidFunction.TAG, data);
@@ -86,13 +95,5 @@ public class FunctionDetailsFragment extends Fragment {
         FunctionDetailsFragment functionDetails = new FunctionDetailsFragment();
         functionDetails.setArguments(bundle);
         fragmentManager.beginTransaction().replace(layout, functionDetails).commit();
-    }
-
-    private void createNewParameter(View view) {
-        FunctionParameterDetailsFragment parameterDetails = new FunctionParameterDetailsFragment();
-        Bundle bundle = new Bundle();
-        bundle.putParcelable(AndroidFunction.TAG, function);
-        parameterDetails.setArguments(bundle);
-        parameterDetails.show(getFragmentManager(), "create");
     }
 }

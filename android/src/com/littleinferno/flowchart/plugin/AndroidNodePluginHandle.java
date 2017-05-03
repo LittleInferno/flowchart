@@ -36,7 +36,7 @@ public class AndroidNodePluginHandle extends AndroidBasePluginHandle {
         ScriptFun codegen = createScriptFun((Function) object.get("gen"));
         ScriptFun init = createScriptFun((Function) object.get("init"));
 
-        NodeHandle nodeHandle = new NodeHandle(name, title, category, codegen, init);
+        NodeHandle nodeHandle = new NodeHandle(this, name, title, category, codegen, init);
 
         NativeArray attributes = (NativeArray) object.get("attributes");
 
@@ -75,10 +75,12 @@ public class AndroidNodePluginHandle extends AndroidBasePluginHandle {
         final String category;
         final ScriptFun codegen;
         final ScriptFun init;
-
+        final AndroidNodePluginHandle nodePluginHandle;
         private Map<String, Object> attributes;
 
-        NodeHandle(final String name, final String title, final String category, final ScriptFun codegen, final ScriptFun init) {
+        NodeHandle(AndroidNodePluginHandle nodePluginHandle, final String name, final String title,
+                   final String category, final ScriptFun codegen, final ScriptFun init) {
+            this.nodePluginHandle = nodePluginHandle;
             this.name = name;
             this.title = title;
             this.category = category;
@@ -114,6 +116,10 @@ public class AndroidNodePluginHandle extends AndroidBasePluginHandle {
 
         public ScriptFun getInit() {
             return init;
+        }
+
+        public AndroidNodePluginHandle getPluginHandle() {
+            return nodePluginHandle;
         }
     }
 }

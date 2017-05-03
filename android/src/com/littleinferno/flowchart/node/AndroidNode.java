@@ -19,7 +19,9 @@ public class AndroidNode extends BaseNode implements Destroyable {
         super(context);
         this.nodeHandle = nodeHandle;
         this.nodeHandle.getInit().call(this);
-        layout.nodeTitle.setText(this.nodeHandle.getTitle());
+        this.nodeHandle.getAttribute("functionInit").ifPresent(o -> {
+
+        });
 
         setOnClickListener(v -> {
             onDestroy();
