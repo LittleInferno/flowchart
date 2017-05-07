@@ -3,11 +3,11 @@ package com.littleinferno.flowchart.function;
 import android.os.Parcel;
 import android.os.Parcelable;
 
-import com.annimon.stream.Collectors;
 import com.annimon.stream.Stream;
-import com.littleinferno.flowchart.codegen.BaseCodeGenerator;
 import com.littleinferno.flowchart.project.FlowchartProject;
 import com.littleinferno.flowchart.project.ProjectModule;
+import com.littleinferno.flowchart.util.Fun;
+import com.littleinferno.flowchart.util.Link;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -20,15 +20,25 @@ public class AndroidFunctionManager implements ProjectModule, Parcelable {
     private List<AndroidFunction> functions;
     private int counter;
     private FlowchartProject project;
+    private final List<Link> functionRemoveListeners;
+    private final List<Link> functionAddListeners;
 
     public AndroidFunctionManager(final FlowchartProject project) {
         this.project = project;
         functions = new ArrayList<>();
         counter = 0;
+
+        functionRemoveListeners = new ArrayList<>();
+        functionAddListeners = new ArrayList<>();
     }
 
-    protected AndroidFunctionManager(Parcel in) {
+    private AndroidFunctionManager(Parcel in) {
         counter = in.readInt();
+
+        functionAddListeners = new ArrayList<>();
+        in.readList(functionAddListeners, Fun.class.getClassLoader());
+        functionRemoveListeners = new ArrayList<>();
+        in.readList(functionRemoveListeners, Fun.class.getClassLoader());
     }
 
     public static final Creator<AndroidFunctionManager> CREATOR = new Creator<AndroidFunctionManager>() {
@@ -45,17 +55,17 @@ public class AndroidFunctionManager implements ProjectModule, Parcelable {
 
     public AndroidFunction createFunction(String name) {
         AndroidFunction function = new AndroidFunction(this, name);
-
         functions.add(function);
 
+        notifyFunctionAdd();
         return function;
     }
 
     public MainFunction createMain() {
         MainFunction function = new MainFunction(this);
-
         functions.add(function);
 
+        notifyFunctionAdd();
         return function;
     }
 
@@ -68,7 +78,7 @@ public class AndroidFunctionManager implements ProjectModule, Parcelable {
 
     void removeFunction(AndroidFunction function) {
         function.destroy();
-
+        notifyFunctionRemove();
         functions.remove(function);
     }
 
@@ -80,11 +90,11 @@ public class AndroidFunctionManager implements ProjectModule, Parcelable {
                         new RuntimeException("Cannot find codegen with title:\"" + name + "\""));
     }
 
-    public String gen(BaseCodeGenerator builder) {
-        return Stream.of(functions)
-                .map(function -> function.gen(builder))
-                .collect(Collectors.joining());
-    }
+//    public String gen(BaseCodeGenerator builder) {
+//        return Stream.of(functions)
+//                .map(function -> function.gen(builder))
+//                .collect(Collectors.joining());
+//    }
 
     public List<AndroidFunction> getFunctions() {
         return functions;
@@ -118,7 +128,29 @@ public class AndroidFunctionManager implements ProjectModule, Parcelable {
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeInt(counter);
         dest.writeList(functions);
+        dest.writeList(functionAddListeners);
+        dest.writeList(functionRemoveListeners);
         dest.writeList(Collections.singletonList(getProject()));//TODO action hack
     }
+
+    public Link onFunctionAdd(Fun fun) {
+        Link link = new Link(functionAddListeners, fun);
+        functionAddListeners.add(link);
+        return link;
+    }
+
+    public Link onFunctionRemove(Fun fun) {
+        Link link = new Link(functionRemoveListeners, fun);
+        functionRemoveListeners.add(link);
+        return link;
+    }
+
+    private void notifyFunctionAdd() {
+        Stream.of(functionAddListeners).forEach(Link::call);
+    }
+
+    private void notifyFunctionRemove() {
+        Stream.of(functionRemoveListeners).forEach(Link::call);
+    }
+
 }
-//"[$a-zA-Z_][0-9a-zA-Z_$]*"

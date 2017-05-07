@@ -3,7 +3,6 @@ package com.littleinferno.flowchart.scene;
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Paint;
-import android.graphics.Path;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.PopupMenu;
@@ -14,17 +13,18 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.widget.RelativeLayout;
 
-import com.annimon.stream.Stream;
-import com.littleinferno.flowchart.Connection;
 import com.littleinferno.flowchart.R;
 import com.littleinferno.flowchart.node.BaseNode;
 import com.littleinferno.flowchart.pin.Connector;
-import com.littleinferno.flowchart.project.FlowchartProject;
 
 import java.util.ArrayList;
 
 public class AndroidSceneLayout extends RelativeLayout {
     private final Paint paint;
+
+    private int x = 0;
+    private int y = 0;
+    boolean touch = false;
 
     private static class Wire {
         final Connector begin, end;
@@ -56,6 +56,18 @@ public class AndroidSceneLayout extends RelativeLayout {
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {
+
+
+        if (event.getAction() == MotionEvent.ACTION_DOWN) {
+            touch = true;
+            x = (int) event.getX();
+            y = (int) event.getY();
+
+        } else if (event.getAction() == MotionEvent.ACTION_UP) {
+            touch = false;
+
+        }
+
 //        super.onTouchEvent(event);
 
 //        gestureDetector.onTouchEvent(event);
@@ -101,40 +113,40 @@ public class AndroidSceneLayout extends RelativeLayout {
         // paint.setStyle(Paint.Style.FILL);
 
 
-        Stream.of(wires).forEach(wire -> {
-
-            final Path path = new Path();
-            path.moveTo(wire.begin.getX(), wire.begin.getY());
-
-            float bx = wire.begin.getX();
-            float by = wire.begin.getY();
-
-            float ex = wire.end.getX();
-            float ey = wire.end.getY();
-
-            float xLength = (ex - bx);
-
-            if (wire.begin.getConnection() == Connection.INPUT) {
-                float tmp = bx;
-                bx = ex;
-                ex = tmp;
-
-                tmp = by;
-                by = ey;
-                ey = tmp;
-            }
-
-            float xHalfLength = xLength / 2;
-
-            float cx1 = bx + xHalfLength;
-            float cx2 = ex - xHalfLength;
-            path.moveTo(bx, by);
-            path.cubicTo(cx1, by, cx2, ey, ex, ey);
-            paint.setStrokeWidth(5);
-            canvas.drawPath(path, paint);
-        });
+//        Stream.of(wires).forEach(wire -> {
+//
+//            final Path path = new Path();
+//            path.moveTo(wire.begin.getX(), wire.begin.getY());
+//
+//            float bx = wire.begin.getX();
+//            float by = wire.begin.getY();
+//
+//            float ex = wire.end.getX();
+//            float ey = wire.end.getY();
+//
+//            float xLength = (ex - bx);
+//
+//            if (wire.begin.getConnection() == Connection.INPUT) {
+//                float tmp = bx;
+//                bx = ex;
+//                ex = tmp;
+//
+//                tmp = by;
+//                by = ey;
+//                ey = tmp;
+//            }
+//
+//            float xHalfLength = xLength / 2;
+//
+//            float cx1 = bx + xHalfLength;
+//            float cx2 = ex - xHalfLength;
+//            path.moveTo(bx, by);
+//            path.cubicTo(cx1, by, cx2, ey, ex, ey);
+//            paint.setStrokeWidth(5);
+//            canvas.drawPath(path, paint);
+//        });
         //canvas.drawP
-        canvas.drawCircle(10, 400, 50, paint);
+        canvas.drawCircle(50, x, y, paint);
     }
 
     @Override

@@ -16,7 +16,7 @@ public class AndroidNodePluginHandle extends AndroidBasePluginHandle {
 
     private final List<NodeHandle> handles;
 
-    public AndroidNodePluginHandle(String plugin) {
+    AndroidNodePluginHandle(String plugin) {
         super(plugin);
         handles = new ArrayList<>();
 
@@ -27,7 +27,7 @@ public class AndroidNodePluginHandle extends AndroidBasePluginHandle {
         for (Object i : object) registerNode((ScriptableObject) i);
     }
 
-    public void registerNode(ScriptableObject object) {
+    private void registerNode(ScriptableObject object) {
 
         String name = (String) object.get("name");
         String title = (String) object.get("title");
@@ -45,14 +45,16 @@ public class AndroidNodePluginHandle extends AndroidBasePluginHandle {
                 addAttrib(nodeHandle, (NativeObject) o);
             }
         }
+        nodeHandle.getAttribute("closable")
+                .executeIfAbsent(() -> nodeHandle.addAttribute("closable", true));
 
         handles.add(nodeHandle);
     }
 
     private void addAttrib(NodeHandle nodeHandle, NativeObject object) {
-        String name = (String) object.get(0);
-        Object attr = object.get(1);
-        nodeHandle.addAttribute(name, attr);
+        for (Map.Entry<Object, Object> e : object.entrySet()) {
+            nodeHandle.addAttribute((String) e.getKey(), e.getValue());
+        }
     }
 
     @Override
@@ -65,7 +67,7 @@ public class AndroidNodePluginHandle extends AndroidBasePluginHandle {
         return 400;
     }
 
-    public List<NodeHandle> getNodes() {
+    List<NodeHandle> getNodes() {
         return handles;
     }
 
@@ -90,7 +92,7 @@ public class AndroidNodePluginHandle extends AndroidBasePluginHandle {
             attributes = new HashMap<>();
         }
 
-        public void addAttribute(final String key, final Object attr) {
+        void addAttribute(final String key, final Object attr) {
             attributes.put(key, attr);
         }
 

@@ -6,7 +6,6 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.annimon.stream.Optional;
 import com.littleinferno.flowchart.R;
 import com.littleinferno.flowchart.function.AndroidFunction;
 import com.littleinferno.flowchart.node.AndroidNode;
@@ -100,25 +99,23 @@ public class NodeSection extends StatelessSection {
 
                     AndroidFunction currentScene = FlowchartProject.getProject().getCurrentScene();
 
-                    Optional<AndroidNode> node = currentScene.getNodeManager().createNode(nodeName.getText().toString());
+                    AndroidNode node = currentScene.getNodeManager().createNode(nodeName.getText().toString());
 
-                    node.ifPresent(androidNode -> {
 
-                        Integer i = androidNode
-                                .getNodeHandle()
-                                .getAttribute("limit")
-                                .map(Integer.class::cast)
-                                .orElse(0);
+                    Integer i = node
+                            .getNodeHandle()
+                            .getAttribute("limit")
+                            .map(Integer.class::cast)
+                            .orElse(0);
 
-                        if (i > 0)
-                            root.setEnabled(false);
+                    if (i > 0)
+                        root.setEnabled(false);
 
-                        androidNode.setVisibility(View.INVISIBLE);
+                    node.setVisibility(View.INVISIBLE);
 
-                        androidNode.post(() -> {
-                            androidNode.setPoint(androidNode.getWidth() / 2, androidNode.getHeight() / 2);
-                            androidNode.drag();
-                        });
+                    node.post(() -> {
+                        node.setPoint(node.getWidth() / 2, node.getHeight() / 2);
+                        node.drag();
                     });
                 }
                 return true;

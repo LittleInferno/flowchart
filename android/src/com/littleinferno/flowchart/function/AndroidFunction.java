@@ -3,11 +3,9 @@ package com.littleinferno.flowchart.function;
 import android.os.Parcel;
 import android.os.Parcelable;
 
-import com.annimon.stream.Optional;
 import com.annimon.stream.Stream;
 import com.littleinferno.flowchart.Connection;
 import com.littleinferno.flowchart.DataType;
-import com.littleinferno.flowchart.codegen.BaseCodeGenerator;
 import com.littleinferno.flowchart.node.AndroidNode;
 import com.littleinferno.flowchart.node.AndroidNodeManager;
 import com.littleinferno.flowchart.node.FunctionReturnNode;
@@ -16,11 +14,14 @@ import com.littleinferno.flowchart.project.ProjectModule;
 import com.littleinferno.flowchart.scene.AndroidSceneLayout;
 import com.littleinferno.flowchart.scene.SceneType;
 import com.littleinferno.flowchart.util.DestroyListener;
+import com.littleinferno.flowchart.util.Fun;
+import com.littleinferno.flowchart.util.Link;
 import com.littleinferno.flowchart.util.NameChangedListener;
 
+import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.List;
-
+import java.util.Map;
 
 public class AndroidFunction implements ProjectModule, Parcelable {
 
@@ -36,12 +37,11 @@ public class AndroidFunction implements ProjectModule, Parcelable {
     private List<NameChangedListener> nameChangedListeners;
     private List<DestroyListener> destroyListeners;
 
-    private List<FunctionParameter.Added> parameterAddedListeners;
-    private List<FunctionParameter.Removed> parameterRemovedListeners;
-    private GenerateListener generateListener;
-
-    private AndroidNodeManager nodeManager;
+    private final AndroidNodeManager nodeManager;
     private AndroidSceneLayout androidScene;
+    private List<Map.Entry<AndroidFunctionParameter.Add, AndroidFunctionParameter.Remove>> parameterListeners;
+    private final List<Link> parameterAddListeners;
+    private final List<Link> parameterRemoveListeners;
 
     AndroidFunction(AndroidFunctionManager functionManager, String name) {
 
@@ -53,36 +53,41 @@ public class AndroidFunction implements ProjectModule, Parcelable {
         nameChangedListeners = new ArrayList<>();
         destroyListeners = new ArrayList<>();
 
-        parameterAddedListeners = new ArrayList<>();
-        parameterRemovedListeners = new ArrayList<>();
+        parameterListeners = new ArrayList<>();
 
         returnNodes = new ArrayList<>();
 
         nodeManager = new AndroidNodeManager(SceneType.FUNCTION, this);
 
+        AndroidNode begin = nodeManager.createNode("function begin node");
+        begin.setX(10);
+        begin.setY(400);
 
-        Optional<AndroidNode> node = nodeManager.createNode("function begin node");
+        AndroidNode end = nodeManager.createNode("function return node");
+        end.setX(600);
+        end.setY(400);
 
-        node.ifPresent(n -> {
-                    n.getNodeHandle()
-                            .getAttribute("functionInit")
-                            .ifPresent(o -> {
-                                n.getNodeHandle()
-                                        .getPluginHandle()
-                                        .createScriptFun((String) o)
-                                        .call(this);
-                            });
-                    n.setX(10);
-                    n.setY(400);
-                }
-        );
+        parameterAddListeners = new ArrayList<>();
+        parameterRemoveListeners = new ArrayList<>();
     }
 
     private AndroidFunction(Parcel in) {
-        functionManager = in.readParcelable(AndroidFunctionManager.class.getClassLoader());
         name = in.readString();
+
+        functionManager = in.readParcelable(AndroidFunctionManager.class.getClassLoader());
+        nodeManager = in.readParcelable(AndroidNodeManager.class.getClassLoader());
+
         parameters = new ArrayList<>();
         in.readList(parameters, AndroidFunctionParameter.class.getClassLoader());
+
+        parameterListeners = new ArrayList<>();
+        in.readList(parameterListeners, Map.Entry.class.getClassLoader());
+
+        parameterAddListeners = new ArrayList<>();
+        in.readList(parameterAddListeners, Link.class.getClassLoader());
+
+        parameterRemoveListeners = new ArrayList<>();
+        in.readList(parameterRemoveListeners, Link.class.getClassLoader());
     }
 
     public static final Creator<AndroidFunction> CREATOR = new Creator<AndroidFunction>() {
@@ -127,36 +132,41 @@ public class AndroidFunction implements ProjectModule, Parcelable {
             returnNodes.get(0).removeCloseButton();
     }
 
-    public AndroidFunctionParameter addParameter(Connection connection, String name, DataType type, boolean isArray) {
+    public AndroidFunctionParameter createParameter(Connection connection, String name, DataType type, boolean isArray) {
         AndroidFunctionParameter parameter =
                 new AndroidFunctionParameter(this, connection, type, name, isArray);
 
         notifyListenersParameterAdded(parameter);
         parameters.add(parameter);
-
+        notifyParameterAdd();
         return parameter;
     }
 
-    public void removeParameter(FunctionParameter parameter) {
+    public void removeParameter(AndroidFunctionParameter parameter) {
         notifyListenersParameterRemoved(parameter);
         parameters.remove(parameter);
+        notifyParameterRemove();
     }
 
-    public void addListener(NameChangedListener listener) {
+    @SuppressWarnings("unused")
+    public void onNameChange(NameChangedListener listener) {
         nameChangedListeners.add(listener);
     }
 
-    public void addListener(DestroyListener listener) {
-        destroyListeners.add(listener);
+    @SuppressWarnings("unused")
+    public void removeNameChangeListener(NameChangedListener listener) {
+        nameChangedListeners.remove(listener);
     }
 
-    public void addPareameterListener(FunctionParameter.Added added, FunctionParameter.Removed removed) {
-        parameterAddedListeners.add(added);
-        parameterRemovedListeners.add(removed);
+    @SuppressWarnings("unused")
+    public int addParameterListener(AndroidFunctionParameter.Add add, AndroidFunctionParameter.Remove remove) {
+        parameterListeners.add(new AbstractMap.SimpleEntry<>(add, remove));
+        return parameterListeners.get(parameterListeners.size() - 1).hashCode();
     }
 
-    public void setGenerateListener(GenerateListener listener) {
-        generateListener = listener;
+    @SuppressWarnings("unused")
+    public void removeParameterListener(int i) {
+        parameterListeners = Stream.of(parameterListeners).filter(v -> v.hashCode() != i).toList();
     }
 
     private void notifyListenersNameChanged(String newName) {
@@ -168,11 +178,11 @@ public class AndroidFunction implements ProjectModule, Parcelable {
     }
 
     private void notifyListenersParameterAdded(AndroidFunctionParameter parameter) {
-        //Stream.of(parameterAddedListeners).forEach(var -> var.add(parameter));
+        Stream.of(parameterListeners).map(Map.Entry::getKey).forEach(v -> v.add(parameter));
     }
 
-    private void notifyListenersParameterRemoved(FunctionParameter parameter) {
-        Stream.of(parameterRemovedListeners).forEach(var -> var.remove(parameter));
+    private void notifyListenersParameterRemoved(AndroidFunctionParameter parameter) {
+        Stream.of(parameterListeners).map(Map.Entry::getValue).forEach(v -> v.remove(parameter));
     }
 
     public void addReturnNode(FunctionReturnNode returnNode) {
@@ -180,22 +190,22 @@ public class AndroidFunction implements ProjectModule, Parcelable {
         returnNode.addCloseButton();
     }
 
+    @SuppressWarnings("unused")
     public void applyParameters() {
-//        if (!parameterAddedListeners.isEmpty()) {
-//            FunctionParameter.Added listener = parameterAddedListeners.get(parameterAddedListeners.size() - 1);
-//            Stream.of(parameters).forEach(listener::add);
-//        }
+        if (!parameterListeners.isEmpty()) {
+            AndroidFunctionParameter.Add listener = parameterListeners.get(parameterListeners.size() - 1).getKey();
+            Stream.of(parameters).forEach(listener::add);
+        }
     }
 
-    public String gen(BaseCodeGenerator builder) {
-        return generateListener.gen(builder);
-    }
+//    public String gen(BaseCodeGenerator builder) {
+//        return generateListener.gen(builder);
+//    }
 
 
     void destroy() {
         notifyListenersDestroed();
     }
-
 
     public String checkParameterName(String name) {
         String result = functionManager.checkFunctionName(name);
@@ -220,8 +230,12 @@ public class AndroidFunction implements ProjectModule, Parcelable {
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
-        dest.writeParcelable(functionManager, flags);
         dest.writeString(name);
+        dest.writeParcelable(functionManager, flags);
+        dest.writeParcelable(nodeManager, flags);
+        dest.writeList(parameterListeners);
+        dest.writeList(parameterAddListeners);
+        dest.writeList(parameterRemoveListeners);
     }
 
     public AndroidNodeManager getNodeManager() {
@@ -232,9 +246,17 @@ public class AndroidFunction implements ProjectModule, Parcelable {
         this.androidScene = androidScene;
 
         Stream.of(nodeManager.getNodes())
-                .filter(node -> node.getParent() != null)
-                .peek(node -> ((AndroidSceneLayout) node.getParent()).removeView(node))
-                .forEach(androidScene::addView);
+                .forEach(androidNode -> {
+                    AndroidSceneLayout parent = (AndroidSceneLayout) androidNode.getParent();
+                    if (parent != null)
+                        parent.removeView(androidNode);
+
+                    androidScene.addView(androidNode);
+                });
+    }
+
+    public AndroidFunctionManager getFunctionManager() {
+        return functionManager;
     }
 
     public void nodeAdded(AndroidNode node) {
@@ -242,8 +264,35 @@ public class AndroidFunction implements ProjectModule, Parcelable {
             androidScene.addView(node);
     }
 
-    public interface GenerateListener {
-        String gen(BaseCodeGenerator builder);
+    public Link onParameterAdd(Fun fun) {
+        Link link = new Link(parameterAddListeners, fun);
+        parameterAddListeners.add(link);
+        return link;
     }
 
+    public Link onParameterRemove(Fun fun) {
+        Link link = new Link(parameterRemoveListeners, fun);
+        parameterRemoveListeners.add(link);
+        return link;
+    }
+
+    private void notifyParameterAdd() {
+        Stream.of(parameterAddListeners).forEach(Link::call);
+    }
+
+    private void notifyParameterRemove() {
+        Stream.of(parameterRemoveListeners).forEach(Link::call);
+    }
+
+    public void updateData() {
+        notifyParameterAdd();
+    }
+
+    public AndroidFunctionParameter getParameter(int position) {
+        return parameters.get(position);
+    }
+
+    public void removeParameter(int position) {
+        parameters.remove(position);
+    }
 }

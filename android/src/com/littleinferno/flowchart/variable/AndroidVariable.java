@@ -95,16 +95,34 @@ public class AndroidVariable implements ProjectModule, Parcelable {
         notifyListenersIsArrayChanged(isArray);
     }
 
-    public void addListener(NameChangedListener listener) {
+    @SuppressWarnings("unused")
+    public void onNameChange(NameChangedListener listener) {
         nameChangedListeners.add(listener);
     }
 
-    public void addListener(TypeChangedListener listener) {
+    @SuppressWarnings("unused")
+    public void onTypeChange(TypeChangedListener listener) {
         typeChangedListeners.add(listener);
     }
 
-    public void addListener(ArrayChangedListener listener) {
+    @SuppressWarnings("unused")
+    public void onArrayChange(ArrayChangedListener listener) {
         arrayChangedListeners.add(listener);
+    }
+
+    @SuppressWarnings("unused")
+    public void removeNameChangeListener(NameChangedListener listener) {
+        nameChangedListeners.remove(listener);
+    }
+
+    @SuppressWarnings("unused")
+    public void removeTypeChangeListener(TypeChangedListener listener) {
+        typeChangedListeners.remove(listener);
+    }
+
+    @SuppressWarnings("unused")
+    public void removeArrayChangeListener(ArrayChangedListener listener) {
+        arrayChangedListeners.remove(listener);
     }
 
     private void notifyListenersNameChanged(String newName) {
@@ -117,6 +135,12 @@ public class AndroidVariable implements ProjectModule, Parcelable {
 
     private void notifyListenersIsArrayChanged(boolean isArray) {
         Stream.of(arrayChangedListeners).forEach(var -> var.changed(isArray));
+    }
+
+    public boolean isUse() {
+        return !nameChangedListeners.isEmpty() ||
+                !typeChangedListeners.isEmpty() ||
+                !arrayChangedListeners.isEmpty();
     }
 
     @Override

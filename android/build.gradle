@@ -1,5 +1,5 @@
 android {
-    buildToolsVersion '25.0.2'
+    buildToolsVersion '25.0.3'
     compileSdkVersion 25
     sourceSets {
         main {
@@ -80,6 +80,11 @@ task run(type: Exec) {
     commandLine "$adb", 'shell', 'am', 'start', '-n',
             'com.littleinferno.app/com.littleinferno.app.AndroidLauncher'
 }
+
 dependencies {
+    compile 'com.android.support:appcompat-v7:25.3.1'
     compile 'com.android.support.constraint:constraint-layout:1.0.2'
+
+    compile 'com.android.support:design:25.3.1'
+    compile 'com.android.support:cardview-v7:25.3.1'
 }

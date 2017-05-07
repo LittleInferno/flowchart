@@ -27,7 +27,7 @@ public class AndroidFunctionParameter implements Parcelable {
     private final List<TypeChangedListener> typeChangedListeners;
     private final List<ArrayChangedListener> arrayChangedListeners;
 
-    public AndroidFunctionParameter(AndroidFunction function, Connection connection, DataType dataType, String name, boolean isArray) {
+    AndroidFunctionParameter(AndroidFunction function, Connection connection, DataType dataType, String name, boolean isArray) {
         this.function = function;
         this.connection = connection;
         this.dataType = dataType;
@@ -39,7 +39,7 @@ public class AndroidFunctionParameter implements Parcelable {
         arrayChangedListeners = new ArrayList<>();
     }
 
-    protected AndroidFunctionParameter(Parcel in) {
+    private AndroidFunctionParameter(Parcel in) {
         function = in.readParcelable(AndroidFunction.class.getClassLoader());
         name = in.readString();
         isArray = in.readByte() != 0;
@@ -47,8 +47,13 @@ public class AndroidFunctionParameter implements Parcelable {
         connection = Connection.valueOf(in.readString());
 
         nameChangedListeners = new ArrayList<>();
+        in.readList(nameChangedListeners, NameChangedListener.class.getClassLoader());
+
         typeChangedListeners = new ArrayList<>();
+        in.readList(typeChangedListeners, TypeChangedListener.class.getClassLoader());
+
         arrayChangedListeners = new ArrayList<>();
+        in.readList(arrayChangedListeners, ArrayChangedListener.class.getClassLoader());
     }
 
     public static final Creator<AndroidFunctionParameter> CREATOR = new Creator<AndroidFunctionParameter>() {
@@ -101,18 +106,20 @@ public class AndroidFunctionParameter implements Parcelable {
         notifyListenersIsArrayChanged(array);
     }
 
-    public void addListener(NameChangedListener listener) {
+    @SuppressWarnings("unused")
+    public void onNameChange(NameChangedListener listener) {
         nameChangedListeners.add(listener);
     }
 
-    public void addListener(TypeChangedListener listener) {
+    @SuppressWarnings("unused")
+    public void onTypeChange(TypeChangedListener listener) {
         typeChangedListeners.add(listener);
     }
 
-    public void addListener(ArrayChangedListener listener) {
+    @SuppressWarnings("unused")
+    public void onArrayChange(ArrayChangedListener listener) {
         arrayChangedListeners.add(listener);
     }
-
 
     private void notifyListenersNameChanged(String newName) {
         Stream.of(nameChangedListeners).forEach(var -> var.changed(newName));
@@ -138,5 +145,21 @@ public class AndroidFunctionParameter implements Parcelable {
         dest.writeByte((byte) (isArray ? 1 : 0));
         dest.writeString(dataType.toString());
         dest.writeString(connection.toString());
+    }
+
+    public boolean isUse() {
+        return !nameChangedListeners.isEmpty() ||
+                !typeChangedListeners.isEmpty() ||
+                !arrayChangedListeners.isEmpty();
+    }
+
+    @SuppressWarnings("WeakerAccess")
+    public interface Add {
+        void add(AndroidFunctionParameter parameter);
+    }
+
+    @SuppressWarnings("WeakerAccess")
+    public interface Remove {
+        void remove(AndroidFunctionParameter parameter);
     }
 }

@@ -9,6 +9,7 @@ import com.annimon.stream.Stream;
 import com.littleinferno.flowchart.Files;
 import com.littleinferno.flowchart.function.AndroidFunction;
 import com.littleinferno.flowchart.plugin.AndroidPluginManager;
+import com.littleinferno.flowchart.variable.AndroidVariableManager;
 
 import java.io.File;
 
@@ -23,12 +24,13 @@ public class FlowchartProject {
     private Context context;
 
     private FragmentManager fragmentManager;
+    private AndroidVariableManager variableManager;
 
     public FlowchartProject(Context context) {
         this.context = context;
 
         pluginManager = new AndroidPluginManager();
-
+        variableManager = new AndroidVariableManager(this);
         String string = Environment.getExternalStorageDirectory().toString();
 
 
@@ -88,5 +90,9 @@ public class FlowchartProject {
 
     public FragmentManager getFragmentManager() {
         return fragmentManager;
+    }
+
+    public AndroidVariableManager getVariableManager() {
+        return variableManager;
     }
 }

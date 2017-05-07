@@ -22,7 +22,6 @@ import com.littleinferno.flowchart.DataType;
 import com.littleinferno.flowchart.R;
 import com.littleinferno.flowchart.databinding.LayoutVariableDetailsBinding;
 import com.littleinferno.flowchart.util.Objects;
-import com.littleinferno.flowchart.util.UpdaterHandle;
 import com.littleinferno.flowchart.variable.AndroidVariable;
 import com.littleinferno.flowchart.variable.AndroidVariableManager;
 
@@ -44,7 +43,6 @@ public class VariableDetailsFragment extends DialogFragment {
     private Disposable isArray;
     private Disposable discard;
     private Disposable ok;
-    private UpdaterHandle updater;
 
     public VariableDetailsFragment() {
     }
@@ -77,7 +75,6 @@ public class VariableDetailsFragment extends DialogFragment {
         if (bundle != null) {
             variableManager = bundle.getParcelable(AndroidVariableManager.TAG);
             variable = bundle.getParcelable(AndroidVariable.TAG);
-            updater = bundle.getParcelable(UpdaterHandle.TAG);
         }
 
         if (variableManager == null)
@@ -93,8 +90,8 @@ public class VariableDetailsFragment extends DialogFragment {
         name.dispose();
         type.dispose();
         isArray.dispose();
-
-        updater.update();
+        ok.dispose();
+        discard.dispose();
     }
 
     private void init() {
@@ -161,6 +158,7 @@ public class VariableDetailsFragment extends DialogFragment {
         var.setDataType(dataTypeBuffer);
         var.setArray(isArrayBuffer);
         var.setName(nameBuffer);
+        variableManager.updateData();
     }
 
     private void addVariable() {
@@ -169,15 +167,11 @@ public class VariableDetailsFragment extends DialogFragment {
 
     public static void show(@NonNull final AndroidVariableManager variableManager,
                             @NonNull final FragmentManager fragmentManager,
-                            @NonNull final UpdaterHandle handle,
                             @Nullable final AndroidVariable variable) {
 
         Bundle bundle = new Bundle();
         bundle.putParcelable(AndroidVariableManager.TAG, variableManager);
         bundle.putParcelable(AndroidVariable.TAG, variable);
-        bundle.putParcelable(UpdaterHandle.TAG, handle);
-
-//        bundle.putParcelable("UPDATER", new VariableListAdapter.UpdaterHandle(VariableListAdapter.this::notifyDataSetChanged));
 
         VariableDetailsFragment variableDetailsFragment = new VariableDetailsFragment();
         variableDetailsFragment.setArguments(bundle);

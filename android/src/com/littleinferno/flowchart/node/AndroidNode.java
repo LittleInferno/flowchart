@@ -1,10 +1,10 @@
 package com.littleinferno.flowchart.node;
 
 import android.annotation.SuppressLint;
-import android.content.Context;
 import android.support.annotation.NonNull;
 import android.view.View;
 
+import com.littleinferno.flowchart.function.AndroidFunction;
 import com.littleinferno.flowchart.pin.Connector;
 import com.littleinferno.flowchart.plugin.AndroidNodePluginHandle;
 import com.littleinferno.flowchart.scene.AndroidSceneLayout;
@@ -15,15 +15,18 @@ public class AndroidNode extends BaseNode implements Destroyable {
 
     private final AndroidNodePluginHandle.NodeHandle nodeHandle;
 
-    public AndroidNode(final Context context, @NonNull AndroidNodePluginHandle.NodeHandle nodeHandle) {
-        super(context);
+    public AndroidNode(final AndroidFunction function, @NonNull AndroidNodePluginHandle.NodeHandle nodeHandle) {
+        super(function);
         this.nodeHandle = nodeHandle;
+        setTitle(nodeHandle.getTitle());
+
         this.nodeHandle.getInit().call(this);
-        this.nodeHandle.getAttribute("functionInit").ifPresent(o -> {
+        this.nodeHandle.getAttribute("closable")
+                .map(Boolean.class::cast)
+                .map(o -> o ? VISIBLE : INVISIBLE)
+                .ifPresent(o -> layout.close.setVisibility(o));
 
-        });
-
-        setOnClickListener(v -> {
+        layout.close.setOnClickListener(v -> {
             onDestroy();
             ((AndroidSceneLayout) getParent()).removeView(this);
         });

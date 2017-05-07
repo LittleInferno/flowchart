@@ -84,9 +84,9 @@ public class Connector extends android.support.v7.widget.AppCompatTextView imple
         if (this.isArray == isArray)
             return;
 
-        setImage();
-
         this.isArray = isArray;
+
+        setImage();
     }
 
     private void setImage() {
@@ -101,6 +101,8 @@ public class Connector extends android.support.v7.widget.AppCompatTextView imple
             setCompoundDrawablesWithIntrinsicBounds(ContextCompat.getDrawable(getContext(), i), null, null, null);
         else
             setCompoundDrawablesWithIntrinsicBounds(null, null, ContextCompat.getDrawable(getContext(), i), null);
+
+        setCompoundDrawablePadding(4);
 
         if (getType() != null)
             setColor(getType());

@@ -9,21 +9,15 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.jakewharton.rxbinding2.view.RxView;
 import com.jakewharton.rxbinding2.widget.RxTextView;
 import com.littleinferno.flowchart.databinding.LayoutCreateNewFunctionBinding;
 import com.littleinferno.flowchart.function.AndroidFunctionManager;
-import com.littleinferno.flowchart.util.UpdaterHandle;
-
-import io.reactivex.disposables.Disposable;
 
 public class NewFunctionDialog extends DialogFragment {
 
     LayoutCreateNewFunctionBinding layout;
     private AndroidFunctionManager functionManager;
     private String nameBuffer;
-    private Disposable create;
-    private Disposable discard;
 
     @Nullable
     @Override
@@ -49,24 +43,12 @@ public class NewFunctionDialog extends DialogFragment {
                 .subscribe(b -> layout.create.setEnabled(b));
 
 
-        discard = RxView.clicks(layout.discard).subscribe(v -> dismiss());
+        layout.discard.setOnClickListener(v -> dismiss());
 
-        create = RxView.clicks(layout.create).subscribe(v -> {
-            createFunction();
+        layout.create.setOnClickListener(v -> {
+            functionManager.createFunction(nameBuffer);
             dismiss();
         });
-    }
-
-    @Override
-    public void onStop() {
-        super.onStop();
-
-        create.dispose();
-        discard.dispose();
-    }
-
-    private void createFunction() {
-        functionManager.createFunction(nameBuffer);
     }
 
     private boolean checkName(String s) {
@@ -84,11 +66,9 @@ public class NewFunctionDialog extends DialogFragment {
     }
 
     public static void show(@NonNull final AndroidFunctionManager functionManager,
-                            @NonNull final FragmentManager fragmentManager,
-                            @NonNull final UpdaterHandle handle) {
+                            @NonNull final FragmentManager fragmentManager) {
         Bundle bundle = new Bundle();
         bundle.putParcelable(AndroidFunctionManager.TAG, functionManager);
-        bundle.putParcelable(UpdaterHandle.TAG, handle);
 
         NewFunctionDialog functionDialog = new NewFunctionDialog();
         functionDialog.setArguments(bundle);

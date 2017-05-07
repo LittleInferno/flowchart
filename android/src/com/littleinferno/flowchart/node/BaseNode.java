@@ -18,6 +18,7 @@ import com.annimon.stream.Stream;
 import com.littleinferno.flowchart.Connection;
 import com.littleinferno.flowchart.DataType;
 import com.littleinferno.flowchart.databinding.NodeLayoutBinding;
+import com.littleinferno.flowchart.function.AndroidFunction;
 import com.littleinferno.flowchart.pin.Connector;
 
 import java.util.Arrays;
@@ -26,19 +27,22 @@ import java.util.List;
 
 public class BaseNode extends CardView {
 
-
     public enum Align {
         LEFT, RIGHT, CENTER
     }
 
-    private PointF delta = new PointF();
-
     NodeLayoutBinding layout;
+    private AndroidFunction function;
     private PointF point;
 
-    public BaseNode(final Context context) {
-        super(context);
-        layout = NodeLayoutBinding.inflate((LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE), this, true);
+    public BaseNode(final AndroidFunction function) {
+        super(function.getProject().getContext());
+        layout = NodeLayoutBinding.inflate((LayoutInflater) function
+                .getProject()
+                .getContext()
+                .getSystemService(Context.LAYOUT_INFLATER_SERVICE), this, true);
+        this.function = function;
+
         setElevation(8);
         bringToFront();
         setLayoutParams(selfLayoutParams());
@@ -47,18 +51,22 @@ public class BaseNode extends CardView {
     private void init(Context context) {
     }
 
+    @SuppressWarnings("unused")
     public Connector addDataInputPin(final String name, final boolean isArray, final DataType... possibleConvert) {
         return buildPin(Connection.INPUT, name, isArray, possibleConvert);
     }
 
+    @SuppressWarnings("unused")
     public Connector addDataOutputPin(final String name, final boolean isArray, final DataType... possibleConvert) {
         return buildPin(Connection.OUTPUT, name, isArray, possibleConvert);
     }
 
+    @SuppressWarnings("unused")
     public Connector addExecutionInputPin(final String name) {
         return buildPin(Connection.INPUT, name, false, DataType.EXECUTION);
     }
 
+    @SuppressWarnings("unused")
     public Connector addExecutionOutputPin(final String name) {
         return buildPin(Connection.OUTPUT, name, false, DataType.EXECUTION);
     }
@@ -74,14 +82,31 @@ public class BaseNode extends CardView {
 
         return new Connector(this, createLayoutParams(),
                 connection, name, isArray,
-                Optional.of(new HashSet<DataType>(Arrays.asList(possibleConverts))),
+                Optional.of(new HashSet<>(Arrays.asList(possibleConverts))),
                 DataType.UNIVERSAL);
     }
 
     public void removePin(final Connector pin) {
+        pin.disconnectAll();
         layout.nodeLeft.removeView(pin);
         layout.nodeRight.removeView(pin);
+    }
 
+    @SuppressWarnings("unused")
+    public void removePin(final String pin) {
+        Stream.range(0, layout.nodeLeft.getChildCount())
+                .map(layout.nodeLeft::getChildAt)
+                .filter(value -> value instanceof Connector)
+                .map(Connector.class::cast)
+                .filter(connector -> connector.getName().equals(pin))
+                .findFirst().ifPresent(p -> layout.nodeLeft.removeView(p));
+
+        Stream.range(0, layout.nodeRight.getChildCount())
+                .map(layout.nodeRight::getChildAt)
+                .filter(value -> value instanceof Connector)
+                .map(Connector.class::cast)
+                .filter(connector -> connector.getName().equals(pin))
+                .findFirst().ifPresent(p -> layout.nodeRight.removeView(p));
     }
 
     public List<Connector> getPins() {
@@ -126,10 +151,6 @@ public class BaseNode extends CardView {
         }
     }
 
-    public PointF getDelta() {
-        return delta;
-    }
-
     public void drag() {
         ClipData data = ClipData.newPlainText("", "");
         ShadowBuilder shadowBuilder = new ShadowBuilder(this);
@@ -159,11 +180,23 @@ public class BaseNode extends CardView {
         return point;
     }
 
-    public static class ShadowBuilder extends View.DragShadowBuilder {
+    public void setTitle(final String title) {
+        layout.nodeTitle.setText(title);
+    }
+
+    public String getText() {
+        return layout.nodeTitle.getText().toString();
+    }
+
+    public AndroidFunction getFunction(){
+        return function;
+    }
+
+    private static class ShadowBuilder extends View.DragShadowBuilder {
 
         private final PointF touchPoint;
 
-        public ShadowBuilder(BaseNode node) {
+        ShadowBuilder(BaseNode node) {
             super(node);
             this.touchPoint = node.getPoint();
         }

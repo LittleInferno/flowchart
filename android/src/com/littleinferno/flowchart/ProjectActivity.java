@@ -66,8 +66,6 @@ public class ProjectActivity extends AppCompatActivity implements NavigationView
 
         FlowchartProject flowchartProject = FlowchartProject.load(this);
 
-        variableManager = new AndroidVariableManager(FlowchartProject.getProject());
-
         functionManager = new AndroidFunctionManager(FlowchartProject.getProject());
         functionManager.createFunction("func1");
         functionManager.createFunction("func2");
@@ -139,7 +137,7 @@ public class ProjectActivity extends AppCompatActivity implements NavigationView
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.variable: {
-                VariableListFragment.show(variableManager, getFragmentManager());
+                VariableListFragment.show(FlowchartProject.getProject().getVariableManager(), getFragmentManager());
                 break;
             }
             case R.id.function: {

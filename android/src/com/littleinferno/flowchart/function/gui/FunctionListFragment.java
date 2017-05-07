@@ -21,8 +21,8 @@ import com.littleinferno.flowchart.function.AndroidFunction;
 import com.littleinferno.flowchart.function.AndroidFunctionManager;
 import com.littleinferno.flowchart.project.FlowchartProject;
 import com.littleinferno.flowchart.scene.gui.SceneFragment;
+import com.littleinferno.flowchart.util.Link;
 import com.littleinferno.flowchart.util.Swiper;
-import com.littleinferno.flowchart.util.UpdaterHandle;
 
 import net.idik.lib.slimadapter.SlimAdapter;
 
@@ -30,6 +30,8 @@ public class FunctionListFragment extends DialogFragment {
 
     LayoutFunctionListBinding layout;
     private AndroidFunctionManager functionManager;
+    private Link add;
+    private Link remove;
 
     @Nullable
     @Override
@@ -44,9 +46,9 @@ public class FunctionListFragment extends DialogFragment {
 
         Window window = getDialog().getWindow();
         if (window != null) {
-            WindowManager.LayoutParams wmlp = window.getAttributes();
-            wmlp.gravity = Gravity.FILL_HORIZONTAL;
-            wmlp.windowAnimations = R.style.FragmentAnim;
+            WindowManager.LayoutParams layoutParams = window.getAttributes();
+            layoutParams.gravity = Gravity.FILL_HORIZONTAL;
+            layoutParams.windowAnimations = R.style.FragmentAnim;
         }
     }
 
@@ -63,6 +65,7 @@ public class FunctionListFragment extends DialogFragment {
         if (functionManager == null)
             throw new RuntimeException("function manager cannot be null");
 
+        layout.addFunction.setOnClickListener(v -> NewFunctionDialog.show(functionManager, getFragmentManager()));
 
         layout.functions.items.setLayoutManager(new LinearLayoutManager(getContext()));
 
@@ -113,8 +116,15 @@ public class FunctionListFragment extends DialogFragment {
         FunctionDetailsFragment.show(functionManager, getChildFragmentManager(),
                 functionManager.getProject().getCurrentScene(), R.id.function_details_layout);
 
-        layout.addFunction.setOnClickListener(v -> NewFunctionDialog.show(functionManager, getFragmentManager(),
-                new UpdaterHandle(() -> adapter.updateData(functionManager.getFunctions()))));
+        add = functionManager.onFunctionAdd(adapter::notifyDataSetChanged);
+        remove = functionManager.onFunctionRemove(adapter::notifyDataSetChanged);
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        add.disconnect();
+        remove.disconnect();
     }
 
     public static void show(@NonNull AndroidFunctionManager functionManager,

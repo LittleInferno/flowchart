@@ -23,7 +23,6 @@ import com.littleinferno.flowchart.databinding.LayoutFunctionParameterDetailsBin
 import com.littleinferno.flowchart.function.AndroidFunction;
 import com.littleinferno.flowchart.function.AndroidFunctionParameter;
 import com.littleinferno.flowchart.util.Objects;
-import com.littleinferno.flowchart.util.UpdaterHandle;
 
 import io.reactivex.disposables.Disposable;
 
@@ -39,7 +38,6 @@ public class FunctionParameterDetailsFragment extends DialogFragment {
 
     private AndroidFunctionParameter parameter;
     private Connection connectionBuffer;
-    private UpdaterHandle updater;
     private Disposable name;
     private Disposable type;
     private Disposable connection;
@@ -67,7 +65,6 @@ public class FunctionParameterDetailsFragment extends DialogFragment {
         if (bundle != null) {
             function = bundle.getParcelable(AndroidFunction.TAG);
             parameter = bundle.getParcelable(AndroidFunctionParameter.TAG);
-            updater = bundle.getParcelable(UpdaterHandle.TAG);
         }
 
         if (function == null)
@@ -84,9 +81,8 @@ public class FunctionParameterDetailsFragment extends DialogFragment {
         type.dispose();
         isArray.dispose();
         discard.dispose();
+        connection.dispose();
         ok.dispose();
-
-        updater.update();
     }
 
 
@@ -172,20 +168,19 @@ public class FunctionParameterDetailsFragment extends DialogFragment {
         var.setArray(isArrayBuffer);
         var.setName(nameBuffer);
         var.setConnection(connectionBuffer);
+        function.updateData();
     }
 
     private void addParameter() {
-        this.parameter = function.addParameter(connectionBuffer, nameBuffer, dataTypeBuffer, isArrayBuffer);
+        this.parameter = function.createParameter(connectionBuffer, nameBuffer, dataTypeBuffer, isArrayBuffer);
     }
 
     public static void show(@NonNull AndroidFunction function,
                             @NonNull FragmentManager fragmentManager,
-                            @NonNull UpdaterHandle updaterHandle,
                             @Nullable AndroidFunctionParameter data) {
         Bundle bundle = new Bundle();
         bundle.putParcelable(AndroidFunction.TAG, function);
         bundle.putParcelable(AndroidFunctionParameter.TAG, data);
-        bundle.putParcelable(UpdaterHandle.TAG, updaterHandle);
 
         FunctionParameterDetailsFragment parameterDetails = new FunctionParameterDetailsFragment();
         parameterDetails.setArguments(bundle);
