@@ -283,31 +283,7 @@ function functionBeginNode() {
 
         // this.function.addListener(node.setT);
         // this.function.addListener(this::close);
-        var pins = [];
-
-        // function.addPareameterListener(
-        //         parameter -> {
-        //             if (parameter.getConnection() == Connection.INPUT) {
-        //                 final Pin pin = addDataOutputPin(parameter.getName(), parameter.getDataType());
-
-        //                 pin.setArray(parameter.isArray());
-
-        //                 parameter.addListener(pin::setArray);
-        //                 parameter.addListener(pin::setName);
-        //                 parameter.addListener(pin::setType);
-
-        //                 pins.add(pin);
-        //             }
-        //         },
-        //         parameter -> {
-        //             for (Pin pin : pins)
-        //                 if (parameter.getName().equals(pin.getName()))
-        //                     removePin(pin);
-        //         }
-        // );
-
-        // this.function.applyParameters();
-
+        
     }
 
     var initFun = function (node, fun) {

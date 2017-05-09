@@ -4,6 +4,7 @@ import android.os.Parcel;
 import android.os.Parcelable;
 import android.support.annotation.NonNull;
 
+import com.annimon.stream.Stream;
 import com.littleinferno.flowchart.function.AndroidFunction;
 import com.littleinferno.flowchart.plugin.AndroidNodePluginHandle;
 import com.littleinferno.flowchart.scene.SceneType;
@@ -68,6 +69,13 @@ public class AndroidNodeManager implements Parcelable {
 
     public List<AndroidNode> getNodes() {
         return nodes;
+    }
+
+    public AndroidNode getNode(String name) {
+        return Stream.of(nodes)
+                .filter(name::equals)
+                .findFirst()
+                .orElseThrow(() -> new RuntimeException("Cannot find node"));
     }
 
     @Override

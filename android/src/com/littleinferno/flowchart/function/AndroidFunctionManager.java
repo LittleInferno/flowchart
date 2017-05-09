@@ -3,7 +3,9 @@ package com.littleinferno.flowchart.function;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import com.annimon.stream.Collectors;
 import com.annimon.stream.Stream;
+import com.littleinferno.flowchart.generator.Generator;
 import com.littleinferno.flowchart.project.FlowchartProject;
 import com.littleinferno.flowchart.project.ProjectModule;
 import com.littleinferno.flowchart.util.Fun;
@@ -13,7 +15,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-public class AndroidFunctionManager implements ProjectModule, Parcelable {
+public class AndroidFunctionManager implements ProjectModule, Generator, Parcelable {
 
     public static final String TAG = "FUNCTION_MANAGER";
 
@@ -90,12 +92,6 @@ public class AndroidFunctionManager implements ProjectModule, Parcelable {
                         new RuntimeException("Cannot find codegen with title:\"" + name + "\""));
     }
 
-//    public String gen(BaseCodeGenerator builder) {
-//        return Stream.of(functions)
-//                .map(function -> function.gen(builder))
-//                .collect(Collectors.joining());
-//    }
-
     public List<AndroidFunction> getFunctions() {
         return functions;
     }
@@ -153,4 +149,8 @@ public class AndroidFunctionManager implements ProjectModule, Parcelable {
         Stream.of(functionRemoveListeners).forEach(Link::call);
     }
 
+    @Override
+    public String generate() {
+        return Stream.of(functions).map(AndroidFunction::generate).collect(Collectors.joining("\n"));
+    }
 }

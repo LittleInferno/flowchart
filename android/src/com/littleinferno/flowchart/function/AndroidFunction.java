@@ -6,6 +6,7 @@ import android.os.Parcelable;
 import com.annimon.stream.Stream;
 import com.littleinferno.flowchart.Connection;
 import com.littleinferno.flowchart.DataType;
+import com.littleinferno.flowchart.generator.Generator;
 import com.littleinferno.flowchart.node.AndroidNode;
 import com.littleinferno.flowchart.node.AndroidNodeManager;
 import com.littleinferno.flowchart.node.FunctionReturnNode;
@@ -23,7 +24,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-public class AndroidFunction implements ProjectModule, Parcelable {
+public class AndroidFunction implements ProjectModule, Generator, Parcelable {
 
     public static final String TAG = "FUNCTION";
 
@@ -198,11 +199,6 @@ public class AndroidFunction implements ProjectModule, Parcelable {
         }
     }
 
-//    public String gen(BaseCodeGenerator builder) {
-//        return generateListener.gen(builder);
-//    }
-
-
     void destroy() {
         notifyListenersDestroed();
     }
@@ -294,5 +290,17 @@ public class AndroidFunction implements ProjectModule, Parcelable {
 
     public void removeParameter(int position) {
         parameters.remove(position);
+    }
+
+    @Override
+    public String generate() {
+        AndroidNode node = nodeManager.getNode("function begin node");
+
+        return node.getNodeHandle()
+                .getAttribute("functionGenerate")
+                .map(org.mozilla.javascript.Function.class::cast)
+                .map(node.getNodeHandle().getPluginHandle()::createScriptFun)
+                .orElseThrow(RuntimeException::new)
+                .call(String.class, node, this);
     }
 }
