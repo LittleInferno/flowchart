@@ -2,8 +2,17 @@ package com.littleinferno.flowchart.function;
 
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.util.Log;
 
 import com.annimon.stream.Stream;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonDeserializationContext;
+import com.google.gson.JsonDeserializer;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParseException;
+import com.google.gson.JsonSerializationContext;
+import com.google.gson.JsonSerializer;
 import com.littleinferno.flowchart.Connection;
 import com.littleinferno.flowchart.DataType;
 import com.littleinferno.flowchart.generator.Generator;
@@ -13,12 +22,12 @@ import com.littleinferno.flowchart.node.FunctionReturnNode;
 import com.littleinferno.flowchart.project.FlowchartProject;
 import com.littleinferno.flowchart.project.ProjectModule;
 import com.littleinferno.flowchart.scene.AndroidSceneLayout;
-import com.littleinferno.flowchart.scene.SceneType;
 import com.littleinferno.flowchart.util.DestroyListener;
 import com.littleinferno.flowchart.util.Fun;
 import com.littleinferno.flowchart.util.Link;
 import com.littleinferno.flowchart.util.NameChangedListener;
 
+import java.lang.reflect.Type;
 import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.List;
@@ -58,18 +67,29 @@ public class AndroidFunction implements ProjectModule, Generator, Parcelable {
 
         returnNodes = new ArrayList<>();
 
-        nodeManager = new AndroidNodeManager(SceneType.FUNCTION, this);
-
-        AndroidNode begin = nodeManager.createNode("function begin node");
-        begin.setX(10);
-        begin.setY(400);
-
-        AndroidNode end = nodeManager.createNode("function return node");
-        end.setX(600);
-        end.setY(400);
+        nodeManager = new AndroidNodeManager(this);
+        nodeManager.createNode("function begin node", 10, 400);
+        nodeManager.createNode("function return node", 600, 400);
 
         parameterAddListeners = new ArrayList<>();
         parameterRemoveListeners = new ArrayList<>();
+    }
+
+
+    AndroidFunction(AndroidFunctionManager functionManager, SimpleObject saveInfo) {
+
+        this.functionManager = functionManager;
+        this.name = saveInfo.name;
+
+        parameterListeners = new ArrayList<>();
+        parameterAddListeners = new ArrayList<>();
+        parameterRemoveListeners = new ArrayList<>();
+
+        parameters = new ArrayList<>();
+        Stream.of(saveInfo.parameters).forEach(this::addParameter);
+
+        nodeManager = new AndroidNodeManager(this);
+        Stream.of(saveInfo.nodes).forEach(nodeManager::createNode);
     }
 
     private AndroidFunction(Parcel in) {
@@ -104,17 +124,21 @@ public class AndroidFunction implements ProjectModule, Generator, Parcelable {
     };
 
     public List<AndroidFunctionParameter> getParameters() {
-        return parameters;
+        return Stream.of(parameters).toList();
     }
 
-    public List<AndroidFunctionParameter> getInputParameters() {
-        // return Stream.of(parameters).filter(value -> value.getConnection() == Connection.INPUT).toList();
-        return null;
+    @SuppressWarnings("unused")
+    public AndroidFunctionParameter[] getInputParameters() {
+        return Stream.of(getParameters())
+                .filter(value -> value.getConnection() == Connection.INPUT)
+                .toArray(AndroidFunctionParameter[]::new);
     }
 
-    public List<AndroidFunctionParameter> getOutputParameters() {
-        //    return Stream.of(parameters).filter(value -> value.getConnection() == Connection.OUTPUT).toList();
-        return null;
+    @SuppressWarnings("unused")
+    public AndroidFunctionParameter[] getOutputParameters() {
+        return Stream.of(getParameters())
+                .filter(value -> value.getConnection() == Connection.OUTPUT)
+                .toArray(AndroidFunctionParameter[]::new);
     }
 
     public String getName() {
@@ -133,20 +157,25 @@ public class AndroidFunction implements ProjectModule, Generator, Parcelable {
             returnNodes.get(0).removeCloseButton();
     }
 
-    public AndroidFunctionParameter createParameter(Connection connection, String name, DataType type, boolean isArray) {
+    public AndroidFunctionParameter addParameter(Connection connection, String name, DataType type, boolean isArray) {
         AndroidFunctionParameter parameter =
                 new AndroidFunctionParameter(this, connection, type, name, isArray);
 
-        notifyListenersParameterAdded(parameter);
         parameters.add(parameter);
         notifyParameterAdd();
+        notifyListenersParameterAdded(parameter);
         return parameter;
     }
 
+    private AndroidFunctionParameter addParameter(AndroidFunctionParameter.SimpleObject savedInfo) {
+        return addParameter(Connection.valueOf(savedInfo.connection), savedInfo.name,
+                DataType.valueOf(savedInfo.type), savedInfo.array);
+    }
+
     public void removeParameter(AndroidFunctionParameter parameter) {
-        notifyListenersParameterRemoved(parameter);
         parameters.remove(parameter);
         notifyParameterRemove();
+        notifyListenersParameterRemoved(parameter);
     }
 
     @SuppressWarnings("unused")
@@ -289,18 +318,91 @@ public class AndroidFunction implements ProjectModule, Generator, Parcelable {
     }
 
     public void removeParameter(int position) {
-        parameters.remove(position);
+        removeParameter(parameters.get(position));
+    }
+
+    public SimpleObject getSaveInfo() {
+        return new SimpleObject(name,
+                Stream.of(parameters).map(AndroidFunctionParameter::getSaveInfo).toList(),
+                Stream.of(nodeManager.getNodes()).map(AndroidNode::getSaveInfo).toList());
     }
 
     @Override
     public String generate() {
         AndroidNode node = nodeManager.getNode("function begin node");
 
-        return node.getNodeHandle()
-                .getAttribute("functionGenerate")
+        String functionGen = node.getNodeHandle()
+                .getAttribute("functionGen")
                 .map(org.mozilla.javascript.Function.class::cast)
                 .map(node.getNodeHandle().getPluginHandle()::createScriptFun)
                 .orElseThrow(RuntimeException::new)
                 .call(String.class, node, this);
+
+        Log.d(getName(), functionGen);
+        return functionGen;
+    }
+
+
+    public static class Serializer implements JsonSerializer<AndroidFunction>, JsonDeserializer<AndroidFunction> {
+        @Override
+        public JsonElement serialize(AndroidFunction src, Type typeOfSrc, JsonSerializationContext context) {
+
+            JsonObject result = new JsonObject();
+            result.addProperty("name", src.getName());
+            JsonArray parameters = new JsonArray();
+            Stream.of(src.getParameters())
+                    .map(AndroidFunctionParameter::getSaveInfo)
+                    .map(context::serialize)
+                    .forEach(parameters::add);
+
+            result.add("parameters", parameters);
+
+            JsonArray nodes = new JsonArray();
+            Stream.of(src.getNodeManager().getNodes())
+                    .map(AndroidNode::getSaveInfo)
+                    .map(context::serialize)
+                    .forEach(nodes::add);
+
+            result.add("nodes", nodes);
+
+            return result;
+        }
+
+        @Override
+        public AndroidFunction deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
+
+            JsonObject data = json.getAsJsonObject();
+
+            String name = data.get("name").getAsString();
+
+            AndroidFunction function = FlowchartProject.getProject().getFunctionManager().createFunction(name);
+
+            Stream.of(data.get("parameters").getAsJsonArray())
+                    .map(JsonElement::getAsJsonObject)
+                    .map(jso -> context.deserialize(jso, AndroidFunctionParameter.SimpleObject.class))
+                    .map(AndroidFunctionParameter.SimpleObject.class::cast)
+                    .forEach(function::addParameter);
+
+
+            Stream.of(data.get("nodes").getAsJsonArray())
+                    .map(JsonElement::getAsJsonObject)
+                    .map(jso -> context.deserialize(jso, AndroidNode.SimpleObject.class))
+                    .map(AndroidNode.SimpleObject.class::cast)
+                    .forEach(function.nodeManager::createNode);
+
+            return function;
+        }
+    }
+
+    public static class SimpleObject {
+        final String name;
+        final List<AndroidFunctionParameter.SimpleObject> parameters;
+        final List<AndroidNode.SimpleObject> nodes;
+
+        public SimpleObject(String name, List<AndroidFunctionParameter.SimpleObject> parameters, List<AndroidNode.SimpleObject> nodes) {
+            this.name = name;
+            this.parameters = parameters;
+            this.nodes = nodes;
+        }
     }
 }

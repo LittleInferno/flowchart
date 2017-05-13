@@ -172,7 +172,7 @@ public class FunctionParameterDetailsFragment extends DialogFragment {
     }
 
     private void addParameter() {
-        this.parameter = function.createParameter(connectionBuffer, nameBuffer, dataTypeBuffer, isArrayBuffer);
+        this.parameter = function.addParameter(connectionBuffer, nameBuffer, dataTypeBuffer, isArrayBuffer);
     }
 
     public static void show(@NonNull AndroidFunction function,

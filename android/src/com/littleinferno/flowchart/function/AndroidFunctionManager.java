@@ -63,9 +63,17 @@ public class AndroidFunctionManager implements ProjectModule, Generator, Parcela
         return function;
     }
 
-    public MainFunction createMain() {
-        MainFunction function = new MainFunction(this);
+    public AndroidFunction createFunction(AndroidFunction.SimpleObject saveInfo) {
+        AndroidFunction function = new AndroidFunction(this, saveInfo);
         functions.add(function);
+
+        notifyFunctionAdd();
+        return function;
+    }
+
+    public AndroidFunction createMain() {
+        AndroidFunction function = new AndroidFunction(this, getProject().getPluginManager().getRules().getEntryPoint());
+        functions.add(0, function);
 
         notifyFunctionAdd();
         return function;
@@ -105,11 +113,11 @@ public class AndroidFunctionManager implements ProjectModule, Generator, Parcela
 
         if (name.isEmpty()) {
             return "Name can not be empty";
-        } else if (!project.getPluginManager().getCodeGenerator().checkPattern(name)) {
+        } else if (!project.getPluginManager().getRules().checkPattern(name)) {
             return "Unacceptable symbols";
         } else if (Stream.of(functions).map(AndroidFunction::getName).anyMatch(name::equals)) {
             return "This name is already taken";
-        } else if (project.getPluginManager().getCodeGenerator().containsWord(name))
+        } else if (project.getPluginManager().getRules().containsWord(name))
             return "Invalid name";
 
         return null;

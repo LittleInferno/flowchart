@@ -90,11 +90,11 @@ public class AndroidVariableManager implements Parcelable, ProjectModule {
 
         if (name.isEmpty()) {
             return "Name can not be empty";
-        } else if (!project.getPluginManager().getCodeGenerator().checkPattern(name)) {
+        } else if (!project.getPluginManager().getRules().checkPattern(name)) {
             return "Unacceptable symbols";
         } else if (Stream.of(variables).map(AndroidVariable::getName).anyMatch(name::equals)) {
             return "This name is already taken";
-        } else if (project.getPluginManager().getCodeGenerator().containsWord(name))
+        } else if (project.getPluginManager().getRules().containsWord(name))
             return "Invalid name";
 
         return null;

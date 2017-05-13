@@ -19,14 +19,45 @@ var codegen = new NativeGenerator();
 var Project = com.littleinferno.flowchart.project.FlowchartProject;
 
 function pluginParams() {
-    return new PluginParams("basic", "basic plugin for test", "0.0.2", 400);
+    return new PluginParams("basic", "basic plugin for test", "0.0.3", 500);
 }
 
 function exportNodes() {
     return [addNode(), subNode(), mulNode(), divNode(), equalNode(),
     lessNode(), greatNode(), integerNode(), floatNode(), stringNode(), variableSetNode(),
-    variableGetNode(),
+    variableGetNode(), printNode(),
     functionBeginNode(), functionReturnNode(), functionCallNode()];
+}
+
+function exportRules() {
+    return {
+        keyWords: [
+            "abstract", "arguments", "await", "boolean",
+            "break", "byte", "case", "catch",
+            "char", "class", "const", "continue",
+            "debugger", "default", "delete", "do",
+            "double", "else", "enum", "eval",
+            "export", "extends", "false", "final",
+            "finally", "float", "for", "function",
+            "goto", "if", "implements", "import",
+            "in", "instanceof", "int", "interface",
+            "let", "long", "native", "new",
+            "null", "package", "private", "protected",
+            "public", "return", "short", "static",
+            "super", "switch", "synchronized", "this",
+            "throw", "throws", "transient", "true",
+            "try", "typeof", "var", "void",
+            "volatile", "while", "with", "yield"],
+
+        variableIsAvailable: true,
+        functionIsAvailable: true,
+        pattern: "[$a-zA-Z_][0-9a-zA-Z_$]*",
+        entryPoint: "main"
+    };
+}
+
+function makeVariable(name, value) {
+    return "var " + name + " = " + value + ";";
 }
 
 function addNode() {
@@ -275,15 +306,12 @@ function stringNode() {
 }
 
 function functionBeginNode() {
-
-    var pins = [];
-
     var init = function (node) {
-        var next = node.addExecutionOutputPin("begin");
+        node.addExecutionOutputPin("begin");
 
         // this.function.addListener(node.setT);
         // this.function.addListener(this::close);
-        
+
     }
 
     var initFun = function (node, fun) {
@@ -311,20 +339,34 @@ function functionBeginNode() {
         return "";
     }
 
+    var genFun = function (node, fun) {
+
+        var params = fun.getInputParameters();
+        var paramsStr = "";
+
+        for (var i = 0; i < params.length; i++) {
+            paramsStr += params[i].getName();
+            if (i != params.length - 1)
+                paramsStr += ", ";
+        }
+
+        return "function " + fun.getName() + "(" + paramsStr + "){\n" + node.getPin("begin").generate() + "}";
+    }
+
     return {
         name: "function begin node",
         title: "begin",
         category: "system",
         gen: gen,
         init: init,
-        attributes: [{ "functionInit": initFun }, { "closable": false }],
+        attributes: [{ "functionInit": initFun }, { "functionGen": genFun }, { "closable": false }],
     }
 }
 
 function functionReturnNode() {
 
     var init = function (node) {
-        var next = node.addExecutionInputPin("return");
+        node.addExecutionInputPin("end");
     }
 
     var initFun = function (node, fun) {
@@ -347,8 +389,24 @@ function functionReturnNode() {
         );
     }
 
-    var gen = function (node) {
-        return "";
+    var gen = function (node, pin) {
+
+        params = node.getFunction().getOutputParameters();
+        if (params.length = 0)
+            return "\n";
+
+        if (params.length == 1)
+            return "return " + node.getPin(params[0].getName()).generate() + ";";
+
+        var paramsStr = "return {\n";
+
+        for (var i = 0; i < params.length; i++) {
+            paramsStr += params[i].getName() + ":" + node.getPin(params[i].getName()).generate();
+            if (i != params.length - 1)
+                paramsStr += ",\n";
+        }
+        paramsStr += "};\n";
+        return paramsStr;
     }
 
     return {
@@ -407,17 +465,23 @@ function functionCallNode() {
 function printNode() {
 
     var init = function (node) {
+        node.addExecutionInputPin("in");
         node.addDataInputPin("data", false, [NativeType.INT, NativeType.FLOAT, NativeType.STRING, NativeType.BOOL]);
-        node.addView(NativeNode.Align.CENTER, editText);
+        node.addExecutionOutputPin("out");
     }
 
-    var gen = function (node) {
-        return "";
+    var gen = function (node, pin) {
+        var dataStr = node.getPin("data").generate();
+        var outStr = node.getPin("out").generate();
+
+        var format = "LOG.i(\"\"," + dataStr + ");\n" + outStr;
+
+        return format;
     }
 
     return {
-        name: "string node",
-        title: "string",
+        name: "print node",
+        title: "print",
         category: "basic java script",
         gen: gen,
         init: init,
@@ -481,12 +545,13 @@ function variableGetNode() {
                 m_var.removeArrayChangeListener(m_t);
             }
 
-            pin.setType(variable.getDataType())
-            pin.setArray(variable.isArray());
-
             m_var = variable;
-            m_var.onTypeChange(m_n);
-            m_var.onArrayChange(m_t);
+            if (m_var) {
+                m_var.onTypeChange(m_n);
+                m_var.onArrayChange(m_t);
+                pin.setArray(m_var.isArray());
+                pin.setType(m_var.getDataType())
+            }
         });
         node.addView(NativeNode.Align.CENTER, drop);
     }

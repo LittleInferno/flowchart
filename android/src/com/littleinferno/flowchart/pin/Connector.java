@@ -1,5 +1,6 @@
 package com.littleinferno.flowchart.pin;
 
+import android.annotation.SuppressLint;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
 import android.support.v4.content.ContextCompat;
@@ -8,27 +9,24 @@ import android.widget.LinearLayout;
 
 import com.annimon.stream.Optional;
 import com.annimon.stream.Stream;
-import com.jakewharton.rxbinding2.view.RxView;
 import com.littleinferno.flowchart.Connection;
 import com.littleinferno.flowchart.DataType;
 import com.littleinferno.flowchart.R;
-import com.littleinferno.flowchart.node.BaseNode;
-import com.littleinferno.flowchart.util.Destroyable;
+import com.littleinferno.flowchart.generator.Generator;
+import com.littleinferno.flowchart.node.AndroidNode;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
-import io.reactivex.disposables.Disposable;
-
-public class Connector extends android.support.v7.widget.AppCompatTextView implements Destroyable {
+@SuppressLint("ViewConstructor")
+public class Connector extends android.support.v7.widget.AppCompatTextView implements Generator {
 
     private final Connection connection;
-    private final Disposable click;
     private DataType type;
     private boolean isArray;
 
-    private final BaseNode node;
+    public final AndroidNode node;
 
     private Optional<Connector> connectedPin;
     private Optional<List<Connector>> connectedPins;
@@ -37,22 +35,19 @@ public class Connector extends android.support.v7.widget.AppCompatTextView imple
 
     private static Optional<Connector> connector = Optional.empty();
 
-    public Connector(BaseNode node, LinearLayout.LayoutParams params, Connection connection, String name, boolean isArray, Optional<Set<DataType>> possibleConvert, DataType type) {
+    public Connector(AndroidNode node, LinearLayout.LayoutParams params, Connection connection, String name, boolean isArray, Optional<Set<DataType>> possibleConvert, DataType type) {
         super(node.getContext());
 
         this.connection = connection;
         this.node = node;
 
         if (this.connection == Connection.INPUT)
-            this.node.addView(BaseNode.Align.LEFT, this);
+            this.node.addView(AndroidNode.Align.LEFT, this);
         else
-            this.node.addView(BaseNode.Align.RIGHT, this);
+            this.node.addView(AndroidNode.Align.RIGHT, this);
 
         this.node.invalidate();
         this.possibleConvert = possibleConvert;
-
-        click = RxView.clicks(this).subscribe(o -> connector.ifPresentOrElse(c -> c.connect(this),
-                () -> connector = Optional.of(this)));
 
         connectedPin = Optional.empty();
         connectedPins = Optional.empty();
@@ -64,6 +59,14 @@ public class Connector extends android.support.v7.widget.AppCompatTextView imple
         setArray(isArray);
         setImage();
         setType(type);
+
+        setOnClickListener(v -> connector.ifPresentOrElse(c -> c.connect(this),
+                () -> connector = Optional.of(this)));
+
+        setOnLongClickListener(v -> {
+            disconnectAll();
+            return true;
+        });
     }
 
     private void setBack() {
@@ -195,7 +198,7 @@ public class Connector extends android.support.v7.widget.AppCompatTextView imple
         setImage();
         pin.setImage();
 
-//        node.getScene().addWire(this, pin);
+        node.getScene().addWire(this, pin);
     }
 
     private void connectPins(final Connector pin) {
@@ -270,6 +273,11 @@ public class Connector extends android.support.v7.widget.AppCompatTextView imple
 
     }
 
+//    public float ceneter(){
+////        getImage().
+//    }
+
+
     private void set(int id) {
         getImage().clearColorFilter();
         getImage().setColorFilter(ContextCompat.getColor(getContext(), id), PorterDuff.Mode.SRC_IN);
@@ -283,7 +291,12 @@ public class Connector extends android.support.v7.widget.AppCompatTextView imple
     }
 
     @Override
-    public void onDestroy() {
-        click.dispose();
+    public String generate() {
+        if (connectedPin.isPresent())
+            return connectedPin.get()
+                    .node.getNodeHandle()
+                    .getCodegen()
+                    .call(String.class, connectedPin.get().node, connectedPin.get());
+        return "";
     }
 }

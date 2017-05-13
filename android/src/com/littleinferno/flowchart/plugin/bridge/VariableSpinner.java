@@ -6,7 +6,7 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 
 import com.annimon.stream.Stream;
-import com.littleinferno.flowchart.node.BaseNode;
+import com.littleinferno.flowchart.node.AndroidNode;
 import com.littleinferno.flowchart.util.Fun;
 import com.littleinferno.flowchart.util.Link;
 import com.littleinferno.flowchart.variable.AndroidVariable;
@@ -65,7 +65,7 @@ public class VariableSpinner extends android.support.v7.widget.AppCompatSpinner 
         void select(AndroidVariable object);
     }
 
-    public static VariableSpinner make(BaseNode node, OnSelected selected) {
+    public static VariableSpinner make(AndroidNode node, OnSelected selected) {
         return new VariableSpinner(node.getFunction().getProject().getVariableManager(), selected);
     }
 }

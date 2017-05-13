@@ -8,7 +8,7 @@ import android.widget.ArrayAdapter;
 import com.annimon.stream.Stream;
 import com.littleinferno.flowchart.function.AndroidFunction;
 import com.littleinferno.flowchart.function.AndroidFunctionManager;
-import com.littleinferno.flowchart.node.BaseNode;
+import com.littleinferno.flowchart.node.AndroidNode;
 import com.littleinferno.flowchart.util.Fun;
 import com.littleinferno.flowchart.util.Link;
 
@@ -65,7 +65,7 @@ public class FunctionSpinner extends android.support.v7.widget.AppCompatSpinner 
         void select(AndroidFunction object);
     }
 
-    public static FunctionSpinner make(BaseNode node, OnSelected selected) {
+    public static FunctionSpinner make(AndroidNode node, OnSelected selected) {
         return new FunctionSpinner(node.getFunction().getFunctionManager(), selected);
     }
 }

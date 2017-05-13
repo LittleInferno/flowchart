@@ -153,6 +153,10 @@ public class AndroidFunctionParameter implements Parcelable {
                 !arrayChangedListeners.isEmpty();
     }
 
+    public SimpleObject getSaveInfo() {
+        return new SimpleObject(name, dataType, connection, isArray);
+    }
+
     @SuppressWarnings("WeakerAccess")
     public interface Add {
         void add(AndroidFunctionParameter parameter);
@@ -161,5 +165,19 @@ public class AndroidFunctionParameter implements Parcelable {
     @SuppressWarnings("WeakerAccess")
     public interface Remove {
         void remove(AndroidFunctionParameter parameter);
+    }
+
+    public static class SimpleObject {
+        final String name;
+        final String type;
+        final String connection;
+        final boolean array;
+
+        public SimpleObject(String name, DataType type, Connection connection, boolean array) {
+            this.name = name;
+            this.type = type.toString();
+            this.connection = connection.toString();
+            this.array = array;
+        }
     }
 }

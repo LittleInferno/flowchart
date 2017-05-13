@@ -6,8 +6,7 @@ import android.support.annotation.NonNull;
 
 import com.annimon.stream.Stream;
 import com.littleinferno.flowchart.function.AndroidFunction;
-import com.littleinferno.flowchart.plugin.AndroidNodePluginHandle;
-import com.littleinferno.flowchart.scene.SceneType;
+import com.littleinferno.flowchart.plugin.AndroidPluginHandle;
 
 import org.mozilla.javascript.Function;
 
@@ -19,18 +18,15 @@ public class AndroidNodeManager implements Parcelable {
     public static final String TAG = "NODE_MANAGER";
 
     private final List<AndroidNode> nodes;
-    private final SceneType sceneType;
     private final AndroidFunction function;
 
-    public AndroidNodeManager(SceneType sceneType, AndroidFunction function) {
-        this.sceneType = sceneType;
+    public AndroidNodeManager(AndroidFunction function) {
         this.function = function;
         nodes = new ArrayList<>();
     }
 
     private AndroidNodeManager(Parcel in) {
         function = in.readParcelable(AndroidFunction.class.getClassLoader());
-        sceneType = SceneType.valueOf(in.readString());
         nodes = new ArrayList<>();
         in.readList(nodes, AndroidNode.class.getClassLoader());
     }
@@ -47,8 +43,8 @@ public class AndroidNodeManager implements Parcelable {
         }
     };
 
-    public AndroidNode createNode(@NonNull String nodeName) {
-        AndroidNodePluginHandle.NodeHandle nodeHandle = function
+    public AndroidNode createNode(@NonNull String nodeName, float x, float y) {
+        AndroidPluginHandle.NodeHandle nodeHandle = function
                 .getProject()
                 .getPluginManager()
                 .getNode(nodeName)
@@ -64,7 +60,18 @@ public class AndroidNodeManager implements Parcelable {
                         .createScriptFun((Function) o)
                         .call(node, function));
 
+        node.setX(x);
+        node.setY(y);
+
         return node;
+    }
+
+    public AndroidNode createNode(@NonNull String nodeName) {
+        return createNode(nodeName, 0.f, 0.f);
+    }
+
+    public AndroidNode createNode(AndroidNode.SimpleObject savedInfo) {
+        return createNode(savedInfo.name, savedInfo.x, savedInfo.y);
     }
 
     public List<AndroidNode> getNodes() {
@@ -73,7 +80,7 @@ public class AndroidNodeManager implements Parcelable {
 
     public AndroidNode getNode(String name) {
         return Stream.of(nodes)
-                .filter(name::equals)
+                .filter(n -> n.getNodeHandle().getName().equals(name))
                 .findFirst()
                 .orElseThrow(() -> new RuntimeException("Cannot find node"));
     }
@@ -86,7 +93,6 @@ public class AndroidNodeManager implements Parcelable {
     @Override
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeParcelable(function, flags);
-        dest.writeString(sceneType.toString());
         dest.writeList(nodes);
     }
 }

@@ -23,6 +23,7 @@ public class SceneFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
         layout = LayoutSceneBinding.inflate(inflater, container, false);
+
         return layout.getRoot();
     }
 

@@ -110,7 +110,10 @@ public class FunctionListFragment extends DialogFragment {
                         .getFunctions()
                         .get(vh.getLayoutPosition())
                         .getName()
-                        .equals("MAIN"))
+                        .equals(functionManager.getProject()
+                                .getPluginManager()
+                                .getRules()
+                                .getEntryPoint()))
                 .attachTo(layout.functions.items);
 
         FunctionDetailsFragment.show(functionManager, getChildFragmentManager(),

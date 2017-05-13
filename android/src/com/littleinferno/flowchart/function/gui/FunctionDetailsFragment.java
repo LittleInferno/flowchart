@@ -63,7 +63,8 @@ public class FunctionDetailsFragment extends Fragment {
         layout.addParameter.setOnClickListener(v ->
                 FunctionParameterDetailsFragment.show(function, getFragmentManager(), null));
 
-        if (function.getName().equals("MAIN")) {
+        String entryPoint = functionManager.getProject().getPluginManager().getRules().getEntryPoint();
+        if (function.getName().equals(entryPoint)) {
             layout.addParameter.setEnabled(false);
             layout.addParameter.hide();
 
@@ -103,8 +104,8 @@ public class FunctionDetailsFragment extends Fragment {
                 .backgroundColor(Color.RED)
                 .attachTo(layout.parameters.items);
 
-        add = function.onParameterAdd(adapter::notifyDataSetChanged);
-        remove = function.onParameterRemove(adapter::notifyDataSetChanged);
+        add = function.onParameterAdd(() -> adapter.updateData(function.getParameters()));
+        remove = function.onParameterRemove(() -> adapter.updateData(function.getParameters()));
     }
 
     private void removeParameter(int position) {

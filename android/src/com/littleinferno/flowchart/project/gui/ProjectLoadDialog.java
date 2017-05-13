@@ -46,8 +46,7 @@ public class ProjectLoadDialog extends DialogFragment {
             e.printStackTrace();
         }
 
-        FlowchartProject load = FlowchartProject.load(null);
-        load.getPluginManager().loadCodeGeneratorPlugin(s);
+        FlowchartProject load = FlowchartProject.load(null, null);
 
     }
 

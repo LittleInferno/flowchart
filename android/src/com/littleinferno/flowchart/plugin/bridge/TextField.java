@@ -7,14 +7,14 @@ import android.widget.EditText;
 
 import com.littleinferno.flowchart.DataType;
 import com.littleinferno.flowchart.R;
-import com.littleinferno.flowchart.node.BaseNode;
+import com.littleinferno.flowchart.node.AndroidNode;
 
 
 public class TextField extends TextInputLayout {
 
     private EditText editText;
 
-    public static TextField make(BaseNode node, DataType dataType) {
+    public static TextField make(AndroidNode node, DataType dataType) {
         TextField textField = new TextField(node.getContext(), dataType);
 
 
