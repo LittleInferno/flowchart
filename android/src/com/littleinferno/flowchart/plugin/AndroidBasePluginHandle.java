@@ -1,26 +1,39 @@
 package com.littleinferno.flowchart.plugin;
 
 import org.mozilla.javascript.Context;
+import org.mozilla.javascript.ContextFactory;
 import org.mozilla.javascript.Function;
 import org.mozilla.javascript.Scriptable;
 
 public abstract class AndroidBasePluginHandle {
 
-    private final PluginParams pluginParams;
-    private final Context rhino;
-    private final Scriptable scope;
+    private PluginParams pluginParams;
+    private Context rhino;
+    private Scriptable scope;
+    private String plugin;
 
-    public AndroidBasePluginHandle(String plugin) {
-        rhino = Context.enter();
+    AndroidBasePluginHandle(String plugin) {
+        this.plugin = plugin;
+        rhino = ContextFactory.getGlobal().enterContext();
         rhino.setOptimizationLevel(-1);
 
         scope = rhino.initStandardObjects();
+    }
+
+    public AndroidBasePluginHandle init() throws Exception {
+        rhino = ContextFactory.getGlobal().enterContext();
+        rhino.setOptimizationLevel(-1);
+        scope = rhino.initStandardObjects();
+
+        onInit(rhino, scope);
+        return this;
+    }
+
+    void eval() {
         rhino.evaluateString(scope, plugin, "JavaScript", 1, null);
+    }
 
-        PluginParams params = new ScriptFun(rhino, scope, "pluginParams").call(PluginParams.class);
-        if (params.getApiVersion() != getApiVersion())
-            throw new RuntimeException("plugin api version(" + params.getApiVersion() + ") != api version" + getApiVersion());
-
+    void initParams(PluginParams params) {
         this.pluginParams = params;
     }
 
@@ -33,7 +46,9 @@ public abstract class AndroidBasePluginHandle {
         Context.exit();
     }
 
-    public abstract void onUnload();
+    protected abstract void onInit(Context rhino, Scriptable scope) throws Exception;
+
+    protected abstract void onUnload();
 
     public abstract int getApiVersion();
 

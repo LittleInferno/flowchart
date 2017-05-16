@@ -19,7 +19,6 @@ import com.littleinferno.flowchart.R;
 import com.littleinferno.flowchart.databinding.LayoutFunctionListBinding;
 import com.littleinferno.flowchart.function.AndroidFunction;
 import com.littleinferno.flowchart.function.AndroidFunctionManager;
-import com.littleinferno.flowchart.project.FlowchartProject;
 import com.littleinferno.flowchart.scene.gui.SceneFragment;
 import com.littleinferno.flowchart.util.Link;
 import com.littleinferno.flowchart.util.Swiper;
@@ -77,7 +76,7 @@ public class FunctionListFragment extends DialogFragment {
                                     FunctionDetailsFragment.show(functionManager, getChildFragmentManager(),
                                             data, R.id.function_details_layout))
                             .longClicked(R.id.card, v -> {
-                                        SceneFragment.show(data, FlowchartProject.getProject()
+                                        SceneFragment.show(data, functionManager.getProject()
                                                 .getFragmentManager(), R.id.scene_frame);
 
                                         dismiss();
@@ -111,7 +110,6 @@ public class FunctionListFragment extends DialogFragment {
                         .get(vh.getLayoutPosition())
                         .getName()
                         .equals(functionManager.getProject()
-                                .getPluginManager()
                                 .getRules()
                                 .getEntryPoint()))
                 .attachTo(layout.functions.items);

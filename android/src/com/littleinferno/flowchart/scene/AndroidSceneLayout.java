@@ -3,12 +3,10 @@ package com.littleinferno.flowchart.scene;
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Paint;
-import android.graphics.Path;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.PopupMenu;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.DragEvent;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
@@ -16,7 +14,6 @@ import android.view.View;
 import android.widget.RelativeLayout;
 
 import com.annimon.stream.Stream;
-import com.littleinferno.flowchart.Connection;
 import com.littleinferno.flowchart.R;
 import com.littleinferno.flowchart.node.AndroidNode;
 import com.littleinferno.flowchart.pin.Connector;
@@ -41,7 +38,7 @@ public class AndroidSceneLayout extends RelativeLayout {
 
     ArrayList<Wire> wires = new ArrayList<>();
 
-    public AndroidSceneLayout(Context context, String sceneType) {
+    public AndroidSceneLayout(Context context) {
         super(context);
         paint = new Paint();
         setWillNotDraw(false);
@@ -113,56 +110,22 @@ public class AndroidSceneLayout extends RelativeLayout {
 
     @Override
     protected void onDraw(Canvas canvas) {
-
-        //  if (update)
-        {
-            // canvas.translate(delta.x, delta.y);
-        }
-//        canvas.scale(scaleFactor, scaleFactor);
         super.onDraw(canvas);
-        // paint.setStyle(Paint.Style.FILL);
-
 
         Stream.of(wires).forEach(wire -> {
 
-            Log.d("DD", "DD");
+            float bx = wire.begin.getSceneX();
+            float by = wire.begin.getSceneY();
 
-            final Path path = new Path();
-            path.moveTo(wire.begin.getX(), wire.begin.node.getY());
+            float ex = wire.end.getSceneX();
+            float ey = wire.end.getSceneY();
 
-            float bx = wire.begin.getX();
-            float by = wire.begin.node.getY();
+            paint.setStrokeWidth(10);
 
-            float ex = wire.end.getX();
-            float ey = wire.end.node.getY();
-
-            float xLength = (ex - bx);
-
-            if (wire.begin.getConnection() == Connection.INPUT) {
-                float tmp = bx;
-                bx = ex;
-                ex = tmp;
-
-                tmp = by;
-                by = ey;
-                ey = tmp;
-            }
-
-            float xHalfLength = xLength / 2;
-
-            float cx1 = bx + xHalfLength;
-            float cx2 = ex - xHalfLength;
-            path.moveTo(bx, by);
-            path.cubicTo(cx1, by, cx2, ey, ex, ey);
-            paint.setStrokeWidth(5);
-            canvas.drawPath(path, paint);
-
-            Log.d("DD", bx + " " + by + " " + ex + " " + ey);
+//            paint.setColor(ResUtil.getDataTypeColor(getContext(), wire.begin.getType()));
 
             canvas.drawLine(bx, by, ex, ey, paint);
         });
-        //canvas.drawP
-        canvas.drawCircle(x, y, 50, paint);
     }
 
     @Override

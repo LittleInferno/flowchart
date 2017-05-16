@@ -8,7 +8,6 @@ import android.view.Menu;
 import android.view.MenuItem;
 
 import com.littleinferno.flowchart.databinding.NewProjectLayoutBinding;
-import com.littleinferno.flowchart.project.FlowchartProject;
 
 
 public class CreateNewProjectDialog extends AppCompatActivity {
@@ -63,7 +62,7 @@ public class CreateNewProjectDialog extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.bt_create_project:
-                FlowchartProject.createNew(layout.projectName.toString());
+//                FlowchartProject.createNew(layout.projectName.toString());
                 return true;
             default:
                 // If we got here, the user's action was not recognized.

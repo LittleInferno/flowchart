@@ -1,6 +1,8 @@
 package com.littleinferno.flowchart.plugin.bridge;
 
 import android.annotation.SuppressLint;
+import android.content.Context;
+import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -19,9 +21,9 @@ public class FunctionSpinner extends android.support.v7.widget.AppCompatSpinner 
     private final Link add;
     private final Link remove;
 
-    private FunctionSpinner(AndroidFunctionManager functionManager, OnSelected onSelected) {
-        super(functionManager.getProject().getContext());
-
+    private FunctionSpinner(AndroidFunctionManager functionManager, Context context, OnSelected onSelected) {
+        super(context);
+        Log.e("EROR", "E");
         ArrayAdapter<String> adapter =
                 new ArrayAdapter<>(getContext(), android.R.layout.simple_spinner_item,
                         Stream.of(functionManager.getFunctions())
@@ -66,6 +68,6 @@ public class FunctionSpinner extends android.support.v7.widget.AppCompatSpinner 
     }
 
     public static FunctionSpinner make(AndroidNode node, OnSelected selected) {
-        return new FunctionSpinner(node.getFunction().getFunctionManager(), selected);
+        return new FunctionSpinner(node.getFunction().getFunctionManager(), node.getContext(), selected);
     }
 }

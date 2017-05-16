@@ -5,20 +5,11 @@ import android.os.Parcelable;
 import android.util.Log;
 
 import com.annimon.stream.Stream;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonDeserializationContext;
-import com.google.gson.JsonDeserializer;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParseException;
-import com.google.gson.JsonSerializationContext;
-import com.google.gson.JsonSerializer;
 import com.littleinferno.flowchart.Connection;
 import com.littleinferno.flowchart.DataType;
 import com.littleinferno.flowchart.generator.Generator;
 import com.littleinferno.flowchart.node.AndroidNode;
 import com.littleinferno.flowchart.node.AndroidNodeManager;
-import com.littleinferno.flowchart.node.FunctionReturnNode;
 import com.littleinferno.flowchart.project.FlowchartProject;
 import com.littleinferno.flowchart.project.ProjectModule;
 import com.littleinferno.flowchart.scene.AndroidSceneLayout;
@@ -27,7 +18,6 @@ import com.littleinferno.flowchart.util.Fun;
 import com.littleinferno.flowchart.util.Link;
 import com.littleinferno.flowchart.util.NameChangedListener;
 
-import java.lang.reflect.Type;
 import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.List;
@@ -41,8 +31,6 @@ public class AndroidFunction implements ProjectModule, Generator, Parcelable {
 
     private String name;
     private List<AndroidFunctionParameter> parameters;
-
-    private List<FunctionReturnNode> returnNodes;
 
     private List<NameChangedListener> nameChangedListeners;
     private List<DestroyListener> destroyListeners;
@@ -65,11 +53,8 @@ public class AndroidFunction implements ProjectModule, Generator, Parcelable {
 
         parameterListeners = new ArrayList<>();
 
-        returnNodes = new ArrayList<>();
-
         nodeManager = new AndroidNodeManager(this);
         nodeManager.createNode("function begin node", 10, 400);
-        nodeManager.createNode("function return node", 600, 400);
 
         parameterAddListeners = new ArrayList<>();
         parameterRemoveListeners = new ArrayList<>();
@@ -85,11 +70,12 @@ public class AndroidFunction implements ProjectModule, Generator, Parcelable {
         parameterAddListeners = new ArrayList<>();
         parameterRemoveListeners = new ArrayList<>();
 
-        parameters = new ArrayList<>();
-        Stream.of(saveInfo.parameters).forEach(this::addParameter);
-
         nodeManager = new AndroidNodeManager(this);
-        Stream.of(saveInfo.nodes).forEach(nodeManager::createNode);
+        parameters = new ArrayList<>();
+
+        Stream.of(saveInfo.nodes).forEach((savedInfo) ->
+                nodeManager.createNode(savedInfo));
+        Stream.of(saveInfo.parameters).forEach(this::addParameter);
     }
 
     private AndroidFunction(Parcel in) {
@@ -151,19 +137,19 @@ public class AndroidFunction implements ProjectModule, Generator, Parcelable {
         notifyListenersNameChanged(name);
     }
 
-    public void removeReturnNode(FunctionReturnNode node) {
-        returnNodes.remove(node);
-        if (returnNodes.size() == 1)
-            returnNodes.get(0).removeCloseButton();
-    }
-
     public AndroidFunctionParameter addParameter(Connection connection, String name, DataType type, boolean isArray) {
         AndroidFunctionParameter parameter =
                 new AndroidFunctionParameter(this, connection, type, name, isArray);
 
         parameters.add(parameter);
+
+        if (nodeManager.getNodes("function return node").isEmpty()) {
+            nodeManager.createNode("function return node", 600, 400);
+        }
+
         notifyParameterAdd();
         notifyListenersParameterAdded(parameter);
+
         return parameter;
     }
 
@@ -176,6 +162,12 @@ public class AndroidFunction implements ProjectModule, Generator, Parcelable {
         parameters.remove(parameter);
         notifyParameterRemove();
         notifyListenersParameterRemoved(parameter);
+        if (getOutputParameters().length == 0)
+            Stream.of(nodeManager.getNodes("function return node")).forEach(nodeManager::removeNode);
+    }
+
+    public void removeParameter(int position) {
+        removeParameter(parameters.get(position));
     }
 
     @SuppressWarnings("unused")
@@ -213,11 +205,6 @@ public class AndroidFunction implements ProjectModule, Generator, Parcelable {
 
     private void notifyListenersParameterRemoved(AndroidFunctionParameter parameter) {
         Stream.of(parameterListeners).map(Map.Entry::getValue).forEach(v -> v.remove(parameter));
-    }
-
-    public void addReturnNode(FunctionReturnNode returnNode) {
-        returnNodes.add(returnNode);
-        returnNode.addCloseButton();
     }
 
     @SuppressWarnings("unused")
@@ -317,10 +304,6 @@ public class AndroidFunction implements ProjectModule, Generator, Parcelable {
         return parameters.get(position);
     }
 
-    public void removeParameter(int position) {
-        removeParameter(parameters.get(position));
-    }
-
     public SimpleObject getSaveInfo() {
         return new SimpleObject(name,
                 Stream.of(parameters).map(AndroidFunctionParameter::getSaveInfo).toList(),
@@ -340,58 +323,6 @@ public class AndroidFunction implements ProjectModule, Generator, Parcelable {
 
         Log.d(getName(), functionGen);
         return functionGen;
-    }
-
-
-    public static class Serializer implements JsonSerializer<AndroidFunction>, JsonDeserializer<AndroidFunction> {
-        @Override
-        public JsonElement serialize(AndroidFunction src, Type typeOfSrc, JsonSerializationContext context) {
-
-            JsonObject result = new JsonObject();
-            result.addProperty("name", src.getName());
-            JsonArray parameters = new JsonArray();
-            Stream.of(src.getParameters())
-                    .map(AndroidFunctionParameter::getSaveInfo)
-                    .map(context::serialize)
-                    .forEach(parameters::add);
-
-            result.add("parameters", parameters);
-
-            JsonArray nodes = new JsonArray();
-            Stream.of(src.getNodeManager().getNodes())
-                    .map(AndroidNode::getSaveInfo)
-                    .map(context::serialize)
-                    .forEach(nodes::add);
-
-            result.add("nodes", nodes);
-
-            return result;
-        }
-
-        @Override
-        public AndroidFunction deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
-
-            JsonObject data = json.getAsJsonObject();
-
-            String name = data.get("name").getAsString();
-
-            AndroidFunction function = FlowchartProject.getProject().getFunctionManager().createFunction(name);
-
-            Stream.of(data.get("parameters").getAsJsonArray())
-                    .map(JsonElement::getAsJsonObject)
-                    .map(jso -> context.deserialize(jso, AndroidFunctionParameter.SimpleObject.class))
-                    .map(AndroidFunctionParameter.SimpleObject.class::cast)
-                    .forEach(function::addParameter);
-
-
-            Stream.of(data.get("nodes").getAsJsonArray())
-                    .map(JsonElement::getAsJsonObject)
-                    .map(jso -> context.deserialize(jso, AndroidNode.SimpleObject.class))
-                    .map(AndroidNode.SimpleObject.class::cast)
-                    .forEach(function.nodeManager::createNode);
-
-            return function;
-        }
     }
 
     public static class SimpleObject {

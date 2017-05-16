@@ -63,7 +63,7 @@ public class FunctionDetailsFragment extends Fragment {
         layout.addParameter.setOnClickListener(v ->
                 FunctionParameterDetailsFragment.show(function, getFragmentManager(), null));
 
-        String entryPoint = functionManager.getProject().getPluginManager().getRules().getEntryPoint();
+        String entryPoint = functionManager.getProject().getRules().getEntryPoint();
         if (function.getName().equals(entryPoint)) {
             layout.addParameter.setEnabled(false);
             layout.addParameter.hide();

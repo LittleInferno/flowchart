@@ -1,13 +1,16 @@
 package com.littleinferno.flowchart;
 
 import android.os.Environment;
+import android.support.annotation.NonNull;
 
 import com.annimon.stream.Stream;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.PrintWriter;
 import java.util.List;
 import java.util.Scanner;
 
@@ -41,6 +44,24 @@ public class Files {
             e.printStackTrace();
         }
         return "";
+    }
+
+    public static void writeToFile(@NonNull final String fileName, @NonNull final String content) {
+        try (PrintWriter out = new PrintWriter(fileName)) {
+            out.print(content);
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+    }
+
+
+    public static String projectNameToSaveName(String name) {
+        return name + ".json";
+    }
+
+
+    public static String getSavesLocation() {
+        return Environment.getExternalStorageDirectory().toString() + "/flowchart_projects/saves/";
     }
 
 }

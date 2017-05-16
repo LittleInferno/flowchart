@@ -3,6 +3,7 @@ package com.littleinferno.flowchart.plugin.bridge;
 import android.content.Context;
 import android.support.design.widget.TextInputLayout;
 import android.text.InputType;
+import android.util.Log;
 import android.widget.EditText;
 
 import com.littleinferno.flowchart.DataType;
@@ -24,6 +25,8 @@ public class TextField extends TextInputLayout {
 
     private TextField(Context context, DataType dataType) {
         super(context);
+        Log.e("EROR", "T");
+
         inflate(context, R.layout.text_field, this);
         editText = (EditText) findViewById(R.id.edit_text);
 

@@ -5,7 +5,7 @@ var NativeType = com.littleinferno.flowchart.DataType;
 var Connection = com.littleinferno.flowchart.Connection;
 
 var NativeConnection = com.littleinferno.flowchart.Connection;
-var NativeGenerator = com.littleinferno.flowchart.codegen.JSCodeGenerator;
+// var NativeGenerator = com.littleinferno.flowchart.codegen.JSCodeGenerator;
 var PluginParams = com.littleinferno.flowchart.plugin.AndroidBasePluginHandle.PluginParams;
 
 var EditText = com.littleinferno.flowchart.plugin.bridge.TextField;
@@ -14,7 +14,7 @@ var VariableSpinner = com.littleinferno.flowchart.plugin.bridge.VariableSpinner;
 
 var LOG = android.util.Log;
 
-var codegen = new NativeGenerator();
+// var codegen = new NativeGenerator();
 
 var Project = com.littleinferno.flowchart.project.FlowchartProject;
 
@@ -61,19 +61,18 @@ function makeVariable(name, value) {
 }
 
 function addNode() {
-    var a;
-    var b;
-    var result;
     var possibleConvert = [NativeType.INT, NativeType.FLOAT, NativeType.STRING];
 
     var init = function (node) {
-        a = node.addDataInputPin("A", false, possibleConvert);
-        b = node.addDataInputPin("B", false, possibleConvert);
+        node.addDataInputPin("A", false, possibleConvert);
+        node.addDataInputPin("B", false, possibleConvert);
         result = node.addDataOutputPin("result", false, possibleConvert);
     }
 
     var gen = function (node) {
-        codegen.makeAdd(a, b);
+        var a = node.getPin("A").generate();
+        var b = node.getPin("B").generate();
+        return "( " + a + " + " + b + " )";
     }
 
     return {
@@ -99,7 +98,9 @@ function subNode() {
     }
 
     var gen = function (node) {
-        codegen.makeSub(a, b);
+        var a = node.getPin("A").generate();
+        var b = node.getPin("B").generate();
+        return "( " + a + " - " + b + " )";
     }
 
     return {
@@ -124,7 +125,9 @@ function mulNode() {
     }
 
     var gen = function (node) {
-        codegen.makeMul(a, b);
+        var a = node.getPin("A").generate();
+        var b = node.getPin("B").generate();
+        return "( " + a + " * " + b + " )";
     }
 
     return {
@@ -149,7 +152,9 @@ function divNode() {
     }
 
     var gen = function (node) {
-        codegen.makeDiv(a, b);
+        var a = node.getPin("A").generate();
+        var b = node.getPin("B").generate();
+        return "( " + a + " / " + b + " )";
     }
 
     return {
@@ -174,7 +179,9 @@ function equalNode() {
     }
 
     var gen = function (node) {
-        codegen.makeEq(a, b);
+        var a = node.getPin("A").generate();
+        var b = node.getPin("B").generate();
+        return "( " + a + " == " + b + " )";
     }
 
     return {
@@ -199,7 +206,9 @@ function lessNode() {
     }
 
     var gen = function (node) {
-        codegen.makeLt(a, b);
+        var a = node.getPin("A").generate();
+        var b = node.getPin("B").generate();
+        return "( " + a + " < " + b + " )";
     }
 
     return {
@@ -224,7 +233,9 @@ function greatNode() {
     }
 
     var gen = function (node) {
-        codegen.makeGt(a, b);
+        var a = node.getPin("A").generate();
+        var b = node.getPin("B").generate();
+        return "( " + a + " > " + b + " )";
     }
 
     return {
@@ -243,11 +254,12 @@ function integerNode() {
     var init = function (node) {
         node.addDataOutputPin("data", false, NativeType.INT);
         editText = EditText.make(node, NativeType.INT);
-        node.addView(NativeNode.Align.CENTER, editText);
+     ///   node.addView(NativeNode.Align.CENTER, editText);
     }
 
     var gen = function (node) {
-        return codegen.makeExpr(editText.getText());
+        // return codegen.makeExpr(editText.getText());
+        return "";  
     }
 
     return {
@@ -270,7 +282,8 @@ function floatNode() {
     }
 
     var gen = function (node) {
-        return codegen.makeExpr(editText.getText());
+        // return codegen.makeExpr(editText.getText());
+        return ""
     }
 
     return {
@@ -289,11 +302,12 @@ function stringNode() {
     var init = function (node) {
         node.addDataOutputPin("result", false, NativeType.STRING);
         editText = EditText.make(node, NativeType.STRING);
-        node.addView(NativeNode.Align.CENTER, editText);
+      //  node.addView(NativeNode.Align.CENTER, editText);
     }
 
     var gen = function (node) {
-        return codegen.makeExpr(codegen.makeString(editText.getText()));
+        // return codegen.makeExpr(codegen.makeString(editText.getText()));
+        return "";
     }
 
     return {
@@ -445,7 +459,7 @@ function functionCallNode() {
             );
             fun.applyParameters();
         });
-        node.addView(NativeNode.Align.CENTER, drop);
+       // node.addView(NativeNode.Align.CENTER, drop);
     }
 
     var gen = function (node) {
@@ -514,7 +528,7 @@ function variableSetNode() {
                 pin.setType(m_var.getDataType())
             }
         });
-        node.addView(NativeNode.Align.CENTER, drop);
+     //   node.addView(NativeNode.Align.CENTER, drop);
     }
 
     var gen = function (node) {
@@ -553,7 +567,7 @@ function variableGetNode() {
                 pin.setType(m_var.getDataType())
             }
         });
-        node.addView(NativeNode.Align.CENTER, drop);
+        //node.addView(NativeNode.Align.CENTER, drop);
     }
 
     var gen = function (node) {

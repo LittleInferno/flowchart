@@ -144,8 +144,8 @@ public class FunctionParameterDetailsFragment extends DialogFragment {
                     layout.dataType.getAdapter()).getPosition(parameter.getDataType()));
 
             //noinspection unchecked
-            layout.dataType.setSelection(((ArrayAdapter<Connection>)
-                    layout.dataType.getAdapter()).getPosition(parameter.getConnection()));
+            layout.connection.setSelection(((ArrayAdapter<Connection>)
+                    layout.connection.getAdapter()).getPosition(parameter.getConnection()));
         }
     }
 

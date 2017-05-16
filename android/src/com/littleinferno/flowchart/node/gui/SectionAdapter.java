@@ -8,30 +8,33 @@ import android.view.ViewGroup;
 
 import com.bignerdranch.expandablerecyclerview.ExpandableRecyclerAdapter;
 import com.littleinferno.flowchart.R;
+import com.littleinferno.flowchart.project.FlowchartProject;
 
 import java.util.List;
 
-public class SectionAdapter extends ExpandableRecyclerAdapter<Section, String, Section.SectionViewHolder, Section.NodeViewHolder> {
+class SectionAdapter extends ExpandableRecyclerAdapter<Section, String, Section.SectionViewHolder, Section.NodeViewHolder> {
 
     private LayoutInflater inflater;
+    private FlowchartProject project;
 
-    public SectionAdapter(Context context, @NonNull List<Section> sections) {
+    SectionAdapter(FlowchartProject project, Context context, @NonNull List<Section> sections) {
         super(sections);
+        this.project = project;
         inflater = LayoutInflater.from(context);
     }
 
     @NonNull
     @Override
     public Section.SectionViewHolder onCreateParentViewHolder(@NonNull ViewGroup parentViewGroup, int viewType) {
-        View recipeView = inflater.inflate(R.layout.item_node_section_layout, parentViewGroup, false);
-        return new Section.SectionViewHolder(recipeView);
+        View section = inflater.inflate(R.layout.item_node_section_layout, parentViewGroup, false);
+        return new Section.SectionViewHolder(section);
     }
 
     @NonNull
     @Override
     public Section.NodeViewHolder onCreateChildViewHolder(@NonNull ViewGroup childViewGroup, int viewType) {
         View ingredientView = inflater.inflate(R.layout.item_node_layout, childViewGroup, false);
-        return new Section.NodeViewHolder(ingredientView);
+        return new Section.NodeViewHolder(project.getCurrentScene().getNodeManager(), ingredientView);
     }
 
     @Override

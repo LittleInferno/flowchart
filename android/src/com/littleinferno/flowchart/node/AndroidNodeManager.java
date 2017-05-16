@@ -3,10 +3,12 @@ package com.littleinferno.flowchart.node;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.support.annotation.NonNull;
+import android.view.View;
 
 import com.annimon.stream.Stream;
 import com.littleinferno.flowchart.function.AndroidFunction;
 import com.littleinferno.flowchart.plugin.AndroidPluginHandle;
+import com.littleinferno.flowchart.scene.AndroidSceneLayout;
 
 import org.mozilla.javascript.Function;
 
@@ -46,9 +48,7 @@ public class AndroidNodeManager implements Parcelable {
     public AndroidNode createNode(@NonNull String nodeName, float x, float y) {
         AndroidPluginHandle.NodeHandle nodeHandle = function
                 .getProject()
-                .getPluginManager()
-                .getNode(nodeName)
-                .orElseThrow(() -> new RuntimeException("cannot find node: " + nodeName));
+                .getNodeHandle(nodeName);
 
         AndroidNode node = new AndroidNode(function, nodeHandle);
         nodes.add(node);
@@ -62,6 +62,14 @@ public class AndroidNodeManager implements Parcelable {
 
         node.setX(x);
         node.setY(y);
+
+        if (nodeName.equals("function return node")) {
+            List<AndroidNode> nodes = getNodes("function return node");
+            if (nodes.size() == 1) node.setClosable(View.INVISIBLE);
+            else if (nodes.size() == 2) {
+                Stream.of(nodes).forEach(n -> n.setClosable(View.VISIBLE));
+            }
+        }
 
         return node;
     }
@@ -94,5 +102,23 @@ public class AndroidNodeManager implements Parcelable {
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeParcelable(function, flags);
         dest.writeList(nodes);
+    }
+
+    public List<AndroidNode> getNodes(String name) {
+        return Stream.of(nodes)
+                .filter(n -> n.getNodeHandle().getName().equals(name))
+                .toList();
+    }
+
+    public void removeNode(AndroidNode node) {
+        AndroidSceneLayout parent = (AndroidSceneLayout) node.getParent();
+        if (parent != null)
+            parent.removeView(node);
+        nodes.remove(node);
+
+        if (node.getNodeHandle().getName().equals("function return node")) {
+            List<AndroidNode> nodes = getNodes("function return node");
+            if (nodes.size() == 1) node.setClosable(View.INVISIBLE);
+        }
     }
 }

@@ -11,14 +11,13 @@ import com.littleinferno.flowchart.util.Fun;
 import com.littleinferno.flowchart.util.Link;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 public class AndroidVariableManager implements Parcelable, ProjectModule {
 
     public static final String TAG = "VARIABLE_MANAGER";
 
-    private final FlowchartProject project;
+    private FlowchartProject project;
     private final List<AndroidVariable> variables;
     private final List<Link> variableAddListeners;
     private final List<Link> variableRemoveListeners;
@@ -32,15 +31,17 @@ public class AndroidVariableManager implements Parcelable, ProjectModule {
     }
 
     private AndroidVariableManager(Parcel in) {
-        variables = new ArrayList<>();
-        project = (FlowchartProject) in.readArrayList(FlowchartProject.class.getClassLoader()).get(0);
 
+        variables = new ArrayList<>();
         in.readList(variables, AndroidVariable.class.getClassLoader());
 
         variableAddListeners = new ArrayList<>();
         in.readList(variableAddListeners, Fun.class.getClassLoader());
+
         variableRemoveListeners = new ArrayList<>();
         in.readList(variableRemoveListeners, Fun.class.getClassLoader());
+
+        project = FlowchartProject.getProject();
     }
 
     public static final Creator<AndroidVariableManager> CREATOR = new Creator<AndroidVariableManager>() {
@@ -90,11 +91,11 @@ public class AndroidVariableManager implements Parcelable, ProjectModule {
 
         if (name.isEmpty()) {
             return "Name can not be empty";
-        } else if (!project.getPluginManager().getRules().checkPattern(name)) {
+        } else if (!project.getRules().checkPattern(name)) {
             return "Unacceptable symbols";
         } else if (Stream.of(variables).map(AndroidVariable::getName).anyMatch(name::equals)) {
             return "This name is already taken";
-        } else if (project.getPluginManager().getRules().containsWord(name))
+        } else if (project.getRules().containsWord(name))
             return "Invalid name";
 
         return null;
@@ -112,7 +113,6 @@ public class AndroidVariableManager implements Parcelable, ProjectModule {
     @Override
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeList(variables);
-        dest.writeList(Collections.singletonList(getProject()));//TODO action hack
         dest.writeList(variableAddListeners);
         dest.writeList(variableRemoveListeners);
     }

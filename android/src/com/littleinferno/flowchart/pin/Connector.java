@@ -31,6 +31,9 @@ public class Connector extends android.support.v7.widget.AppCompatTextView imple
     private Optional<Connector> connectedPin;
     private Optional<List<Connector>> connectedPins;
 
+    private float sceneX;
+    private float sceneY;
+
     private final Optional<Set<DataType>> possibleConvert;
 
     private static Optional<Connector> connector = Optional.empty();
@@ -67,6 +70,16 @@ public class Connector extends android.support.v7.widget.AppCompatTextView imple
             disconnectAll();
             return true;
         });
+
+        node.getViewTreeObserver().addOnGlobalLayoutListener(
+                () -> {
+                    if (connection == Connection.INPUT) {
+                        sceneX = node.getX() + getImage().getIntrinsicWidth() / 2;
+                    } else
+                        sceneX = node.getX() + node.getWidth() - getImage().getIntrinsicWidth() / 2;
+
+                    sceneY = node.getY() + node.getHeaderHeight() + getTop() + getImage().getIntrinsicWidth() / 2;
+                });
     }
 
     private void setBack() {
@@ -240,7 +253,7 @@ public class Connector extends android.support.v7.widget.AppCompatTextView imple
 
     private boolean possibleConnect(Connector pin) {
         return !(pin.getConnection() == getConnection()
-                || pin.getParent() == getParent()
+                || pin.node == node
                 || pin.isArray() != isArray());
     }
 
@@ -288,6 +301,14 @@ public class Connector extends android.support.v7.widget.AppCompatTextView imple
             return getCompoundDrawables()[0];
         else
             return getCompoundDrawables()[2];
+    }
+
+    public float getSceneX() {
+        return sceneX;
+    }
+
+    public float getSceneY() {
+        return sceneY;
     }
 
     @Override

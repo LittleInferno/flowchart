@@ -3,7 +3,6 @@ package com.littleinferno.flowchart;
 import android.annotation.SuppressLint;
 import android.app.FragmentManager;
 import android.content.Context;
-import android.content.Intent;
 import android.content.res.TypedArray;
 import android.graphics.Canvas;
 import android.graphics.Rect;
@@ -35,14 +34,15 @@ public class ProjectsAdaptor extends RecyclerView.Adapter<ProjectsAdaptor.ViewHo
                 .inflate(R.layout.project_card, parent, false);
 
         itemView.setOnClickListener(v -> {
-                    itemView
-                            .getContext()
-                            .startActivity(new Intent(itemView.getContext(), ProjectActivity.class));
 
-//                    com.littleinferno.flowchart.project.gui.ProjectLoadDialog
-//                            projectLoadDialog = new com.littleinferno.flowchart.project.gui.ProjectLoadDialog();
-//
-//                    projectLoadDialog.show(fm, "pld");
+//                    itemView
+//                            .getContext()
+//                            .startActivity(new Intent(itemView.getContext(), ProjectActivity.class));
+
+                    com.littleinferno.flowchart.project.gui.ProjectLoadDialog
+                            projectLoadDialog = new com.littleinferno.flowchart.project.gui.ProjectLoadDialog();
+
+                    projectLoadDialog.show(fm, "pld");
                 }
         );
 

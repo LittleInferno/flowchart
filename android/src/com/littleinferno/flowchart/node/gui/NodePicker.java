@@ -6,6 +6,8 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.AttributeSet;
 
+import com.littleinferno.flowchart.project.FlowchartProject;
+
 import java.util.List;
 
 public class NodePicker extends RecyclerView {
@@ -22,8 +24,8 @@ public class NodePicker extends RecyclerView {
         super(context, attrs, defStyle);
     }
 
-    public void init(List<Section> sections) {
-        SectionAdapter adapter = new SectionAdapter(getContext(), sections);
+    public void init(FlowchartProject flowchartProject, List<Section> sections) {
+        SectionAdapter adapter = new SectionAdapter(flowchartProject, getContext(), sections);
         setLayoutManager(new LinearLayoutManager(getContext()));
         setAdapter(adapter);
     }

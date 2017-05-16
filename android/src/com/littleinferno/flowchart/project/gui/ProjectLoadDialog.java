@@ -1,6 +1,8 @@
 package com.littleinferno.flowchart.project.gui;
 
 import android.app.DialogFragment;
+import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.Environment;
 import android.support.annotation.Nullable;
@@ -8,22 +10,27 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.google.gson.Gson;
+import com.littleinferno.flowchart.Files;
+import com.littleinferno.flowchart.ProjectActivity;
 import com.littleinferno.flowchart.databinding.LayoutProjectLoadBinding;
+import com.littleinferno.flowchart.function.AndroidFunction;
+import com.littleinferno.flowchart.plugin.AndroidBasePluginHandle;
+import com.littleinferno.flowchart.plugin.AndroidPluginHandle;
 import com.littleinferno.flowchart.project.FlowchartProject;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.InputStreamReader;
-import java.util.Scanner;
+import java.util.List;
 
 import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
 
 public class ProjectLoadDialog extends DialogFragment {
 
     private LayoutProjectLoadBinding layout;
+    private Disposable plugin;
 
     @Nullable
     @Override
@@ -36,39 +43,73 @@ public class ProjectLoadDialog extends DialogFragment {
     public void onStart() {
         super.onStart();
 
-        String string = Environment.getExternalStorageDirectory().toString();
-        File file = new File(string + "/flowchart_projects/plugins/codegen.js");
+        String projectName = "test";
+        String pluginPath = Environment.getExternalStorageDirectory().toString() + "/flowchart_projects/plugins/new.js";
 
-        String s = null;
-        try {
-            s = readFile(file);
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        }
+        String saveName = Files.projectNameToSaveName(projectName);
 
-        FlowchartProject load = FlowchartProject.load(null, null);
+        layout.close.setOnClickListener(v -> dismiss());
 
+        FlowchartProject project = FlowchartProject.create(getContext(), projectName);
+
+        Observable<FlowchartProject> projectObservable = Observable.just(pluginPath)
+                .subscribeOn(Schedulers.io())
+                .map(File::new)
+                .map(Files::readToString)
+                .observeOn(Schedulers.computation())
+//                .observeOn(AndroidSchedulers.mainThread())
+                .map(AndroidPluginHandle::new)
+                .map(AndroidBasePluginHandle::init)
+                .map(AndroidPluginHandle.class::cast)
+                .map(ph -> {
+                    project.setPlugin(ph);
+                    return project;
+                })
+                .map(p -> {
+                    Observable.zip(
+                            Observable.just(Files.getSavesLocation() + saveName)
+                                    .map(File::new)
+                                    .map(Files::readToString),
+                            Observable.just(new Gson()), this::readSave)
+                            .subscribeOn(Schedulers.io())
+                            .observeOn(AndroidSchedulers.mainThread())
+                            .flatMap(Observable::fromIterable)
+                            .forEach(p.getFunctionManager()::createFunction);
+                    return p;
+                });
+
+        Observable<List<AndroidFunction.SimpleObject>> nodesObservable = Observable.zip(
+                Observable.just(Files.getSavesLocation() + saveName)
+                        .map(File::new)
+                        .map(Files::readToString),
+                Observable.just(new Gson()), this::readSave)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread());
+
+
+//        plugin = Observable.zip(projectObservable, nodesObservable,
+//                (p, objects) ->
+//                {
+//                    Observable.fromIterable(objects)
+//                            .subscribeOn(AndroidSchedulers.mainThread())
+//                            .forEach(p.getFunctionManager()::createFunction);
+//                    return p;
+//                })
+        projectObservable.subscribe(p -> getContext().startActivity(new Intent(getContext(), ProjectActivity.class)),
+                throwable -> {
+                    throwable.printStackTrace();
+                    layout.information.setText("ERROR load plugin:" + throwable.getMessage());
+                    layout.close.setText("close");
+                });
     }
 
-    String readFile(File file) throws FileNotFoundException {
-        int fileSize = (int) file.length();
-        layout.progress.setMax(fileSize);
+    List<AndroidFunction.SimpleObject> readSave(String save, Gson gson) {
+        return gson.fromJson(save, FlowchartProject.getSavingType());
+    }
 
-        Scanner scanner = new Scanner(new InputStreamReader(new FileInputStream(file)));
-
-        StringBuilder text = new StringBuilder();
-
-        Observable.just(scanner)
-                .subscribeOn(Schedulers.io())
-                .takeWhile(Scanner::hasNextLine)
-                .map(Scanner::nextLine)
-                .doOnEach(text::append)
-                .map(String::length)
-                .reduce((i1, i2) -> i1 += i2)
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(layout.progress::setProgress);
-
-
-        return text.toString();
+    @Override
+    public void onDismiss(DialogInterface dialog) {
+        super.onDismiss(dialog);
+        plugin.dispose();
     }
 }

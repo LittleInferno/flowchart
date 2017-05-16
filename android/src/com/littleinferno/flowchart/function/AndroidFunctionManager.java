@@ -4,6 +4,7 @@ import android.os.Parcel;
 import android.os.Parcelable;
 
 import com.annimon.stream.Collectors;
+import com.annimon.stream.Optional;
 import com.annimon.stream.Stream;
 import com.littleinferno.flowchart.generator.Generator;
 import com.littleinferno.flowchart.project.FlowchartProject;
@@ -12,7 +13,6 @@ import com.littleinferno.flowchart.util.Fun;
 import com.littleinferno.flowchart.util.Link;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 public class AndroidFunctionManager implements ProjectModule, Generator, Parcelable {
@@ -39,8 +39,11 @@ public class AndroidFunctionManager implements ProjectModule, Generator, Parcela
 
         functionAddListeners = new ArrayList<>();
         in.readList(functionAddListeners, Fun.class.getClassLoader());
+
         functionRemoveListeners = new ArrayList<>();
         in.readList(functionRemoveListeners, Fun.class.getClassLoader());
+
+        project = FlowchartProject.getProject();
     }
 
     public static final Creator<AndroidFunctionManager> CREATOR = new Creator<AndroidFunctionManager>() {
@@ -72,7 +75,7 @@ public class AndroidFunctionManager implements ProjectModule, Generator, Parcela
     }
 
     public AndroidFunction createMain() {
-        AndroidFunction function = new AndroidFunction(this, getProject().getPluginManager().getRules().getEntryPoint());
+        AndroidFunction function = new AndroidFunction(this, getProject().getRules().getEntryPoint());
         functions.add(0, function);
 
         notifyFunctionAdd();
@@ -93,11 +96,19 @@ public class AndroidFunctionManager implements ProjectModule, Generator, Parcela
     }
 
     public AndroidFunction getFunction(String name) {
-        return Stream.of(functions)
+
+        Optional<AndroidFunction> function = Stream.of(functions)
                 .filter(value -> value.getName().equals(name))
-                .findFirst()
-                .orElseThrow(() ->
-                        new RuntimeException("Cannot find codegen with title:\"" + name + "\""));
+                .findFirst();
+
+        if (!function.isPresent()) {
+            String entryPoint = getProject().getRules().getEntryPoint();
+            if (name.equals(entryPoint)) {
+                return createFunction(entryPoint);
+            } else
+                throw new RuntimeException("Cannot find functin with title:\"" + name + "\"");
+        }
+        return function.get();
     }
 
     public List<AndroidFunction> getFunctions() {
@@ -113,11 +124,11 @@ public class AndroidFunctionManager implements ProjectModule, Generator, Parcela
 
         if (name.isEmpty()) {
             return "Name can not be empty";
-        } else if (!project.getPluginManager().getRules().checkPattern(name)) {
+        } else if (!project.getRules().checkPattern(name)) {
             return "Unacceptable symbols";
         } else if (Stream.of(functions).map(AndroidFunction::getName).anyMatch(name::equals)) {
             return "This name is already taken";
-        } else if (project.getPluginManager().getRules().containsWord(name))
+        } else if (project.getRules().containsWord(name))
             return "Invalid name";
 
         return null;
@@ -134,7 +145,6 @@ public class AndroidFunctionManager implements ProjectModule, Generator, Parcela
         dest.writeList(functions);
         dest.writeList(functionAddListeners);
         dest.writeList(functionRemoveListeners);
-        dest.writeList(Collections.singletonList(getProject()));//TODO action hack
     }
 
     public Link onFunctionAdd(Fun fun) {

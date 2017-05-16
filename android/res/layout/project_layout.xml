@@ -27,7 +27,14 @@
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintVertical_bias="1.0">
 
+            <com.littleinferno.flowchart.node.gui.NodePicker
+                android:id="@+id/nodes"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+            </com.littleinferno.flowchart.node.gui.NodePicker>
         </android.support.v7.widget.CardView>
+
 
         <FrameLayout
             android:id="@+id/scene_frame"

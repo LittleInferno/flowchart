@@ -16,28 +16,27 @@ import android.widget.RelativeLayout;
 
 import com.annimon.stream.Optional;
 import com.annimon.stream.Stream;
-import com.google.gson.JsonDeserializationContext;
-import com.google.gson.JsonDeserializer;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParseException;
-import com.google.gson.JsonSerializationContext;
-import com.google.gson.JsonSerializer;
 import com.littleinferno.flowchart.Connection;
 import com.littleinferno.flowchart.DataType;
 import com.littleinferno.flowchart.databinding.NodeLayoutBinding;
 import com.littleinferno.flowchart.function.AndroidFunction;
 import com.littleinferno.flowchart.pin.Connector;
 import com.littleinferno.flowchart.plugin.AndroidPluginHandle;
-import com.littleinferno.flowchart.project.FlowchartProject;
 import com.littleinferno.flowchart.scene.AndroidSceneLayout;
 
-import java.lang.reflect.Type;
 import java.util.Arrays;
 import java.util.HashSet;
 
 @SuppressLint("ViewConstructor")
 public class AndroidNode extends CardView {
+
+    public float getHeaderHeight() {
+        return layout.header.getBottom();
+    }
+
+    public void setClosable(Integer closable) {
+        layout.close.setVisibility(closable);
+    }
 
     public enum Align {
         LEFT, RIGHT, CENTER
@@ -50,9 +49,7 @@ public class AndroidNode extends CardView {
 
     public AndroidNode(final AndroidFunction function, final AndroidPluginHandle.NodeHandle nodeHandle) {
         super(function.getProject().getContext());
-        layout = NodeLayoutBinding.inflate((LayoutInflater) function
-                .getProject()
-                .getContext()
+        layout = NodeLayoutBinding.inflate((LayoutInflater) function.getProject().getContext()
                 .getSystemService(Context.LAYOUT_INFLATER_SERVICE), this, true);
 
         this.function = function;
@@ -68,9 +65,9 @@ public class AndroidNode extends CardView {
         this.nodeHandle.getAttribute("closable")
                 .map(Boolean.class::cast)
                 .map(o -> o ? VISIBLE : INVISIBLE)
-                .ifPresent(o -> layout.close.setVisibility(o));
+                .ifPresent(this::setClosable);
 
-        layout.close.setOnClickListener(v -> ((AndroidSceneLayout) getParent()).removeView(this));
+        layout.close.setOnClickListener(v -> function.getNodeManager().removeNode(this));
     }
 
     private void init(Context context) {
@@ -264,34 +261,6 @@ public class AndroidNode extends CardView {
         public void onDrawShadow(Canvas canvas) {
             canvas.scale(getView().getScaleX(), getView().getScaleY());
             getView().draw(canvas);
-        }
-    }
-
-    public static class Serializer implements JsonSerializer<AndroidNode>, JsonDeserializer<AndroidNode> {
-        @Override
-        public JsonElement serialize(AndroidNode src, Type typeOfSrc, JsonSerializationContext context) {
-
-            JsonObject result = new JsonObject();
-            result.addProperty("x", src.getX());
-            result.addProperty("y", src.getY());
-            result.addProperty("name", src.getNodeHandle().getName());
-
-            return result;
-        }
-
-        @Override
-        public AndroidNode deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
-
-            JsonObject data = json.getAsJsonObject();
-
-            float x = data.get("x").getAsFloat();
-            float y = data.get("y").getAsFloat();
-            String name = data.get("name").getAsString();
-            String fun = data.get("function").getAsString();
-
-            AndroidFunction function = FlowchartProject.getProject().getFunctionManager().getFunction(fun);
-
-            return function.getNodeManager().createNode(name, x, y);
         }
     }
 

@@ -7,6 +7,7 @@ import org.mozilla.javascript.Context;
 import org.mozilla.javascript.Function;
 import org.mozilla.javascript.NativeArray;
 import org.mozilla.javascript.NativeObject;
+import org.mozilla.javascript.Scriptable;
 import org.mozilla.javascript.ScriptableObject;
 
 import java.util.ArrayList;
@@ -17,18 +18,30 @@ import java.util.regex.Pattern;
 
 public class AndroidPluginHandle extends AndroidBasePluginHandle {
 
-    private final List<NodeHandle> handles;
-    private final RuleHandle ruleHandle;
+    private List<NodeHandle> handles;
+    private RuleHandle ruleHandle;
 
-    AndroidPluginHandle(String plugin) {
+    public AndroidPluginHandle(String plugin) {
         super(plugin);
+
+    }
+
+    @Override
+    protected void onInit(Context rhino, Scriptable scope) throws Exception {
+        eval();
+
+        PluginParams params = new ScriptFun(rhino, scope, "pluginParams").call(PluginParams.class);
+        if (params.getApiVersion() != getApiVersion())
+            throw new RuntimeException("plugin api version(" + params.getApiVersion() + ") != api version" + getApiVersion());
+        initParams(params);
+
         handles = new ArrayList<>();
 
         ruleHandle = readRules((ScriptableObject) createScriptFun("exportRules").call());
         registerNodes((NativeArray) createScriptFun("exportNodes").call());
     }
 
-    private RuleHandle readRules(ScriptableObject exportRules) {
+    private RuleHandle readRules(ScriptableObject exportRules) throws Exception {
         final String words[] = (String[]) Context.jsToJava(exportRules.get("keyWords"), String[].class);
         final Boolean variableAvailable = (Boolean) exportRules.get("variableIsAvailable");
         final Boolean functionAvailable = (Boolean) exportRules.get("functionIsAvailable");
@@ -41,7 +54,7 @@ public class AndroidPluginHandle extends AndroidBasePluginHandle {
         return new RuleHandle(words, variableAvailable, functionAvailable, Pattern.compile(pattern), entryPoint);
     }
 
-    private void checkRule(String[] words, Boolean variableAvailable, Boolean functionAvailable, String pattern, String entryPoint) {
+    private void checkRule(String[] words, Boolean variableAvailable, Boolean functionAvailable, String pattern, String entryPoint) throws Exception {
         String error = "";
         if (words == null)
             error = "keywords must be defined";
@@ -55,14 +68,14 @@ public class AndroidPluginHandle extends AndroidBasePluginHandle {
             error = "entryPoint must be defined";
 
         if (!error.isEmpty())
-            throw new IllegalArgumentException(error);
-}
+            throw new Exception(error);
+    }
 
-    private void registerNodes(NativeArray object) {
+    private void registerNodes(NativeArray object) throws Exception {
         for (Object i : object) registerNode((ScriptableObject) i);
     }
 
-    private void registerNode(ScriptableObject object) {
+    private void registerNode(ScriptableObject object) throws Exception {
 
         String name = (String) object.get("name");
         String title = (String) object.get("title");
@@ -94,7 +107,7 @@ public class AndroidPluginHandle extends AndroidBasePluginHandle {
         }
     }
 
-    private void checkNode(String name, String title, String category, ScriptFun codegen, ScriptFun init) {
+    private void checkNode(String name, String title, String category, ScriptFun codegen, ScriptFun init) throws Exception {
         String error = "";
         if (name == null)
             error = "name must be defined";
@@ -108,7 +121,7 @@ public class AndroidPluginHandle extends AndroidBasePluginHandle {
             error = "init function must be defined";
 
         if (!error.isEmpty())
-            throw new IllegalArgumentException(error);
+            throw new Exception(error);
     }
 
     @Override
