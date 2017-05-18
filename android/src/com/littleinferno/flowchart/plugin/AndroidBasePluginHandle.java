@@ -12,29 +12,14 @@ public abstract class AndroidBasePluginHandle {
     private Scriptable scope;
     private String plugin;
 
-    AndroidBasePluginHandle(String plugin) {
+    AndroidBasePluginHandle(PluginParams params, String plugin) {
+        this.pluginParams = params;
         this.plugin = plugin;
         rhino = ContextFactory.getGlobal().enterContext();
         rhino.setOptimizationLevel(-1);
 
         scope = rhino.initStandardObjects();
-    }
-
-    public AndroidBasePluginHandle init() throws Exception {
-        rhino = ContextFactory.getGlobal().enterContext();
-        rhino.setOptimizationLevel(-1);
-        scope = rhino.initStandardObjects();
-
-        onInit(rhino, scope);
-        return this;
-    }
-
-    void eval() {
         rhino.evaluateString(scope, plugin, "JavaScript", 1, null);
-    }
-
-    void initParams(PluginParams params) {
-        this.pluginParams = params;
     }
 
     public PluginParams getPluginParams() {
@@ -45,8 +30,6 @@ public abstract class AndroidBasePluginHandle {
         onUnload();
         Context.exit();
     }
-
-    protected abstract void onInit(Context rhino, Scriptable scope) throws Exception;
 
     protected abstract void onUnload();
 
@@ -64,9 +47,9 @@ public abstract class AndroidBasePluginHandle {
         private final String pluginName;
         private final String pluginDescription;
         private final String pluginVersion;
-        private final int apiVersion;
+        private final String apiVersion;
 
-        public PluginParams(String pluginName, String pluginDescription, String pluginVersion, int apiVersion) {
+        public PluginParams(String pluginName, String pluginDescription, String pluginVersion, String apiVersion) {
             this.pluginName = pluginName;
             this.pluginDescription = pluginDescription;
             this.pluginVersion = pluginVersion;
@@ -85,7 +68,7 @@ public abstract class AndroidBasePluginHandle {
             return pluginVersion;
         }
 
-        public int getApiVersion() {
+        public String getApiVersion() {
             return apiVersion;
         }
     }

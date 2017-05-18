@@ -7,6 +7,7 @@ import android.graphics.Canvas;
 import android.graphics.Point;
 import android.graphics.PointF;
 import android.os.Build;
+import android.os.Parcelable;
 import android.support.v7.widget.CardView;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
@@ -68,6 +69,16 @@ public class AndroidNode extends CardView {
                 .ifPresent(this::setClosable);
 
         layout.close.setOnClickListener(v -> function.getNodeManager().removeNode(this));
+    }
+
+    @Override
+    public Parcelable onSaveInstanceState() {
+        return super.onSaveInstanceState();
+    }
+
+    @Override
+    protected void onRestoreInstanceState(Parcelable state) {
+        super.onRestoreInstanceState(state);
     }
 
     private void init(Context context) {

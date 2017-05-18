@@ -13,24 +13,27 @@ import com.littleinferno.flowchart.scene.AndroidSceneLayout;
 import org.mozilla.javascript.Function;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.UUID;
 
 public class AndroidNodeManager implements Parcelable {
+    private final HashMap<UUID, AndroidFunction> parent = new HashMap<>();
 
     public static final String TAG = "NODE_MANAGER";
 
-    private final List<AndroidNode> nodes;
+    private final List<AndroidNode> nodes = new ArrayList<>();
     private final AndroidFunction function;
+    private final UUID id;
 
     public AndroidNodeManager(AndroidFunction function) {
+        id = UUID.randomUUID();
         this.function = function;
-        nodes = new ArrayList<>();
     }
 
     private AndroidNodeManager(Parcel in) {
-        function = in.readParcelable(AndroidFunction.class.getClassLoader());
-        nodes = new ArrayList<>();
-        in.readList(nodes, AndroidNode.class.getClassLoader());
+        id = UUID.fromString(in.readString());
+        function = parent.remove(id);
     }
 
     public static final Creator<AndroidNodeManager> CREATOR = new Creator<AndroidNodeManager>() {
@@ -100,8 +103,7 @@ public class AndroidNodeManager implements Parcelable {
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
-        dest.writeParcelable(function, flags);
-        dest.writeList(nodes);
+        dest.writeString(id.toString());
     }
 
     public List<AndroidNode> getNodes(String name) {

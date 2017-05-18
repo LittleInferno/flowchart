@@ -15,7 +15,7 @@ import com.littleinferno.flowchart.util.gui.ArrayChangedListener;
 import java.util.ArrayList;
 import java.util.List;
 
-public class AndroidVariable implements ProjectModule, Parcelable {
+public class AndroidVariable extends ProjectModule implements Parcelable {
 
     public static final String TAG = "VARIABLE";
 
@@ -31,6 +31,7 @@ public class AndroidVariable implements ProjectModule, Parcelable {
     private final List<DestroyListener> destroyListeners;
 
     public AndroidVariable(final AndroidVariableManager variableManager, final DataType dataType, final String name, final boolean isArray) {
+        super(variableManager.getProject());
         this.variableManager = variableManager;
 
         this.dataType = dataType;
@@ -44,6 +45,7 @@ public class AndroidVariable implements ProjectModule, Parcelable {
     }
 
     protected AndroidVariable(Parcel in) {
+        super(in);
         variableManager = in.readParcelable(AndroidVariableManager.class.getClassLoader());
 
         name = in.readString();
@@ -150,14 +152,10 @@ public class AndroidVariable implements ProjectModule, Parcelable {
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
+        super.writeToParcel(dest, flags);
         dest.writeParcelable(variableManager, flags);
         dest.writeString(name);
         dest.writeByte((byte) (isArray ? 1 : 0));
         dest.writeString(dataType.toString());
-    }
-
-    @Override
-    public FlowchartProject getProject() {
-        return variableManager.getProject();
     }
 }

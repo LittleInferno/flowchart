@@ -167,6 +167,25 @@ public class AndroidFunctionParameter implements Parcelable {
         void remove(AndroidFunctionParameter parameter);
     }
 
+    public static class CallbackPair {
+        public final Add add;
+        public final Remove remove;
+
+        CallbackPair(Add add, Remove remove) {
+            this.add = add;
+            this.remove = remove;
+        }
+
+        public Add getAdd() {
+            return add;
+        }
+
+        public Remove getRemove() {
+            return remove;
+        }
+    }
+
+
     public static class SimpleObject {
         final String name;
         final String type;

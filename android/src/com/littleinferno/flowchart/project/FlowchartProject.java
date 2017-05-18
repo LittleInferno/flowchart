@@ -3,6 +3,8 @@ package com.littleinferno.flowchart.project;
 import android.app.FragmentManager;
 import android.content.Context;
 import android.os.Environment;
+import android.os.Parcel;
+import android.os.Parcelable;
 
 import com.annimon.stream.Stream;
 import com.google.gson.Gson;
@@ -21,33 +23,46 @@ import java.util.List;
 import io.reactivex.Observable;
 import io.reactivex.schedulers.Schedulers;
 
-public class FlowchartProject {
+public class FlowchartProject implements Parcelable {
 
-    private static FlowchartProject project;
-
+    public static final String TAG = "FLOWCHART_PROJECT";
     private AndroidFunction currentScene;
     private Context context;
     private String name;
-    private AndroidPluginHandle pluginHandle;
+    private static AndroidPluginHandle pluginHandle;
 
     private FragmentManager fragmentManager;
     private AndroidVariableManager variableManager;
     private AndroidFunctionManager functionManager;
 
-    public FlowchartProject(Context context, String name) {
-        this.context = context;
+    public FlowchartProject(String name) {
         this.name = name;
 
         variableManager = new AndroidVariableManager(this);
         functionManager = new AndroidFunctionManager(this);
     }
 
-    public static FlowchartProject getProject() {
-        return project;
+    protected FlowchartProject(Parcel in) {
+        currentScene = in.readParcelable(AndroidFunction.class.getClassLoader());
+        name = in.readString();
+        variableManager = in.readParcelable(AndroidVariableManager.class.getClassLoader());
+        functionManager = in.readParcelable(AndroidFunctionManager.class.getClassLoader());
     }
 
+    public static final Creator<FlowchartProject> CREATOR = new Creator<FlowchartProject>() {
+        @Override
+        public FlowchartProject createFromParcel(Parcel in) {
+            return new FlowchartProject(in);
+        }
+
+        @Override
+        public FlowchartProject[] newArray(int size) {
+            return new FlowchartProject[size];
+        }
+    };
+
     public static FlowchartProject create(Context context, String name) {
-        return project = new FlowchartProject(context, name);
+        return new FlowchartProject(name);
     }
 
     public void setPlugin(AndroidPluginHandle plugin) {
@@ -124,7 +139,7 @@ public class FlowchartProject {
     }
 
     public static FlowchartProject load(final Context context, String name) {
-        FlowchartProject project = new FlowchartProject(context, name);
+        FlowchartProject project = new FlowchartProject(name);
 
         String string = Environment.getExternalStorageDirectory().toString();
 
@@ -160,4 +175,16 @@ public class FlowchartProject {
     }
 
 
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeParcelable(currentScene, flags);
+        dest.writeString(name);
+        dest.writeParcelable(variableManager, flags);
+        dest.writeParcelable(functionManager, flags);
+    }
 }

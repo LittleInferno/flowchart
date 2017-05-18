@@ -8,11 +8,15 @@ import com.annimon.stream.Stream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintWriter;
+import java.nio.channels.FileChannel;
 import java.util.List;
 import java.util.Scanner;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
 
 public class Files {
 
@@ -62,6 +66,42 @@ public class Files {
 
     public static String getSavesLocation() {
         return Environment.getExternalStorageDirectory().toString() + "/flowchart_projects/saves/";
+    }
+
+    public static String getPLuginsLocation() {
+        return Environment.getExternalStorageDirectory().toString() + "/flowchart_projects/plugins/";
+    }
+
+    public static void copyFile(File source, File dest) {
+        try (FileChannel inputChannel = new FileInputStream(source).getChannel();
+             FileChannel outputChannel = new FileOutputStream(dest).getChannel()) {
+            outputChannel.transferFrom(inputChannel, 0, inputChannel.size());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static String readZipFromInputStream(InputStream inputStream, String filename) throws IOException {
+
+        ZipInputStream zip = new ZipInputStream(inputStream);
+        ZipEntry ze;
+
+        String content = null;
+
+        while ((ze = zip.getNextEntry()) != null) {
+
+            if (ze.getName().equals(filename)) {
+                StringBuilder s = new StringBuilder();
+                byte[] buffer = new byte[1024];
+                int read = 0;
+
+                while ((read = zip.read(buffer, 0, 1024)) >= 0) {
+                    s.append(new String(buffer, 0, read));
+                }
+                content = s.toString();
+            }
+        }
+        return content;
     }
 
 }

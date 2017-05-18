@@ -15,7 +15,6 @@ import com.littleinferno.flowchart.Files;
 import com.littleinferno.flowchart.ProjectActivity;
 import com.littleinferno.flowchart.databinding.LayoutProjectLoadBinding;
 import com.littleinferno.flowchart.function.AndroidFunction;
-import com.littleinferno.flowchart.plugin.AndroidBasePluginHandle;
 import com.littleinferno.flowchart.plugin.AndroidPluginHandle;
 import com.littleinferno.flowchart.project.FlowchartProject;
 
@@ -23,9 +22,7 @@ import java.io.File;
 import java.util.List;
 
 import io.reactivex.Observable;
-import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
-import io.reactivex.schedulers.Schedulers;
 
 public class ProjectLoadDialog extends DialogFragment {
 
@@ -53,13 +50,12 @@ public class ProjectLoadDialog extends DialogFragment {
         FlowchartProject project = FlowchartProject.create(getContext(), projectName);
 
         Observable<FlowchartProject> projectObservable = Observable.just(pluginPath)
-                .subscribeOn(Schedulers.io())
+//                .subscribeOn(Schedulers.io())
                 .map(File::new)
                 .map(Files::readToString)
-                .observeOn(Schedulers.computation())
+//                .observeOn(Schedulers.computation())
 //                .observeOn(AndroidSchedulers.mainThread())
                 .map(AndroidPluginHandle::new)
-                .map(AndroidBasePluginHandle::init)
                 .map(AndroidPluginHandle.class::cast)
                 .map(ph -> {
                     project.setPlugin(ph);
@@ -71,8 +67,8 @@ public class ProjectLoadDialog extends DialogFragment {
                                     .map(File::new)
                                     .map(Files::readToString),
                             Observable.just(new Gson()), this::readSave)
-                            .subscribeOn(Schedulers.io())
-                            .observeOn(AndroidSchedulers.mainThread())
+//                            .subscribeOn(Schedulers.io())
+//                            .observeOn(AndroidSchedulers.mainThread())
                             .flatMap(Observable::fromIterable)
                             .forEach(p.getFunctionManager()::createFunction);
                     return p;
@@ -82,12 +78,12 @@ public class ProjectLoadDialog extends DialogFragment {
                 Observable.just(Files.getSavesLocation() + saveName)
                         .map(File::new)
                         .map(Files::readToString),
-                Observable.just(new Gson()), this::readSave)
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread());
+                Observable.just(new Gson()), this::readSave);
+//                .subscribeOn(Schedulers.io())
+//                .observeOn(AndroidSchedulers.mainThread());
 
 
-//        plugin = Observable.zip(projectObservable, nodesObservable,
+//        pluginFile = Observable.zip(projectObservable, nodesObservable,
 //                (p, objects) ->
 //                {
 //                    Observable.fromIterable(objects)
@@ -98,7 +94,7 @@ public class ProjectLoadDialog extends DialogFragment {
         projectObservable.subscribe(p -> getContext().startActivity(new Intent(getContext(), ProjectActivity.class)),
                 throwable -> {
                     throwable.printStackTrace();
-                    layout.information.setText("ERROR load plugin:" + throwable.getMessage());
+                    layout.information.setText("ERROR load pluginFile:" + throwable.getMessage());
                     layout.close.setText("close");
                 });
     }

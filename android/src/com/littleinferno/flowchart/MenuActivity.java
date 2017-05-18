@@ -14,6 +14,7 @@ import android.widget.LinearLayout;
 
 import com.annimon.stream.Stream;
 import com.littleinferno.flowchart.databinding.ActivityMenuBinding;
+import com.littleinferno.flowchart.project.gui.CreateNewProjectDialog;
 
 public class MenuActivity extends AppCompatActivity {
 

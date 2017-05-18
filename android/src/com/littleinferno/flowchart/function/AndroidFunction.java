@@ -10,7 +10,6 @@ import com.littleinferno.flowchart.DataType;
 import com.littleinferno.flowchart.generator.Generator;
 import com.littleinferno.flowchart.node.AndroidNode;
 import com.littleinferno.flowchart.node.AndroidNodeManager;
-import com.littleinferno.flowchart.project.FlowchartProject;
 import com.littleinferno.flowchart.project.ProjectModule;
 import com.littleinferno.flowchart.scene.AndroidSceneLayout;
 import com.littleinferno.flowchart.util.DestroyListener;
@@ -18,12 +17,14 @@ import com.littleinferno.flowchart.util.Fun;
 import com.littleinferno.flowchart.util.Link;
 import com.littleinferno.flowchart.util.NameChangedListener;
 
-import java.util.AbstractMap;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
-public class AndroidFunction implements ProjectModule, Generator, Parcelable {
+public class AndroidFunction extends ProjectModule implements Generator, Parcelable {
+    private final HashMap<UUID, AndroidFunctionManager> parent = new HashMap<>();
 
     public static final String TAG = "FUNCTION";
 
@@ -37,11 +38,12 @@ public class AndroidFunction implements ProjectModule, Generator, Parcelable {
 
     private final AndroidNodeManager nodeManager;
     private AndroidSceneLayout androidScene;
-    private List<Map.Entry<AndroidFunctionParameter.Add, AndroidFunctionParameter.Remove>> parameterListeners;
-    private final List<Link> parameterAddListeners;
-    private final List<Link> parameterRemoveListeners;
+    private List<AndroidFunctionParameter.CallbackPair> parameterListeners = new ArrayList<>();
+    private final List<Link> parameterAddListeners = new ArrayList<>();
+    private final List<Link> parameterRemoveListeners = new ArrayList<>();
 
     AndroidFunction(AndroidFunctionManager functionManager, String name) {
+        super(functionManager.getProject());
 
         this.functionManager = functionManager;
         this.name = name;
@@ -51,24 +53,16 @@ public class AndroidFunction implements ProjectModule, Generator, Parcelable {
         nameChangedListeners = new ArrayList<>();
         destroyListeners = new ArrayList<>();
 
-        parameterListeners = new ArrayList<>();
-
         nodeManager = new AndroidNodeManager(this);
         nodeManager.createNode("function begin node", 10, 400);
-
-        parameterAddListeners = new ArrayList<>();
-        parameterRemoveListeners = new ArrayList<>();
     }
 
 
     AndroidFunction(AndroidFunctionManager functionManager, SimpleObject saveInfo) {
+        super(functionManager.getProject());
 
         this.functionManager = functionManager;
         this.name = saveInfo.name;
-
-        parameterListeners = new ArrayList<>();
-        parameterAddListeners = new ArrayList<>();
-        parameterRemoveListeners = new ArrayList<>();
 
         nodeManager = new AndroidNodeManager(this);
         parameters = new ArrayList<>();
@@ -79,9 +73,11 @@ public class AndroidFunction implements ProjectModule, Generator, Parcelable {
     }
 
     private AndroidFunction(Parcel in) {
-        name = in.readString();
+        super(in);
 
-        functionManager = in.readParcelable(AndroidFunctionManager.class.getClassLoader());
+        functionManager = parent.remove(getId());
+
+        name = in.readString();
         nodeManager = in.readParcelable(AndroidNodeManager.class.getClassLoader());
 
         parameters = new ArrayList<>();
@@ -89,12 +85,6 @@ public class AndroidFunction implements ProjectModule, Generator, Parcelable {
 
         parameterListeners = new ArrayList<>();
         in.readList(parameterListeners, Map.Entry.class.getClassLoader());
-
-        parameterAddListeners = new ArrayList<>();
-        in.readList(parameterAddListeners, Link.class.getClassLoader());
-
-        parameterRemoveListeners = new ArrayList<>();
-        in.readList(parameterRemoveListeners, Link.class.getClassLoader());
     }
 
     public static final Creator<AndroidFunction> CREATOR = new Creator<AndroidFunction>() {
@@ -182,7 +172,7 @@ public class AndroidFunction implements ProjectModule, Generator, Parcelable {
 
     @SuppressWarnings("unused")
     public int addParameterListener(AndroidFunctionParameter.Add add, AndroidFunctionParameter.Remove remove) {
-        parameterListeners.add(new AbstractMap.SimpleEntry<>(add, remove));
+        parameterListeners.add(new AndroidFunctionParameter.CallbackPair(add, remove));
         return parameterListeners.get(parameterListeners.size() - 1).hashCode();
     }
 
@@ -200,17 +190,19 @@ public class AndroidFunction implements ProjectModule, Generator, Parcelable {
     }
 
     private void notifyListenersParameterAdded(AndroidFunctionParameter parameter) {
-        Stream.of(parameterListeners).map(Map.Entry::getKey).forEach(v -> v.add(parameter));
+        Stream.of(parameterListeners).map(AndroidFunctionParameter.CallbackPair::getAdd)
+                .forEach(v -> v.add(parameter));
     }
 
     private void notifyListenersParameterRemoved(AndroidFunctionParameter parameter) {
-        Stream.of(parameterListeners).map(Map.Entry::getValue).forEach(v -> v.remove(parameter));
+        Stream.of(parameterListeners).map(AndroidFunctionParameter.CallbackPair::getRemove)
+                .forEach(v -> v.remove(parameter));
     }
 
     @SuppressWarnings("unused")
     public void applyParameters() {
         if (!parameterListeners.isEmpty()) {
-            AndroidFunctionParameter.Add listener = parameterListeners.get(parameterListeners.size() - 1).getKey();
+            AndroidFunctionParameter.Add listener = parameterListeners.get(parameterListeners.size() - 1).getAdd();
             Stream.of(parameters).forEach(listener::add);
         }
     }
@@ -231,23 +223,18 @@ public class AndroidFunction implements ProjectModule, Generator, Parcelable {
     }
 
     @Override
-    public FlowchartProject getProject() {
-        return functionManager.getProject();
-    }
-
-    @Override
     public int describeContents() {
         return 0;
     }
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
+        super.writeToParcel(dest, flags);
+
+        parent.put(getId(), functionManager);
+
         dest.writeString(name);
-        dest.writeParcelable(functionManager, flags);
         dest.writeParcelable(nodeManager, flags);
-        dest.writeList(parameterListeners);
-        dest.writeList(parameterAddListeners);
-        dest.writeList(parameterRemoveListeners);
     }
 
     public AndroidNodeManager getNodeManager() {

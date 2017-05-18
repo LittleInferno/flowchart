@@ -15,18 +15,17 @@ import com.littleinferno.flowchart.util.Link;
 import java.util.ArrayList;
 import java.util.List;
 
-public class AndroidFunctionManager implements ProjectModule, Generator, Parcelable {
+public class AndroidFunctionManager extends ProjectModule implements Generator, Parcelable {
 
     public static final String TAG = "FUNCTION_MANAGER";
 
     private List<AndroidFunction> functions;
     private int counter;
-    private FlowchartProject project;
     private final List<Link> functionRemoveListeners;
     private final List<Link> functionAddListeners;
 
     public AndroidFunctionManager(final FlowchartProject project) {
-        this.project = project;
+        super(project);
         functions = new ArrayList<>();
         counter = 0;
 
@@ -35,15 +34,17 @@ public class AndroidFunctionManager implements ProjectModule, Generator, Parcela
     }
 
     private AndroidFunctionManager(Parcel in) {
+        super(in);
         counter = in.readInt();
+
+        functions = new ArrayList<>();
+        in.readList(functions, AndroidFunction .class.getClassLoader());
 
         functionAddListeners = new ArrayList<>();
         in.readList(functionAddListeners, Fun.class.getClassLoader());
 
         functionRemoveListeners = new ArrayList<>();
         in.readList(functionRemoveListeners, Fun.class.getClassLoader());
-
-        project = FlowchartProject.getProject();
     }
 
     public static final Creator<AndroidFunctionManager> CREATOR = new Creator<AndroidFunctionManager>() {
@@ -115,20 +116,15 @@ public class AndroidFunctionManager implements ProjectModule, Generator, Parcela
         return functions;
     }
 
-    @Override
-    public FlowchartProject getProject() {
-        return project;
-    }
-
     public String checkFunctionName(final String name) {
 
         if (name.isEmpty()) {
             return "Name can not be empty";
-        } else if (!project.getRules().checkPattern(name)) {
+        } else if (!getProject().getRules().checkPattern(name)) {
             return "Unacceptable symbols";
         } else if (Stream.of(functions).map(AndroidFunction::getName).anyMatch(name::equals)) {
             return "This name is already taken";
-        } else if (project.getRules().containsWord(name))
+        } else if (getProject().getRules().containsWord(name))
             return "Invalid name";
 
         return null;
@@ -141,6 +137,7 @@ public class AndroidFunctionManager implements ProjectModule, Generator, Parcela
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
+        super.writeToParcel(dest, flags);
         dest.writeInt(counter);
         dest.writeList(functions);
         dest.writeList(functionAddListeners);

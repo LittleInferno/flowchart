@@ -18,6 +18,7 @@ import com.littleinferno.flowchart.function.AndroidFunction;
 import com.littleinferno.flowchart.function.gui.FunctionListFragment;
 import com.littleinferno.flowchart.node.gui.Section;
 import com.littleinferno.flowchart.plugin.AndroidPluginHandle;
+import com.littleinferno.flowchart.plugin.PluginHelper;
 import com.littleinferno.flowchart.project.FlowchartProject;
 import com.littleinferno.flowchart.scene.gui.SceneFragment;
 import com.littleinferno.flowchart.variable.gui.VariableListFragment;
@@ -30,8 +31,8 @@ public class ProjectActivity extends AppCompatActivity implements NavigationView
     private FlowchartProject flowchartProject;
 
     @Override
-    protected void onStop() {
-        super.onStop();
+    protected void onDestroy() {
+        super.onDestroy();
         flowchartProject.unloadPlugin();
         flowchartProject.clearContext();
     }
@@ -52,7 +53,23 @@ public class ProjectActivity extends AppCompatActivity implements NavigationView
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
-        flowchartProject = FlowchartProject.getProject();
+
+        if (savedInstanceState != null && savedInstanceState.containsKey(FlowchartProject.TAG))
+            flowchartProject = savedInstanceState.getParcelable(FlowchartProject.TAG);
+        else
+            flowchartProject = FlowchartProject.create(this, "t");
+
+        assert flowchartProject != null;
+        flowchartProject.setContext(this);
+
+        AndroidPluginHandle androidPluginHandle = null;
+        try {
+            androidPluginHandle = new AndroidPluginHandle(PluginHelper.getStandartPluginContent(getAssets()));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        flowchartProject.setPlugin(androidPluginHandle);
 
         List<AndroidPluginHandle.NodeHandle> handles = flowchartProject.getNodeHandles();
 
@@ -74,17 +91,6 @@ public class ProjectActivity extends AppCompatActivity implements NavigationView
         getFragmentManager().beginTransaction().replace(R.id.scene_frame, scene).commit();
 
         SceneFragment.show(main, getFragmentManager(), R.id.scene_frame);
-
-        String string = Environment.getExternalStorageDirectory().toString() + "/flowchart_projects/plugins/codegen.js";
-
-
-//        String str = Files.readToString(new File(string));
-
-//        Codeview.with(getApplicationContext())
-//                .withCode(str)
-//                .setStyle(Settings.WithStyle.DARKULA)
-//                .setLang(Settings.Lang.JAVASCRIPT)
-//                .into(layout.projectMain.projectLayout.codeView);
 
     }
 
@@ -121,6 +127,18 @@ public class ProjectActivity extends AppCompatActivity implements NavigationView
 
 
         return true;
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putParcelable(FlowchartProject.TAG, flowchartProject);
+    }
+
+    @Override
+    protected void onRestoreInstanceState(Bundle savedInstanceState) {
+        super.onRestoreInstanceState(savedInstanceState);
+        flowchartProject = savedInstanceState.getParcelable(FlowchartProject.TAG);
     }
 
     @Override

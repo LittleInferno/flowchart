@@ -7,7 +7,6 @@ import org.mozilla.javascript.Context;
 import org.mozilla.javascript.Function;
 import org.mozilla.javascript.NativeArray;
 import org.mozilla.javascript.NativeObject;
-import org.mozilla.javascript.Scriptable;
 import org.mozilla.javascript.ScriptableObject;
 
 import java.util.ArrayList;
@@ -21,25 +20,16 @@ public class AndroidPluginHandle extends AndroidBasePluginHandle {
     private List<NodeHandle> handles;
     private RuleHandle ruleHandle;
 
-    public AndroidPluginHandle(String plugin) {
-        super(plugin);
-
-    }
-
-    @Override
-    protected void onInit(Context rhino, Scriptable scope) throws Exception {
-        eval();
-
-        PluginParams params = new ScriptFun(rhino, scope, "pluginParams").call(PluginParams.class);
-        if (params.getApiVersion() != getApiVersion())
-            throw new RuntimeException("plugin api version(" + params.getApiVersion() + ") != api version" + getApiVersion());
-        initParams(params);
+    public AndroidPluginHandle(String plugin) throws Exception {
+        super(null, plugin);
 
         handles = new ArrayList<>();
 
         ruleHandle = readRules((ScriptableObject) createScriptFun("exportRules").call());
         registerNodes((NativeArray) createScriptFun("exportNodes").call());
     }
+//        if (params.getApiVersion() != getApiVersion())
+//            throw new RuntimeException("pluginFile api version(" + params.getApiVersion() + ") != api version" + getApiVersion());
 
     private RuleHandle readRules(ScriptableObject exportRules) throws Exception {
         final String words[] = (String[]) Context.jsToJava(exportRules.get("keyWords"), String[].class);
