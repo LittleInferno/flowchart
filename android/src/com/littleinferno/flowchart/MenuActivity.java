@@ -11,8 +11,9 @@ import android.view.MenuItem;
 
 import com.littleinferno.flowchart.databinding.ActivityMenuBinding;
 import com.littleinferno.flowchart.plugin.gui.PluginActivity;
-import com.littleinferno.flowchart.project.FlowchartProject;
+import com.littleinferno.flowchart.project.Project;
 import com.littleinferno.flowchart.project.gui.CreateNewProjectDialog;
+import com.littleinferno.flowchart.util.Files;
 
 import net.idik.lib.slimadapter.SlimAdapter;
 
@@ -44,7 +45,7 @@ public class MenuActivity extends AppCompatActivity {
                     injector.text(R.id.project_name, (String) o)
                             .clicked(R.id.project_name, v -> {
                                 Intent intent = new Intent(v.getContext(), ProjectActivity.class);
-                                intent.putExtra(FlowchartProject.TAG, (String) o);
+                                intent.putExtra(Project.TAG, (String) o);
                                 v.getContext().startActivity(intent);
                             });
                 })

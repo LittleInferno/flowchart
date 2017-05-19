@@ -18,13 +18,13 @@ import com.github.angads25.filepicker.view.FilePickerDialog;
 import com.google.gson.Gson;
 import com.jakewharton.rxbinding2.widget.RxAdapterView;
 import com.jakewharton.rxbinding2.widget.RxTextView;
-import com.littleinferno.flowchart.Files;
+import com.littleinferno.flowchart.util.Files;
 import com.littleinferno.flowchart.ProjectActivity;
 import com.littleinferno.flowchart.R;
 import com.littleinferno.flowchart.databinding.LayoutNewProjectBinding;
 import com.littleinferno.flowchart.plugin.AndroidBasePluginHandle;
 import com.littleinferno.flowchart.plugin.PluginHelper;
-import com.littleinferno.flowchart.project.FlowchartProject;
+import com.littleinferno.flowchart.project.Project;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -173,7 +173,7 @@ public class CreateNewProjectDialog extends AppCompatActivity {
         switch (item.getItemId()) {
             case R.id.bt_create_project:
                 Intent intent = new Intent(this, ProjectActivity.class);
-                intent.putExtra(FlowchartProject.PROJECT_NAME, projectName);
+                intent.putExtra(Project.PROJECT_NAME, projectName);
                 intent.putExtra("PLUGIN", pluginParams.get(layout.plugins.getSelectedItemPosition()).getPluginName());
 
                 startActivity(intent);

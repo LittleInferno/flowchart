@@ -12,13 +12,13 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.littleinferno.flowchart.databinding.LayoutSceneBinding;
-import com.littleinferno.flowchart.function.AndroidFunction;
+import com.littleinferno.flowchart.function.Function;
 
 public class SceneFragment extends Fragment {
 
     LayoutSceneBinding layout;
 
-    private AndroidFunction function;
+    private Function function;
 
     @Nullable
     @Override
@@ -35,7 +35,7 @@ public class SceneFragment extends Fragment {
         Bundle bundle = getArguments();
 
         if (bundle != null)
-            function = bundle.getParcelable(AndroidFunction.TAG);
+            function = bundle.getParcelable(Function.TAG);
 
         if (function == null)
             throw new RuntimeException("function cannot be null");
@@ -48,9 +48,9 @@ public class SceneFragment extends Fragment {
     }
 
 
-    public static void show(@NonNull AndroidFunction function, @NonNull FragmentManager fragmentManager, @IdRes int layout) {
+    public static void show(@NonNull Function function, @NonNull FragmentManager fragmentManager, @IdRes int layout) {
         Bundle bundle = new Bundle();
-        bundle.putParcelable(AndroidFunction.TAG, function);
+        bundle.putParcelable(Function.TAG, function);
         SceneFragment scene = new SceneFragment();
         scene.setArguments(bundle);
         fragmentManager.beginTransaction().replace(layout, scene).commit();

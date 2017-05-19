@@ -6,7 +6,7 @@ import android.support.design.widget.TextInputLayout;
 import android.text.InputType;
 import android.widget.EditText;
 
-import com.littleinferno.flowchart.DataType;
+import com.littleinferno.flowchart.util.DataType;
 import com.littleinferno.flowchart.R;
 import com.littleinferno.flowchart.node.AndroidNode;
 

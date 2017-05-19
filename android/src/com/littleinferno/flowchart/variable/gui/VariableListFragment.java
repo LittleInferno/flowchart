@@ -20,15 +20,15 @@ import com.littleinferno.flowchart.databinding.LayoutVariableListBinding;
 import com.littleinferno.flowchart.util.Link;
 import com.littleinferno.flowchart.util.ResUtil;
 import com.littleinferno.flowchart.util.Swiper;
-import com.littleinferno.flowchart.variable.AndroidVariable;
-import com.littleinferno.flowchart.variable.AndroidVariableManager;
+import com.littleinferno.flowchart.variable.Variable;
+import com.littleinferno.flowchart.variable.VariableManager;
 
 import net.idik.lib.slimadapter.SlimAdapter;
 
 public class VariableListFragment extends DialogFragment {
 
     private LayoutVariableListBinding layout;
-    private AndroidVariableManager variableManager;
+    private VariableManager variableManager;
     private SlimAdapter adapter;
     private Link add;
     private Link remove;
@@ -59,7 +59,7 @@ public class VariableListFragment extends DialogFragment {
         Bundle bundle = getArguments();
 
         if (bundle != null) {
-            variableManager = (AndroidVariableManager) bundle.get(AndroidVariableManager.TAG);
+            variableManager = (VariableManager) bundle.get(VariableManager.TAG);
         }
 
         if (variableManager == null)
@@ -72,7 +72,7 @@ public class VariableListFragment extends DialogFragment {
 
         adapter = SlimAdapter.create()
                 .registerDefault(R.layout.item_variable, (o, injector) -> {
-                    AndroidVariable data = (AndroidVariable) o;
+                    Variable data = (Variable) o;
                     injector.text(R.id.variable_name, data.getName())
                             .text(R.id.variable_type, data.getDataType().toString().toLowerCase())
                             .textColor(R.id.variable_type, ResUtil.getDataTypeColor(getContext(), data.getDataType()))
@@ -117,11 +117,11 @@ public class VariableListFragment extends DialogFragment {
         remove.disconnect();
     }
 
-    public static void show(@NonNull final AndroidVariableManager variableManager,
+    public static void show(@NonNull final VariableManager variableManager,
                             @NonNull final FragmentManager fragmentManager) {
 
         Bundle bundle = new Bundle();
-        bundle.putParcelable(AndroidVariableManager.TAG, variableManager);
+        bundle.putParcelable(VariableManager.TAG, variableManager);
 
         VariableListFragment variableFragment = new VariableListFragment();
         variableFragment.setArguments(bundle);

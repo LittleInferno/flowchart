@@ -11,12 +11,12 @@ import android.view.ViewGroup;
 
 import com.jakewharton.rxbinding2.widget.RxTextView;
 import com.littleinferno.flowchart.databinding.LayoutCreateNewFunctionBinding;
-import com.littleinferno.flowchart.function.AndroidFunctionManager;
+import com.littleinferno.flowchart.function.FunctionManager;
 
 public class NewFunctionDialog extends DialogFragment {
 
     LayoutCreateNewFunctionBinding layout;
-    private AndroidFunctionManager functionManager;
+    private FunctionManager functionManager;
     private String nameBuffer;
 
     @Nullable
@@ -34,7 +34,7 @@ public class NewFunctionDialog extends DialogFragment {
         Bundle bundle = getArguments();
 
         if (bundle != null)
-            functionManager = bundle.getParcelable(AndroidFunctionManager.TAG);
+            functionManager = bundle.getParcelable(FunctionManager.TAG);
 
         RxTextView
                 .textChanges(layout.functionName)
@@ -65,10 +65,10 @@ public class NewFunctionDialog extends DialogFragment {
         }
     }
 
-    public static void show(@NonNull final AndroidFunctionManager functionManager,
+    public static void show(@NonNull final FunctionManager functionManager,
                             @NonNull final FragmentManager fragmentManager) {
         Bundle bundle = new Bundle();
-        bundle.putParcelable(AndroidFunctionManager.TAG, functionManager);
+        bundle.putParcelable(FunctionManager.TAG, functionManager);
 
         NewFunctionDialog functionDialog = new NewFunctionDialog();
         functionDialog.setArguments(bundle);

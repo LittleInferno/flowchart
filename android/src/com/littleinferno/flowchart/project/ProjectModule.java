@@ -9,11 +9,11 @@ import java.util.UUID;
 
 @SuppressLint("ParcelCreator")
 public class ProjectModule implements Parcelable {
-    private final HashMap<UUID, FlowchartProject> parents = new HashMap<>();
-    private final FlowchartProject project;
+    private final HashMap<UUID, Project> parents = new HashMap<>();
+    private final Project project;
     private final UUID id;
 
-    public ProjectModule(FlowchartProject project) {
+    public ProjectModule(Project project) {
         id = UUID.randomUUID();
         this.project = project;
     }
@@ -23,7 +23,7 @@ public class ProjectModule implements Parcelable {
         project = parents.remove(id);
     }
 
-    public FlowchartProject getProject() {
+    public Project getProject() {
         return project;
     }
 

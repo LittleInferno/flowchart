@@ -17,8 +17,8 @@ import android.view.WindowManager;
 
 import com.littleinferno.flowchart.R;
 import com.littleinferno.flowchart.databinding.LayoutFunctionListBinding;
-import com.littleinferno.flowchart.function.AndroidFunction;
-import com.littleinferno.flowchart.function.AndroidFunctionManager;
+import com.littleinferno.flowchart.function.Function;
+import com.littleinferno.flowchart.function.FunctionManager;
 import com.littleinferno.flowchart.scene.gui.SceneFragment;
 import com.littleinferno.flowchart.util.Link;
 import com.littleinferno.flowchart.util.Swiper;
@@ -28,7 +28,7 @@ import net.idik.lib.slimadapter.SlimAdapter;
 public class FunctionListFragment extends DialogFragment {
 
     LayoutFunctionListBinding layout;
-    private AndroidFunctionManager functionManager;
+    private FunctionManager functionManager;
     private Link add;
     private Link remove;
 
@@ -58,7 +58,7 @@ public class FunctionListFragment extends DialogFragment {
         Bundle bundle = getArguments();
 
         if (bundle != null) {
-            functionManager = bundle.getParcelable(AndroidFunctionManager.TAG);
+            functionManager = bundle.getParcelable(FunctionManager.TAG);
         }
 
         if (functionManager == null)
@@ -70,7 +70,7 @@ public class FunctionListFragment extends DialogFragment {
 
         SlimAdapter adapter = SlimAdapter.create()
                 .registerDefault(R.layout.item_function_card, (o, injector) -> {
-                    AndroidFunction data = (AndroidFunction) o;
+                    Function data = (Function) o;
                     injector.text(R.id.function_name_card, data.getName())
                             .clicked(R.id.card, v ->
                                     FunctionDetailsFragment.show(functionManager, getChildFragmentManager(),
@@ -128,10 +128,10 @@ public class FunctionListFragment extends DialogFragment {
         remove.disconnect();
     }
 
-    public static void show(@NonNull AndroidFunctionManager functionManager,
+    public static void show(@NonNull FunctionManager functionManager,
                             @NonNull FragmentManager fragmentManager) {
         Bundle bundle = new Bundle();
-        bundle.putParcelable(AndroidFunctionManager.TAG, functionManager);
+        bundle.putParcelable(FunctionManager.TAG, functionManager);
 
         FunctionListFragment functionList = new FunctionListFragment();
         functionList.setArguments(bundle);

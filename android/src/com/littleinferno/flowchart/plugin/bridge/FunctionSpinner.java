@@ -8,8 +8,8 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 
 import com.annimon.stream.Stream;
-import com.littleinferno.flowchart.function.AndroidFunction;
-import com.littleinferno.flowchart.function.AndroidFunctionManager;
+import com.littleinferno.flowchart.function.Function;
+import com.littleinferno.flowchart.function.FunctionManager;
 import com.littleinferno.flowchart.node.AndroidNode;
 import com.littleinferno.flowchart.util.Fun;
 import com.littleinferno.flowchart.util.Link;
@@ -21,13 +21,13 @@ public class FunctionSpinner extends android.support.v7.widget.AppCompatSpinner 
     private final Link add;
     private final Link remove;
 
-    private FunctionSpinner(AndroidFunctionManager functionManager, Context context, OnSelected onSelected) {
+    private FunctionSpinner(FunctionManager functionManager, Context context, OnSelected onSelected) {
         super(context);
         Log.e("EROR", "E");
         ArrayAdapter<String> adapter =
                 new ArrayAdapter<>(getContext(), android.R.layout.simple_spinner_item,
                         Stream.of(functionManager.getFunctions())
-                                .map(AndroidFunction::getName)
+                                .map(Function::getName)
                                 .toList());
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 
@@ -36,7 +36,7 @@ public class FunctionSpinner extends android.support.v7.widget.AppCompatSpinner 
         Fun fun = () -> {
             adapter.clear();
             adapter.addAll(Stream.of(functionManager.getFunctions())
-                    .map(AndroidFunction::getName)
+                    .map(Function::getName)
                     .toList());
         };
         add = functionManager.onFunctionAdd(fun);
@@ -64,7 +64,7 @@ public class FunctionSpinner extends android.support.v7.widget.AppCompatSpinner 
 
     @SuppressWarnings("WeakerAccess")
     public interface OnSelected {
-        void select(AndroidFunction object);
+        void select(Function object);
     }
 
     public static FunctionSpinner make(AndroidNode node, OnSelected selected) {

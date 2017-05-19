@@ -8,16 +8,16 @@ import android.view.ViewGroup;
 
 import com.bignerdranch.expandablerecyclerview.ExpandableRecyclerAdapter;
 import com.littleinferno.flowchart.R;
-import com.littleinferno.flowchart.project.FlowchartProject;
+import com.littleinferno.flowchart.project.Project;
 
 import java.util.List;
 
 class SectionAdapter extends ExpandableRecyclerAdapter<Section, String, Section.SectionViewHolder, Section.NodeViewHolder> {
 
     private LayoutInflater inflater;
-    private FlowchartProject project;
+    private Project project;
 
-    SectionAdapter(FlowchartProject project, Context context, @NonNull List<Section> sections) {
+    SectionAdapter(Project project, Context context, @NonNull List<Section> sections) {
         super(sections);
         this.project = project;
         inflater = LayoutInflater.from(context);

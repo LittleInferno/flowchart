@@ -12,7 +12,7 @@ import com.github.angads25.filepicker.model.DialogConfigs;
 import com.github.angads25.filepicker.model.DialogProperties;
 import com.github.angads25.filepicker.view.FilePickerDialog;
 import com.google.gson.Gson;
-import com.littleinferno.flowchart.Files;
+import com.littleinferno.flowchart.util.Files;
 import com.littleinferno.flowchart.R;
 import com.littleinferno.flowchart.databinding.ActivityPluginBinding;
 import com.littleinferno.flowchart.plugin.AndroidBasePluginHandle;

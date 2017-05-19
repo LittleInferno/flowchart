@@ -7,7 +7,6 @@ import android.graphics.drawable.Drawable;
 import android.graphics.drawable.VectorDrawable;
 import android.support.v4.content.ContextCompat;
 
-import com.littleinferno.flowchart.DataType;
 import com.littleinferno.flowchart.R;
 
 public final class ResUtil {

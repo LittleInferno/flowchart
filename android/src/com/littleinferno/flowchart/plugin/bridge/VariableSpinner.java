@@ -11,8 +11,8 @@ import com.annimon.stream.Stream;
 import com.littleinferno.flowchart.node.AndroidNode;
 import com.littleinferno.flowchart.util.Fun;
 import com.littleinferno.flowchart.util.Link;
-import com.littleinferno.flowchart.variable.AndroidVariable;
-import com.littleinferno.flowchart.variable.AndroidVariableManager;
+import com.littleinferno.flowchart.variable.Variable;
+import com.littleinferno.flowchart.variable.VariableManager;
 
 @SuppressWarnings("unused")
 @SuppressLint("ViewConstructor")
@@ -21,14 +21,14 @@ public class VariableSpinner extends android.support.v7.widget.AppCompatSpinner 
     private final Link add;
     private final Link remove;
 
-    private VariableSpinner(AndroidVariableManager variableManager, Context context, OnSelected onSelected) {
+    private VariableSpinner(VariableManager variableManager, Context context, OnSelected onSelected) {
         super(context);
         Log.e("EROR", "S");
 
         ArrayAdapter<String> adapter =
                 new ArrayAdapter<>(getContext(), android.R.layout.simple_spinner_item,
                         Stream.of(variableManager.getVariables())
-                                .map(AndroidVariable::getName)
+                                .map(Variable::getName)
                                 .toList());
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 
@@ -37,7 +37,7 @@ public class VariableSpinner extends android.support.v7.widget.AppCompatSpinner 
         Fun fun = () -> {
             adapter.clear();
             adapter.addAll(Stream.of(variableManager.getVariables())
-                    .map(AndroidVariable::getName)
+                    .map(Variable::getName)
                     .toList());
         };
         add = variableManager.onVariableAdd(fun);
@@ -65,7 +65,7 @@ public class VariableSpinner extends android.support.v7.widget.AppCompatSpinner 
 
     @SuppressWarnings("WeakerAccess")
     public interface OnSelected {
-        void select(AndroidVariable object);
+        void select(Variable object);
     }
 
     public static VariableSpinner make(AndroidNode node, OnSelected selected) {

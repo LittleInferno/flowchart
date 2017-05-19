@@ -16,13 +16,12 @@ import com.jakewharton.rxbinding2.view.RxView;
 import com.jakewharton.rxbinding2.widget.RxAdapterView;
 import com.jakewharton.rxbinding2.widget.RxCompoundButton;
 import com.jakewharton.rxbinding2.widget.RxTextView;
-import com.littleinferno.flowchart.Connection;
-import com.littleinferno.flowchart.DataType;
 import com.littleinferno.flowchart.R;
 import com.littleinferno.flowchart.databinding.LayoutFunctionParameterDetailsBinding;
-import com.littleinferno.flowchart.function.AndroidFunction;
-import com.littleinferno.flowchart.function.AndroidFunctionParameter;
-import com.littleinferno.flowchart.util.Objects;
+import com.littleinferno.flowchart.function.Function;
+import com.littleinferno.flowchart.function.FunctionParameter;
+import com.littleinferno.flowchart.util.Connection;
+import com.littleinferno.flowchart.util.DataType;
 
 import io.reactivex.disposables.Disposable;
 
@@ -34,9 +33,9 @@ public class FunctionParameterDetailsFragment extends DialogFragment {
     private DataType dataTypeBuffer;
     private String nameBuffer;
 
-    private AndroidFunction function;
+    private Function function;
 
-    private AndroidFunctionParameter parameter;
+    private FunctionParameter parameter;
     private Connection connectionBuffer;
     private Disposable name;
     private Disposable type;
@@ -63,8 +62,8 @@ public class FunctionParameterDetailsFragment extends DialogFragment {
         Bundle bundle = getArguments();
 
         if (bundle != null) {
-            function = bundle.getParcelable(AndroidFunction.TAG);
-            parameter = bundle.getParcelable(AndroidFunctionParameter.TAG);
+            function = bundle.getParcelable(Function.TAG);
+            parameter = bundle.getParcelable(FunctionParameter.TAG);
         }
 
         if (function == null)
@@ -127,7 +126,7 @@ public class FunctionParameterDetailsFragment extends DialogFragment {
         discard = RxView.clicks(layout.discard).subscribe(v -> dismiss());
 
         ok = RxView.clicks(layout.create).subscribe(v -> {
-            if (Objects.nonNull(parameter))
+            if (parameter != null)
                 changeParameter(parameter);
             else
                 addParameter();
@@ -163,7 +162,7 @@ public class FunctionParameterDetailsFragment extends DialogFragment {
         }
     }
 
-    private void changeParameter(AndroidFunctionParameter var) {
+    private void changeParameter(FunctionParameter var) {
         var.setDataType(dataTypeBuffer);
         var.setArray(isArrayBuffer);
         var.setName(nameBuffer);
@@ -175,12 +174,12 @@ public class FunctionParameterDetailsFragment extends DialogFragment {
         this.parameter = function.addParameter(connectionBuffer, nameBuffer, dataTypeBuffer, isArrayBuffer);
     }
 
-    public static void show(@NonNull AndroidFunction function,
+    public static void show(@NonNull Function function,
                             @NonNull FragmentManager fragmentManager,
-                            @Nullable AndroidFunctionParameter data) {
+                            @Nullable FunctionParameter data) {
         Bundle bundle = new Bundle();
-        bundle.putParcelable(AndroidFunction.TAG, function);
-        bundle.putParcelable(AndroidFunctionParameter.TAG, data);
+        bundle.putParcelable(Function.TAG, function);
+        bundle.putParcelable(FunctionParameter.TAG, data);
 
         FunctionParameterDetailsFragment parameterDetails = new FunctionParameterDetailsFragment();
         parameterDetails.setArguments(bundle);

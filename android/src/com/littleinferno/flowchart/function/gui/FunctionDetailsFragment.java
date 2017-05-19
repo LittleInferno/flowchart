@@ -15,9 +15,9 @@ import android.view.ViewGroup;
 
 import com.littleinferno.flowchart.R;
 import com.littleinferno.flowchart.databinding.LayoutFunctionDetailsBinding;
-import com.littleinferno.flowchart.function.AndroidFunction;
-import com.littleinferno.flowchart.function.AndroidFunctionManager;
-import com.littleinferno.flowchart.function.AndroidFunctionParameter;
+import com.littleinferno.flowchart.function.Function;
+import com.littleinferno.flowchart.function.FunctionManager;
+import com.littleinferno.flowchart.function.FunctionParameter;
 import com.littleinferno.flowchart.util.Link;
 import com.littleinferno.flowchart.util.ResUtil;
 import com.littleinferno.flowchart.util.Swiper;
@@ -27,8 +27,8 @@ import net.idik.lib.slimadapter.SlimAdapter;
 public class FunctionDetailsFragment extends Fragment {
 
     private LayoutFunctionDetailsBinding layout;
-    private AndroidFunctionManager functionManager;
-    private AndroidFunction function;
+    private FunctionManager functionManager;
+    private Function function;
     private Link remove;
     private Link add;
     private SlimAdapter adapter;
@@ -47,8 +47,8 @@ public class FunctionDetailsFragment extends Fragment {
         Bundle bundle = getArguments();
 
         if (bundle != null) {
-            functionManager = bundle.getParcelable(AndroidFunctionManager.TAG);
-            function = bundle.getParcelable(AndroidFunction.TAG);
+            functionManager = bundle.getParcelable(FunctionManager.TAG);
+            function = bundle.getParcelable(Function.TAG);
         }
 
         if (functionManager == null)
@@ -74,7 +74,7 @@ public class FunctionDetailsFragment extends Fragment {
         layout.parameters.items.setLayoutManager(new LinearLayoutManager(getContext()));
 
         adapter = SlimAdapter.create().registerDefault(R.layout.item_parameter, (o, injector) -> {
-            AndroidFunctionParameter data = (AndroidFunctionParameter) o;
+            FunctionParameter data = (FunctionParameter) o;
             injector.text(R.id.parameter_name, data.getName())
                     .text(R.id.parameter_type, data.getDataType().toString().toLowerCase())
                     .textColor(R.id.parameter_type, ResUtil.getDataTypeColor(getContext(), data.getDataType()))
@@ -122,13 +122,13 @@ public class FunctionDetailsFragment extends Fragment {
         remove.disconnect();
     }
 
-    public static void show(@NonNull AndroidFunctionManager functionManager,
+    public static void show(@NonNull FunctionManager functionManager,
                             @NonNull FragmentManager fragmentManager,
-                            @NonNull AndroidFunction data,
+                            @NonNull Function data,
                             @IdRes int layout) {
         Bundle bundle = new Bundle();
-        bundle.putParcelable(AndroidFunctionManager.TAG, functionManager);
-        bundle.putParcelable(AndroidFunction.TAG, data);
+        bundle.putParcelable(FunctionManager.TAG, functionManager);
+        bundle.putParcelable(Function.TAG, data);
 
         FunctionDetailsFragment functionDetails = new FunctionDetailsFragment();
         functionDetails.setArguments(bundle);

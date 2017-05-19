@@ -18,12 +18,11 @@ import com.jakewharton.rxbinding2.view.RxView;
 import com.jakewharton.rxbinding2.widget.RxAdapterView;
 import com.jakewharton.rxbinding2.widget.RxCompoundButton;
 import com.jakewharton.rxbinding2.widget.RxTextView;
-import com.littleinferno.flowchart.DataType;
 import com.littleinferno.flowchart.R;
 import com.littleinferno.flowchart.databinding.LayoutVariableDetailsBinding;
-import com.littleinferno.flowchart.util.Objects;
-import com.littleinferno.flowchart.variable.AndroidVariable;
-import com.littleinferno.flowchart.variable.AndroidVariableManager;
+import com.littleinferno.flowchart.util.DataType;
+import com.littleinferno.flowchart.variable.Variable;
+import com.littleinferno.flowchart.variable.VariableManager;
 
 import io.reactivex.disposables.Disposable;
 
@@ -35,9 +34,9 @@ public class VariableDetailsFragment extends DialogFragment {
     private DataType dataTypeBuffer;
     private String nameBuffer;
 
-    private AndroidVariable variable;
+    private Variable variable;
 
-    private AndroidVariableManager variableManager;
+    private VariableManager variableManager;
     private Disposable name;
     private Disposable type;
     private Disposable isArray;
@@ -73,8 +72,8 @@ public class VariableDetailsFragment extends DialogFragment {
         Bundle bundle = getArguments();
 
         if (bundle != null) {
-            variableManager = bundle.getParcelable(AndroidVariableManager.TAG);
-            variable = bundle.getParcelable(AndroidVariable.TAG);
+            variableManager = bundle.getParcelable(VariableManager.TAG);
+            variable = bundle.getParcelable(Variable.TAG);
         }
 
         if (variableManager == null)
@@ -122,7 +121,7 @@ public class VariableDetailsFragment extends DialogFragment {
         discard = RxView.clicks(layout.btDiscard).subscribe(v -> dismiss());
 
         ok = RxView.clicks(layout.btOk).subscribe(v -> {
-            if (Objects.nonNull(variable))
+            if (variable != null)
                 changeVariable(variable);
             else
                 addVariable();
@@ -154,7 +153,7 @@ public class VariableDetailsFragment extends DialogFragment {
         }
     }
 
-    private void changeVariable(AndroidVariable var) {
+    private void changeVariable(Variable var) {
         var.setDataType(dataTypeBuffer);
         var.setArray(isArrayBuffer);
         var.setName(nameBuffer);
@@ -165,13 +164,13 @@ public class VariableDetailsFragment extends DialogFragment {
         this.variable = variableManager.createVariable(nameBuffer, dataTypeBuffer, isArrayBuffer);
     }
 
-    public static void show(@NonNull final AndroidVariableManager variableManager,
+    public static void show(@NonNull final VariableManager variableManager,
                             @NonNull final FragmentManager fragmentManager,
-                            @Nullable final AndroidVariable variable) {
+                            @Nullable final Variable variable) {
 
         Bundle bundle = new Bundle();
-        bundle.putParcelable(AndroidVariableManager.TAG, variableManager);
-        bundle.putParcelable(AndroidVariable.TAG, variable);
+        bundle.putParcelable(VariableManager.TAG, variableManager);
+        bundle.putParcelable(Variable.TAG, variable);
 
         VariableDetailsFragment variableDetailsFragment = new VariableDetailsFragment();
         variableDetailsFragment.setArguments(bundle);

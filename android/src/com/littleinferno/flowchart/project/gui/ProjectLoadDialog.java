@@ -11,12 +11,12 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.google.gson.Gson;
-import com.littleinferno.flowchart.Files;
+import com.littleinferno.flowchart.util.Files;
 import com.littleinferno.flowchart.ProjectActivity;
 import com.littleinferno.flowchart.databinding.LayoutProjectLoadBinding;
-import com.littleinferno.flowchart.function.AndroidFunction;
+import com.littleinferno.flowchart.function.Function;
 import com.littleinferno.flowchart.plugin.AndroidPluginHandle;
-import com.littleinferno.flowchart.project.FlowchartProject;
+import com.littleinferno.flowchart.project.Project;
 
 import java.io.File;
 import java.util.List;
@@ -47,9 +47,9 @@ public class ProjectLoadDialog extends DialogFragment {
 
         layout.close.setOnClickListener(v -> dismiss());
 
-        FlowchartProject project = FlowchartProject.create(projectName);
+        Project project = Project.create(projectName);
 
-        Observable<FlowchartProject> projectObservable = Observable.just(pluginPath)
+        Observable<Project> projectObservable = Observable.just(pluginPath)
 //                .subscribeOn(Schedulers.io())
                 .map(File::new)
                 .map(Files::readToString)
@@ -74,7 +74,7 @@ public class ProjectLoadDialog extends DialogFragment {
                     return p;
                 });
 
-        Observable<List<AndroidFunction.SimpleObject>> nodesObservable = Observable.zip(
+        Observable<List<Function.SimpleObject>> nodesObservable = Observable.zip(
                 Observable.just(Files.getSavesLocation() + saveName)
                         .map(File::new)
                         .map(Files::readToString),
@@ -99,8 +99,8 @@ public class ProjectLoadDialog extends DialogFragment {
                 });
     }
 
-    List<AndroidFunction.SimpleObject> readSave(String save, Gson gson) {
-        return gson.fromJson(save, FlowchartProject.getSavingType());
+    List<Function.SimpleObject> readSave(String save, Gson gson) {
+        return gson.fromJson(save, Project.getSavingType());
     }
 
     @Override

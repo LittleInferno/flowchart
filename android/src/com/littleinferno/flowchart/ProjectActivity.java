@@ -13,15 +13,16 @@ import android.view.MenuItem;
 
 import com.annimon.stream.Stream;
 import com.littleinferno.flowchart.databinding.ActivityProjectBinding;
-import com.littleinferno.flowchart.function.AndroidFunction;
+import com.littleinferno.flowchart.function.Function;
 import com.littleinferno.flowchart.function.gui.FunctionListFragment;
 import com.littleinferno.flowchart.node.gui.Section;
 import com.littleinferno.flowchart.plugin.AndroidPluginHandle;
 import com.littleinferno.flowchart.plugin.PluginHelper;
-import com.littleinferno.flowchart.project.FlowchartProject;
+import com.littleinferno.flowchart.project.Project;
 import com.littleinferno.flowchart.project.gui.CreateNewProjectDialog;
 import com.littleinferno.flowchart.project.gui.ViewCodeFragment;
 import com.littleinferno.flowchart.scene.gui.SceneFragment;
+import com.littleinferno.flowchart.util.Files;
 import com.littleinferno.flowchart.variable.gui.VariableListFragment;
 
 import java.util.List;
@@ -29,13 +30,13 @@ import java.util.List;
 public class ProjectActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
 
     ActivityProjectBinding layout;
-    private FlowchartProject flowchartProject;
+    private Project project;
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        flowchartProject.unloadPlugin();
-        flowchartProject.clearContext();
+        project.unloadPlugin();
+        project.clearContext();
     }
 
     @Override
@@ -56,32 +57,32 @@ public class ProjectActivity extends AppCompatActivity implements NavigationView
 
         String name;
 
-        if (savedInstanceState != null && savedInstanceState.containsKey(FlowchartProject.TAG)) {
-            flowchartProject = savedInstanceState.getParcelable(FlowchartProject.TAG);
-            flowchartProject.setContext(this);
-        } else if ((name = getIntent().getStringExtra(FlowchartProject.TAG)) != null) {
-            flowchartProject = FlowchartProject.create(name);
-            flowchartProject.setContext(this);
-            Files.loadProject(flowchartProject);
+        if (savedInstanceState != null && savedInstanceState.containsKey(Project.TAG)) {
+            project = savedInstanceState.getParcelable(Project.TAG);
+            project.setContext(this);
+        } else if ((name = getIntent().getStringExtra(Project.TAG)) != null) {
+            project = Project.create(name);
+            project.setContext(this);
+            Files.loadProject(project);
         } else {
-            flowchartProject = FlowchartProject.create(getIntent().getStringExtra(FlowchartProject.PROJECT_NAME));
-            flowchartProject.setContext(this);
+            project = Project.create(getIntent().getStringExtra(Project.PROJECT_NAME));
+            project.setContext(this);
             try {
                 String plugin = getIntent().getStringExtra("PLUGIN");
                 if (plugin.equals("standart plugin")) {
-                    flowchartProject.setPlugin
+                    project.setPlugin
                             (new AndroidPluginHandle(PluginHelper.getStandartPluginParams(getAssets()),
                                     PluginHelper.getStandartPluginContent(getAssets())));
                 } else
-                    flowchartProject.setPlugin(Files.loadPlugin(plugin));
+                    project.setPlugin(Files.loadPlugin(plugin));
             } catch (Exception e) {
                 e.printStackTrace();
             }
         }
 
-        List<AndroidPluginHandle.NodeHandle> handles = flowchartProject.getNodeHandles();
+        List<AndroidPluginHandle.NodeHandle> handles = project.getNodeHandles();
 
-        layout.projectMain.projectLayout.nodes.init(flowchartProject, Stream.of(handles)
+        layout.projectMain.projectLayout.nodes.init(project, Stream.of(handles)
                 .map(AndroidPluginHandle.NodeHandle::getCategory)
                 .distinct()
                 .filter(v -> !v.equals("system"))
@@ -90,10 +91,10 @@ public class ProjectActivity extends AppCompatActivity implements NavigationView
                         .map(AndroidPluginHandle.NodeHandle::getName)
                         .toList())).toList());
 
-        flowchartProject.setFragmentManager(getFragmentManager());
-        AndroidFunction main = flowchartProject.getFunctionManager().getFunction(flowchartProject.getRules().getEntryPoint());
+        project.setFragmentManager(getFragmentManager());
+        Function main = project.getFunctionManager().getFunction(project.getRules().getEntryPoint());
         Bundle bundle = new Bundle();
-        bundle.putParcelable(AndroidFunction.TAG, main);
+        bundle.putParcelable(Function.TAG, main);
         SceneFragment scene = new SceneFragment();
         scene.setArguments(bundle);
         getFragmentManager().beginTransaction().replace(R.id.scene_frame, scene).commit();
@@ -114,36 +115,36 @@ public class ProjectActivity extends AppCompatActivity implements NavigationView
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        outState.putParcelable(FlowchartProject.TAG, flowchartProject);
+        outState.putParcelable(Project.TAG, project);
     }
 
     @Override
     protected void onRestoreInstanceState(Bundle savedInstanceState) {
         super.onRestoreInstanceState(savedInstanceState);
-        flowchartProject = savedInstanceState.getParcelable(FlowchartProject.TAG);
+        project = savedInstanceState.getParcelable(Project.TAG);
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.variable: {
-                VariableListFragment.show(flowchartProject.getVariableManager(), getFragmentManager());
+                VariableListFragment.show(project.getVariableManager(), getFragmentManager());
                 break;
             }
             case R.id.function: {
-                FunctionListFragment.show(flowchartProject.getFunctionManager(), getFragmentManager());
+                FunctionListFragment.show(project.getFunctionManager(), getFragmentManager());
                 break;
             }
             case R.id.start: {
-                String generate = flowchartProject.getFunctionManager().generate();
-                flowchartProject.setGen(generate);
-                Files.saveGen(flowchartProject, generate);
+                String generate = project.getFunctionManager().generate();
+                project.setGen(generate);
+                Files.saveGen(project, generate);
                 break;
             }
             case R.id.code: {
-                String generate = flowchartProject.getFunctionManager().generate();
-                flowchartProject.setGen(generate);
-                Files.saveGen(flowchartProject, generate);
+                String generate = project.getFunctionManager().generate();
+                project.setGen(generate);
+                Files.saveGen(project, generate);
                 ViewCodeFragment.show(generate, getFragmentManager());
                 break;
             }
@@ -158,7 +159,7 @@ public class ProjectActivity extends AppCompatActivity implements NavigationView
 
         switch (item.getItemId()) {
             case R.id.nav_save:
-                flowchartProject.save();
+                project.save();
                 break;
             case R.id.nav_close:
                 finish();
@@ -169,7 +170,7 @@ public class ProjectActivity extends AppCompatActivity implements NavigationView
                 startActivity(intent);
                 break;
         }
-        flowchartProject.save();
+        project.save();
         return false;
     }
 

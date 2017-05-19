@@ -3,7 +3,7 @@ package com.littleinferno.flowchart.plugin;
 import android.content.res.AssetManager;
 
 import com.google.gson.Gson;
-import com.littleinferno.flowchart.Files;
+import com.littleinferno.flowchart.util.Files;
 
 import java.io.IOException;
 

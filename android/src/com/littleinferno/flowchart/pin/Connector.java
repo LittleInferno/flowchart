@@ -9,8 +9,8 @@ import android.widget.LinearLayout;
 
 import com.annimon.stream.Optional;
 import com.annimon.stream.Stream;
-import com.littleinferno.flowchart.Connection;
-import com.littleinferno.flowchart.DataType;
+import com.littleinferno.flowchart.util.Connection;
+import com.littleinferno.flowchart.util.DataType;
 import com.littleinferno.flowchart.R;
 import com.littleinferno.flowchart.generator.Generator;
 import com.littleinferno.flowchart.node.AndroidNode;

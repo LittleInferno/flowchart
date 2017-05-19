@@ -17,16 +17,15 @@ import android.widget.RelativeLayout;
 
 import com.annimon.stream.Optional;
 import com.annimon.stream.Stream;
-import com.littleinferno.flowchart.Connection;
-import com.littleinferno.flowchart.DataType;
+import com.littleinferno.flowchart.util.Connection;
+import com.littleinferno.flowchart.util.DataType;
 import com.littleinferno.flowchart.databinding.NodeLayoutBinding;
-import com.littleinferno.flowchart.function.AndroidFunction;
+import com.littleinferno.flowchart.function.Function;
 import com.littleinferno.flowchart.pin.Connector;
 import com.littleinferno.flowchart.plugin.AndroidPluginHandle;
 import com.littleinferno.flowchart.plugin.bridge.ViewName;
 import com.littleinferno.flowchart.scene.AndroidSceneLayout;
 
-import org.mozilla.javascript.Function;
 import org.mozilla.javascript.NativeArray;
 
 import java.util.Arrays;
@@ -52,11 +51,11 @@ public class AndroidNode extends CardView {
     }
 
     NodeLayoutBinding layout;
-    private AndroidFunction function;
+    private Function function;
     private PointF point;
     private final AndroidPluginHandle.NodeHandle nodeHandle;
 
-    public AndroidNode(final AndroidFunction function, final AndroidPluginHandle.NodeHandle nodeHandle) {
+    public AndroidNode(final Function function, final AndroidPluginHandle.NodeHandle nodeHandle) {
         super(function.getProject().getContext());
         layout = NodeLayoutBinding.inflate((LayoutInflater) function.getProject().getContext()
                 .getSystemService(Context.LAYOUT_INFLATER_SERVICE), this, true);
@@ -267,7 +266,7 @@ public class AndroidNode extends CardView {
         return layout.nodeTitle.getText().toString();
     }
 
-    public AndroidFunction getFunction() {
+    public Function getFunction() {
         return function;
     }
 
@@ -284,7 +283,7 @@ public class AndroidNode extends CardView {
         if (nodeHandle.containsAttribute("save")) {
             Object save = nodeHandle.getAttribute("save").get();
             NativeArray call = (NativeArray) nodeHandle.getPluginHandle()
-                    .createScriptFun((Function) save)
+                    .createScriptFun((org.mozilla.javascript.Function) save)
                     .call(this);
 
             String[] attributes = new String[call.size()];

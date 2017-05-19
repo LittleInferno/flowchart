@@ -6,11 +6,9 @@ import android.support.annotation.NonNull;
 import android.view.View;
 
 import com.annimon.stream.Stream;
-import com.littleinferno.flowchart.function.AndroidFunction;
+import com.littleinferno.flowchart.function.Function;
 import com.littleinferno.flowchart.plugin.AndroidPluginHandle;
 import com.littleinferno.flowchart.scene.AndroidSceneLayout;
-
-import org.mozilla.javascript.Function;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -18,15 +16,15 @@ import java.util.List;
 import java.util.UUID;
 
 public class AndroidNodeManager implements Parcelable {
-    private final HashMap<UUID, AndroidFunction> parent = new HashMap<>();
+    private final HashMap<UUID, Function> parent = new HashMap<>();
 
     public static final String TAG = "NODE_MANAGER";
 
     private final List<AndroidNode> nodes = new ArrayList<>();
-    private final AndroidFunction function;
+    private final Function function;
     private final UUID id;
 
-    public AndroidNodeManager(AndroidFunction function) {
+    public AndroidNodeManager(Function function) {
         id = UUID.randomUUID();
         this.function = function;
     }
@@ -60,7 +58,7 @@ public class AndroidNodeManager implements Parcelable {
         node.getNodeHandle().getAttribute("functionInit")
                 .ifPresent(o -> node.getNodeHandle()
                         .getPluginHandle()
-                        .createScriptFun((Function) o)
+                        .createScriptFun((org.mozilla.javascript.Function) o)
                         .call(node, function));
 
         node.setX(x);
@@ -87,7 +85,7 @@ public class AndroidNodeManager implements Parcelable {
         node.getNodeHandle().getAttribute("load")
                 .ifPresent(o -> node.getNodeHandle()
                         .getPluginHandle()
-                        .createScriptFun((Function) o)
+                        .createScriptFun((org.mozilla.javascript.Function) o)
                         .call(node, savedInfo.attributes));
 
         return node;

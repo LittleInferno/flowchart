@@ -11,7 +11,7 @@ import android.view.ViewGroup;
 import com.github.angads25.filepicker.model.DialogConfigs;
 import com.github.angads25.filepicker.model.DialogProperties;
 import com.github.angads25.filepicker.view.FilePickerDialog;
-import com.littleinferno.flowchart.Files;
+import com.littleinferno.flowchart.util.Files;
 import com.littleinferno.flowchart.databinding.LayoutCodeViewBinding;
 
 import java.io.File;
