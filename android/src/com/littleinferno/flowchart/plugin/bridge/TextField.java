@@ -1,9 +1,9 @@
 package com.littleinferno.flowchart.plugin.bridge;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.support.design.widget.TextInputLayout;
 import android.text.InputType;
-import android.util.Log;
 import android.widget.EditText;
 
 import com.littleinferno.flowchart.DataType;
@@ -11,21 +11,35 @@ import com.littleinferno.flowchart.R;
 import com.littleinferno.flowchart.node.AndroidNode;
 
 
-public class TextField extends TextInputLayout {
+@SuppressWarnings("unused")
+@SuppressLint("ViewConstructor")
+public class TextField extends TextInputLayout implements ViewName {
 
     private EditText editText;
+    private String name;
 
-    public static TextField make(AndroidNode node, DataType dataType) {
-        TextField textField = new TextField(node.getContext(), dataType);
-
-
-        return textField;
+    public static TextField make(String name, AndroidNode node, DataType dataType) {
+        return new TextField(name, node.getContext(), dataType);
     }
 
+    public static String getText(AndroidNode node, String name) {
+        TextField view = (TextField) node.getView(name);
+        return view != null ? view.getText() : "";
+    }
 
-    private TextField(Context context, DataType dataType) {
+    public static void setText(AndroidNode node, String name, String text) {
+        TextField view = (TextField) node.getView(name);
+        if (view != null)
+            view.setText(text);
+    }
+
+    private void setText(String text) {
+        editText.setText(text);
+    }
+
+    private TextField(String name, Context context, DataType dataType) {
         super(context);
-        Log.e("EROR", "T");
+        this.name = name;
 
         inflate(context, R.layout.text_field, this);
         editText = (EditText) findViewById(R.id.edit_text);
@@ -47,5 +61,10 @@ public class TextField extends TextInputLayout {
 
     String getText() {
         return editText.getText().toString();
+    }
+
+    @Override
+    public String getName() {
+        return name;
     }
 }

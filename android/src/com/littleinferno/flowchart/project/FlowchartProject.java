@@ -2,30 +2,26 @@ package com.littleinferno.flowchart.project;
 
 import android.app.FragmentManager;
 import android.content.Context;
-import android.os.Environment;
 import android.os.Parcel;
 import android.os.Parcelable;
 
 import com.annimon.stream.Stream;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
 import com.littleinferno.flowchart.Files;
 import com.littleinferno.flowchart.function.AndroidFunction;
 import com.littleinferno.flowchart.function.AndroidFunctionManager;
 import com.littleinferno.flowchart.plugin.AndroidPluginHandle;
+import com.littleinferno.flowchart.plugin.PluginHelper;
+import com.littleinferno.flowchart.variable.AndroidVariable;
 import com.littleinferno.flowchart.variable.AndroidVariableManager;
 
-import java.io.File;
 import java.lang.reflect.Type;
 import java.util.List;
-
-import io.reactivex.Observable;
-import io.reactivex.schedulers.Schedulers;
 
 public class FlowchartProject implements Parcelable {
 
     public static final String TAG = "FLOWCHART_PROJECT";
+    public static final String PROJECT_NAME = "NAME";
     private AndroidFunction currentScene;
     private Context context;
     private String name;
@@ -34,6 +30,7 @@ public class FlowchartProject implements Parcelable {
     private FragmentManager fragmentManager;
     private AndroidVariableManager variableManager;
     private AndroidFunctionManager functionManager;
+    private String gen;
 
     public FlowchartProject(String name) {
         this.name = name;
@@ -47,6 +44,7 @@ public class FlowchartProject implements Parcelable {
         name = in.readString();
         variableManager = in.readParcelable(AndroidVariableManager.class.getClassLoader());
         functionManager = in.readParcelable(AndroidFunctionManager.class.getClassLoader());
+        gen = in.readString();
     }
 
     public static final Creator<FlowchartProject> CREATOR = new Creator<FlowchartProject>() {
@@ -61,7 +59,7 @@ public class FlowchartProject implements Parcelable {
         }
     };
 
-    public static FlowchartProject create(Context context, String name) {
+    public static FlowchartProject create(String name) {
         return new FlowchartProject(name);
     }
 
@@ -122,47 +120,7 @@ public class FlowchartProject implements Parcelable {
     }
 
     public void save() {
-        Gson gson = new GsonBuilder()
-                .setPrettyPrinting()
-                .create();
-
-        String string = Environment.getExternalStorageDirectory().toString();
-        String fn = string + "/flowchart_projects/saves/" + name + ".json";
-
-        Observable.just(this)
-                .observeOn(Schedulers.io())
-                .map(flowchartProject -> getFunctionManager())
-                .map(afm -> Stream.of(afm.getFunctions()).map(AndroidFunction::getSaveInfo).toArray(AndroidFunction.SimpleObject[]::new))
-                .map(gson::toJson)
-                .subscribe(s -> Files.writeToFile(fn, s));
-
-    }
-
-    public static FlowchartProject load(final Context context, String name) {
-        FlowchartProject project = new FlowchartProject(name);
-
-        String string = Environment.getExternalStorageDirectory().toString();
-
-        try {
-            project.setPlugin(new AndroidPluginHandle(Files.readToString(new File(string + "/flowchart_projects/plugins/new.js"))));
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        File file = new File(string + "/flowchart_projects/saves/" + name + ".json");
-
-        String save = Files.readToString(file);
-
-        Gson gson = new GsonBuilder()
-                .setPrettyPrinting()
-                .create();
-
-
-        List<AndroidFunction.SimpleObject> list = gson.fromJson(save, getSavingType());
-
-        Stream.of(list).forEach(project.functionManager::createFunction);
-
-        return project;
+        Files.saveProject(this);
     }
 
     public static Type getSavingType() {
@@ -186,5 +144,50 @@ public class FlowchartProject implements Parcelable {
         dest.writeString(name);
         dest.writeParcelable(variableManager, flags);
         dest.writeParcelable(functionManager, flags);
+        dest.writeString(gen);
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setGen(String gen) {
+        this.gen = gen;
+    }
+
+    public SimpleObject getSaveInfo() {
+
+        List<AndroidFunction.SimpleObject> functions = Stream.of(functionManager.getFunctions())
+                .map(AndroidFunction::getSaveInfo).toList();
+
+        List<AndroidVariable.SimpleObject> variables = Stream.of(variableManager.getVariables())
+                .map(AndroidVariable::getSaveInfo).toList();
+
+        return new SimpleObject(pluginHandle.getPluginParams().getPluginName(), functions, variables);
+    }
+
+    public void init(SimpleObject s) throws Exception {
+
+        if (s.plugin.equals("standart plugin")) {
+            setPlugin(new AndroidPluginHandle(PluginHelper.getStandartPluginParams(context.getAssets()),
+                    PluginHelper.getStandartPluginContent(context.getAssets())));
+        } else {
+            setPlugin(Files.loadPlugin(s.plugin));
+        }
+        Stream.of(s.functions).forEach(functionManager::createFunction);
+        Stream.of(s.variables).forEach(variableManager::createVariable);
+    }
+
+    public static class SimpleObject {
+        final String plugin;
+        final List<AndroidFunction.SimpleObject> functions;
+        final List<AndroidVariable.SimpleObject> variables;
+
+        public SimpleObject(String plugin, List<AndroidFunction.SimpleObject> functions,
+                            List<AndroidVariable.SimpleObject> variables) {
+            this.plugin = plugin;
+            this.functions = functions;
+            this.variables = variables;
+        }
     }
 }

@@ -1,9 +1,17 @@
 package com.littleinferno.flowchart;
 
+import android.content.Context;
+import android.media.MediaScannerConnection;
 import android.os.Environment;
 import android.support.annotation.NonNull;
 
 import com.annimon.stream.Stream;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.littleinferno.flowchart.plugin.AndroidBasePluginHandle;
+import com.littleinferno.flowchart.plugin.AndroidPluginHandle;
+import com.littleinferno.flowchart.plugin.PluginHelper;
+import com.littleinferno.flowchart.project.FlowchartProject;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -15,12 +23,18 @@ import java.io.PrintWriter;
 import java.nio.channels.FileChannel;
 import java.util.List;
 import java.util.Scanner;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipInputStream;
+import java.util.zip.ZipFile;
+
+import io.reactivex.Observable;
+import io.reactivex.schedulers.Schedulers;
 
 public class Files {
 
     public static String projectLocation = "/flowchart_projects/projects";
+
+    private static Gson gson = new GsonBuilder()
+            .setPrettyPrinting()
+            .create();
 
     static List<String> getProjects() {
         File file = new File(Environment.getExternalStorageDirectory().toString() + projectLocation);
@@ -50,12 +64,14 @@ public class Files {
         return "";
     }
 
-    public static void writeToFile(@NonNull final String fileName, @NonNull final String content) {
+    public static void writeToFile(Context context, @NonNull final String fileName, @NonNull final String content) {
         try (PrintWriter out = new PrintWriter(fileName)) {
             out.print(content);
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         }
+
+        updateAndroidFS(context, fileName);
     }
 
 
@@ -63,45 +79,90 @@ public class Files {
         return name + ".json";
     }
 
+    public static String saveNameToProjectName(String name) {
+        return name.substring(0, name.lastIndexOf('.'));
+    }
+
 
     public static String getSavesLocation() {
         return Environment.getExternalStorageDirectory().toString() + "/flowchart_projects/saves/";
+    }
+
+    public static String getSaveLocation(String projectName) {
+        return getSavesLocation() + "/" + projectNameToSaveName(projectName);
     }
 
     public static String getPLuginsLocation() {
         return Environment.getExternalStorageDirectory().toString() + "/flowchart_projects/plugins/";
     }
 
-    public static void copyFile(File source, File dest) {
+    public static String getGenerateLocation() {
+        return Environment.getExternalStorageDirectory().toString() + "/flowchart_projects/plugins/";
+    }
+
+    public static void copyFile(Context context, File source, File dest) {
         try (FileChannel inputChannel = new FileInputStream(source).getChannel();
              FileChannel outputChannel = new FileOutputStream(dest).getChannel()) {
             outputChannel.transferFrom(inputChannel, 0, inputChannel.size());
         } catch (IOException e) {
             e.printStackTrace();
         }
+
+        updateAndroidFS(context, dest.getName());
     }
 
-    public static String readZipFromInputStream(InputStream inputStream, String filename) throws IOException {
+    private static void updateAndroidFS(Context context, String... paths) {
+        MediaScannerConnection.scanFile(context, paths, null, null);
+    }
 
-        ZipInputStream zip = new ZipInputStream(inputStream);
-        ZipEntry ze;
+    public static void saveProject(FlowchartProject project) {
+        Observable.just(project)
+                .map(FlowchartProject::getSaveInfo)
+                .map(gson::toJson)
+                .map(s -> {
+                    Files.writeToFile(project.getContext(),
+                            getSaveLocation(project.getName()), s);
+                    return 1;
+                })
+                .subscribeOn(Schedulers.io())
+                .subscribe(s -> {
+                });
+    }
 
-        String content = null;
+    public static void loadProject(FlowchartProject project) {
+        String string = readToString(new File(getSaveLocation(project.getName())));
 
-        while ((ze = zip.getNextEntry()) != null) {
-
-            if (ze.getName().equals(filename)) {
-                StringBuilder s = new StringBuilder();
-                byte[] buffer = new byte[1024];
-                int read = 0;
-
-                while ((read = zip.read(buffer, 0, 1024)) >= 0) {
-                    s.append(new String(buffer, 0, read));
-                }
-                content = s.toString();
-            }
+        FlowchartProject.SimpleObject s = gson.fromJson(string, FlowchartProject.SimpleObject.class);
+        try {
+            project.init(s);
+        } catch (Exception e) {
+            e.printStackTrace();
         }
-        return content;
+    }
+
+    public static void delete(Context context, String pluginName) {
+        new File(pluginName).delete();
+        updateAndroidFS(context, pluginName);
+    }
+
+    public static void saveGen(FlowchartProject flowchartProject, String generate) {
+        Observable.just(generate)
+                .map(s -> {
+                    Files.writeToFile(flowchartProject.getContext(),
+                            getGenerateLocation() + flowchartProject.getName(), generate);
+                    return 1;
+                })
+                .subscribeOn(Schedulers.io())
+                .subscribe(s -> {
+                });
+    }
+
+    public static AndroidPluginHandle loadPlugin(String plugin) throws Exception {
+        ZipFile zip = new ZipFile(Files.getPLuginsLocation() + "/" + plugin);
+        String index = Files.inputStreamToString(zip.getInputStream(zip.getEntry(PluginHelper.indexFile)));
+        String pl = Files.inputStreamToString(zip.getInputStream(zip.getEntry(PluginHelper.pluginFile)));
+
+        return new AndroidPluginHandle(new Gson().fromJson(index, AndroidBasePluginHandle.PluginParams.class), pl);
     }
 
 }

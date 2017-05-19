@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.support.annotation.IdRes;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v7.app.AppCompatActivity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -36,12 +37,14 @@ public class SceneFragment extends Fragment {
         if (bundle != null)
             function = bundle.getParcelable(AndroidFunction.TAG);
 
-
         if (function == null)
             throw new RuntimeException("function cannot be null");
 
         function.getProject().setCurrentScene(function);
         function.bindScene(layout.scene);
+
+        ((AppCompatActivity) getActivity()).getSupportActionBar()
+                .setTitle(function.getProject().getName() + " - " + function.getName());
     }
 
 

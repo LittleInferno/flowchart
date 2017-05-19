@@ -20,8 +20,8 @@ public class AndroidPluginHandle extends AndroidBasePluginHandle {
     private List<NodeHandle> handles;
     private RuleHandle ruleHandle;
 
-    public AndroidPluginHandle(String plugin) throws Exception {
-        super(null, plugin);
+    public AndroidPluginHandle(PluginParams pluginParams, String plugin) throws Exception {
+        super(pluginParams, plugin);
 
         handles = new ArrayList<>();
 

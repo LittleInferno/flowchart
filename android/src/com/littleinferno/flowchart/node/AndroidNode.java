@@ -23,13 +23,21 @@ import com.littleinferno.flowchart.databinding.NodeLayoutBinding;
 import com.littleinferno.flowchart.function.AndroidFunction;
 import com.littleinferno.flowchart.pin.Connector;
 import com.littleinferno.flowchart.plugin.AndroidPluginHandle;
+import com.littleinferno.flowchart.plugin.bridge.ViewName;
 import com.littleinferno.flowchart.scene.AndroidSceneLayout;
+
+import org.mozilla.javascript.Function;
+import org.mozilla.javascript.NativeArray;
 
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.UUID;
 
 @SuppressLint("ViewConstructor")
 public class AndroidNode extends CardView {
+
+
+    private final UUID id;
 
     public float getHeaderHeight() {
         return layout.header.getBottom();
@@ -62,13 +70,15 @@ public class AndroidNode extends CardView {
 
         setTitle(nodeHandle.getTitle());
 
-        this.nodeHandle.getInit().call(this);
+        this.nodeHandle.getInit().call((AndroidNode) this);
         this.nodeHandle.getAttribute("closable")
                 .map(Boolean.class::cast)
                 .map(o -> o ? VISIBLE : INVISIBLE)
                 .ifPresent(this::setClosable);
 
         layout.close.setOnClickListener(v -> function.getNodeManager().removeNode(this));
+
+        id = UUID.randomUUID();
     }
 
     @Override
@@ -190,6 +200,36 @@ public class AndroidNode extends CardView {
         invalidate();
     }
 
+    public View getView(String name) {
+
+        View viewName = null;
+
+        for (int i = 0; i < layout.nodeLeft.getChildCount(); i++) {
+            View view = layout.nodeLeft.getChildAt(i);
+            if (view instanceof ViewName)
+                if (((ViewName) view).getName().equals(name)) {
+                    viewName = view;
+                }
+        }
+
+        for (int i = 0; i < layout.nodeRight.getChildCount(); i++) {
+            View view = layout.nodeRight.getChildAt(i);
+            if (view instanceof ViewName)
+                if (((ViewName) view).getName().equals(name)) {
+                    viewName = view;
+                }
+        }
+
+        for (int i = 0; i < layout.container.getChildCount(); i++) {
+            View view = layout.container.getChildAt(i);
+            if (view instanceof ViewName)
+                if (((ViewName) view).getName().equals(name)) {
+                    viewName = view;
+                }
+        }
+        return viewName;
+    }
+
     public void drag() {
         ClipData data = ClipData.newPlainText("", "");
         ShadowBuilder shadowBuilder = new ShadowBuilder(this);
@@ -240,7 +280,25 @@ public class AndroidNode extends CardView {
     }
 
     public SimpleObject getSaveInfo() {
+
+        if (nodeHandle.containsAttribute("save")) {
+            Object save = nodeHandle.getAttribute("save").get();
+            NativeArray call = (NativeArray) nodeHandle.getPluginHandle()
+                    .createScriptFun((Function) save)
+                    .call(this);
+
+            String[] attributes = new String[call.size()];
+
+            for (int i = 0; i < call.size(); i++) attributes[i] = (String) call.get(i);
+
+            return new SimpleObject(getNodeHandle().getName(), getX(), getY(), attributes);
+        }
+
         return new SimpleObject(getNodeHandle().getName(), getX(), getY());
+    }
+
+    public UUID getNodeId() {
+        return id;
     }
 
     private static class ShadowBuilder extends View.DragShadowBuilder {
@@ -279,11 +337,13 @@ public class AndroidNode extends CardView {
         final String name;
         final float x;
         final float y;
+        final String[] attributes;
 
-        public SimpleObject(String name, float x, float y) {
+        public SimpleObject(String name, float x, float y, String... attributes) {
             this.name = name;
             this.x = x;
             this.y = y;
+            this.attributes = attributes;
         }
     }
 }

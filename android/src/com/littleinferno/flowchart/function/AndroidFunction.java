@@ -67,8 +67,7 @@ public class AndroidFunction extends ProjectModule implements Generator, Parcela
         nodeManager = new AndroidNodeManager(this);
         parameters = new ArrayList<>();
 
-        Stream.of(saveInfo.nodes).forEach((savedInfo) ->
-                nodeManager.createNode(savedInfo));
+        Stream.of(saveInfo.nodes).forEach(nodeManager::createNode);
         Stream.of(saveInfo.parameters).forEach(this::addParameter);
     }
 

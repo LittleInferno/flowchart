@@ -139,4 +139,8 @@ public class AndroidVariableManager extends ProjectModule implements Parcelable 
     public void updateData() {
         notifyVariableAdd();
     }
+
+    public AndroidVariable createVariable(AndroidVariable.SimpleObject s) {
+        return createVariable(s.name, s.dataType, s.isArray);
+    }
 }

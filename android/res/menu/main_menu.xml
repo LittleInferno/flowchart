@@ -4,5 +4,7 @@
 
     <item
         android:id="@+id/mi_plugins"
-        android:title="plugins" />
+        android:icon="@drawable/ic_plugins"
+        android:title="plugins"
+        app:showAsAction="always" />
 </menu>

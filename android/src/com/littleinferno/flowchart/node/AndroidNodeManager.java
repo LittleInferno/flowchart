@@ -82,7 +82,15 @@ public class AndroidNodeManager implements Parcelable {
     }
 
     public AndroidNode createNode(AndroidNode.SimpleObject savedInfo) {
-        return createNode(savedInfo.name, savedInfo.x, savedInfo.y);
+        AndroidNode node = createNode(savedInfo.name, savedInfo.x, savedInfo.y);
+
+        node.getNodeHandle().getAttribute("load")
+                .ifPresent(o -> node.getNodeHandle()
+                        .getPluginHandle()
+                        .createScriptFun((Function) o)
+                        .call(node, savedInfo.attributes));
+
+        return node;
     }
 
     public List<AndroidNode> getNodes() {

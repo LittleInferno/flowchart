@@ -5,20 +5,22 @@
     <item
         android:id="@+id/code"
         android:icon="@drawable/ic_code"
+        android:title="code"
         app:showAsAction="always" />
     <item
         android:id="@+id/start"
         android:icon="@drawable/ic_run_program"
+        android:title="start"
         app:showAsAction="always" />
     <item
         android:id="@+id/function"
         android:icon="@drawable/ic_function_action"
-        app:showAsAction="always"
-        android:title="" />
+        android:title="functions"
+        app:showAsAction="always" />
 
     <item
         android:id="@+id/variable"
         android:icon="@drawable/ic_variable_action"
-        app:showAsAction="always"
-        android:title="" />
+        android:title="variables"
+        app:showAsAction="always" />
 </menu>

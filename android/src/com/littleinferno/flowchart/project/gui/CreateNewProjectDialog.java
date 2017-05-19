@@ -1,5 +1,6 @@
 package com.littleinferno.flowchart.project.gui;
 
+import android.content.Intent;
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -9,6 +10,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.ArrayAdapter;
 
+import com.annimon.stream.Collectors;
 import com.annimon.stream.Stream;
 import com.github.angads25.filepicker.model.DialogConfigs;
 import com.github.angads25.filepicker.model.DialogProperties;
@@ -17,15 +19,17 @@ import com.google.gson.Gson;
 import com.jakewharton.rxbinding2.widget.RxAdapterView;
 import com.jakewharton.rxbinding2.widget.RxTextView;
 import com.littleinferno.flowchart.Files;
+import com.littleinferno.flowchart.ProjectActivity;
 import com.littleinferno.flowchart.R;
-import com.littleinferno.flowchart.databinding.NewProjectLayoutBinding;
+import com.littleinferno.flowchart.databinding.LayoutNewProjectBinding;
 import com.littleinferno.flowchart.plugin.AndroidBasePluginHandle;
 import com.littleinferno.flowchart.plugin.PluginHelper;
+import com.littleinferno.flowchart.project.FlowchartProject;
 
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
+import java.util.Set;
 import java.util.zip.ZipFile;
 
 import io.reactivex.Observable;
@@ -36,30 +40,27 @@ import io.reactivex.schedulers.Schedulers;
 
 public class CreateNewProjectDialog extends AppCompatActivity {
 
-    private static final int PICK_FILE_REQUEST = 1;
-    NewProjectLayoutBinding layout;
+    LayoutNewProjectBinding layout;
     String projectName;
     private List<AndroidBasePluginHandle.PluginParams> pluginParams;
     private Disposable name;
     private Disposable items;
     private Disposable plugins;
 
+    private Set<String> projectNames;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        layout = DataBindingUtil.setContentView(this, R.layout.new_project_layout);
+        layout = DataBindingUtil.setContentView(this, R.layout.layout_new_project);
 
         setSupportActionBar(layout.toolbar);
         getSupportActionBar().setTitle("create new project");
         layout.toolbar.setNavigationIcon(R.drawable.ic_close_black_24dp);
         layout.toolbar.setNavigationOnClickListener(v -> this.finish());
 
-
-        layout.addPlugin.setOnClickListener(v -> {
-            showFilePicker();
-        });
+        layout.addPlugin.setOnClickListener(v -> showFilePicker());
 
         initPlugins();
         pluginParams = new ArrayList<>();
@@ -76,12 +77,23 @@ public class CreateNewProjectDialog extends AppCompatActivity {
         name = RxTextView.textChanges(layout.projectName)
                 .skipInitialValue()
                 .map(String::valueOf)
-                .map(n -> projectName = n)
-                .map(s -> !s.isEmpty())
+                .map(this::checkName)
                 .subscribe(b ->
                         layout.toolbar.findViewById(R.id.bt_create_project).setEnabled(b));
 
         layout.toolbar.post(() -> layout.toolbar.findViewById(R.id.bt_create_project).setEnabled(false));
+
+        projectNames = Stream.of(new File(Files.getSavesLocation()).list())
+                .map(Files::saveNameToProjectName).collect(Collectors.toSet());
+    }
+
+    private boolean checkName(String s) {
+        boolean b;
+        b = (!projectNames.contains(s) && !s.isEmpty() && !s.matches("^\\s*$"));
+
+        if (b)
+            projectName = s;
+        return b;
     }
 
     private void showFilePicker() {
@@ -101,7 +113,7 @@ public class CreateNewProjectDialog extends AppCompatActivity {
 
             String destinationPath = Files.getPLuginsLocation() + source.getName();
             File destination = new File(destinationPath);
-            Files.copyFile(source, destination);
+            Files.copyFile(this, source, destination);
             initPlugins();
         });
 
@@ -160,7 +172,11 @@ public class CreateNewProjectDialog extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.bt_create_project:
-//                FlowchartProject.createNew(layout.projectName.toString());
+                Intent intent = new Intent(this, ProjectActivity.class);
+                intent.putExtra(FlowchartProject.PROJECT_NAME, projectName);
+                intent.putExtra("PLUGIN", pluginParams.get(layout.plugins.getSelectedItemPosition()).getPluginName());
+
+                startActivity(intent);
                 return true;
             default:
                 // If we got here, the user's action was not recognized.

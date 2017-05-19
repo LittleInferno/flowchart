@@ -1,11 +1,9 @@
-// var NativeNode = com.littleinferno.flowchart.node.AndroidNode;
-var NativeNode = com.littleinferno.flowchart.node.BaseNode;
+var NativeNode = com.littleinferno.flowchart.node.AndroidNode;
 
 var NativeType = com.littleinferno.flowchart.DataType;
 var Connection = com.littleinferno.flowchart.Connection;
 
 var NativeConnection = com.littleinferno.flowchart.Connection;
-// var NativeGenerator = com.littleinferno.flowchart.codegen.JSCodeGenerator;
 var PluginParams = com.littleinferno.flowchart.plugin.AndroidBasePluginHandle.PluginParams;
 
 var EditText = com.littleinferno.flowchart.plugin.bridge.TextField;
@@ -13,8 +11,6 @@ var FunctionDropDown = com.littleinferno.flowchart.plugin.bridge.FunctionSpinner
 var VariableSpinner = com.littleinferno.flowchart.plugin.bridge.VariableSpinner;
 
 var LOG = android.util.Log;
-
-// var codegen = new NativeGenerator();
 
 var Project = com.littleinferno.flowchart.project.FlowchartProject;
 
@@ -249,17 +245,22 @@ function greatNode() {
 
 function integerNode() {
 
-    var editText;
-
     var init = function (node) {
         node.addDataOutputPin("data", false, NativeType.INT);
-        editText = EditText.make(node, NativeType.INT);
-     ///   node.addView(NativeNode.Align.CENTER, editText);
+        var editText = EditText.make("data", node, NativeType.INT);
+        node.addView(NativeNode.Align.CENTER, editText);
     }
 
     var gen = function (node) {
-        // return codegen.makeExpr(editText.getText());
-        return "";  
+        return EditText.getText(node, "data");
+    }
+
+    var load = function (node, attributes) {
+        EditText.setText(node, "data", attributes[0])
+    }
+
+    var save = function (node) {
+        return [EditText.getText(node, "data")];
     }
 
     return {
@@ -268,6 +269,7 @@ function integerNode() {
         category: "basic java script",
         gen: gen,
         init: init,
+        attributes: [{ "save": save }]
     }
 }
 
@@ -278,12 +280,19 @@ function floatNode() {
     var init = function (node) {
         node.addDataOutputPin("data", false, NativeType.FLOAT);
         editText = EditText.make(node, NativeType.FLOAT);
-        //      node.addView(NativeNode.Align.CENTER,editText);
+        node.addView(NativeNode.Align.CENTER, editText);
     }
 
     var gen = function (node) {
-        // return codegen.makeExpr(editText.getText());
-        return ""
+        return EditText.getText(node, "data");
+    }
+
+    var load = function (node, attributes) {
+        EditText.setText(node, "data", attributes[0])
+    }
+
+    var save = function (node) {
+        return [EditText.getText(node, "data")];
     }
 
     return {
@@ -292,6 +301,7 @@ function floatNode() {
         category: "basic java script",
         gen: gen,
         init: init,
+        attributes: [{ "save": save }]
     }
 }
 
@@ -302,12 +312,19 @@ function stringNode() {
     var init = function (node) {
         node.addDataOutputPin("result", false, NativeType.STRING);
         editText = EditText.make(node, NativeType.STRING);
-      //  node.addView(NativeNode.Align.CENTER, editText);
+        node.addView(NativeNode.Align.CENTER, editText);
     }
 
     var gen = function (node) {
-        // return codegen.makeExpr(codegen.makeString(editText.getText()));
-        return "";
+        return EditText.getText(node, "data");
+    }
+
+    var load = function (node, attributes) {
+        EditText.setText(node, "data", attributes[0])
+    }
+
+    var save = function (node) {
+        return [EditText.getText(node, "data")];
     }
 
     return {
@@ -316,6 +333,7 @@ function stringNode() {
         category: "basic java script",
         gen: gen,
         init: init,
+        attributes: [{ "save": save }]
     }
 }
 
@@ -459,7 +477,7 @@ function functionCallNode() {
             );
             fun.applyParameters();
         });
-       // node.addView(NativeNode.Align.CENTER, drop);
+        // node.addView(NativeNode.Align.CENTER, drop);
     }
 
     var gen = function (node) {
@@ -528,7 +546,7 @@ function variableSetNode() {
                 pin.setType(m_var.getDataType())
             }
         });
-     //   node.addView(NativeNode.Align.CENTER, drop);
+        //   node.addView(NativeNode.Align.CENTER, drop);
     }
 
     var gen = function (node) {

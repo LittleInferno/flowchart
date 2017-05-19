@@ -47,7 +47,7 @@ public class ProjectLoadDialog extends DialogFragment {
 
         layout.close.setOnClickListener(v -> dismiss());
 
-        FlowchartProject project = FlowchartProject.create(getContext(), projectName);
+        FlowchartProject project = FlowchartProject.create(projectName);
 
         Observable<FlowchartProject> projectObservable = Observable.just(pluginPath)
 //                .subscribeOn(Schedulers.io())
@@ -55,7 +55,7 @@ public class ProjectLoadDialog extends DialogFragment {
                 .map(Files::readToString)
 //                .observeOn(Schedulers.computation())
 //                .observeOn(AndroidSchedulers.mainThread())
-                .map(AndroidPluginHandle::new)
+                .map(s -> new AndroidPluginHandle(null, s))
                 .map(AndroidPluginHandle.class::cast)
                 .map(ph -> {
                     project.setPlugin(ph);

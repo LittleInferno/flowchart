@@ -5,7 +5,6 @@ import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.CardView;
-import android.support.v7.widget.PopupMenu;
 import android.util.AttributeSet;
 import android.view.DragEvent;
 import android.view.GestureDetector;
@@ -14,7 +13,6 @@ import android.view.View;
 import android.widget.RelativeLayout;
 
 import com.annimon.stream.Stream;
-import com.littleinferno.flowchart.R;
 import com.littleinferno.flowchart.node.AndroidNode;
 import com.littleinferno.flowchart.pin.Connector;
 
@@ -80,14 +78,6 @@ public class AndroidSceneLayout extends RelativeLayout {
 //        scaleDetector.onTouchEvent(event);
 
         return ((CardView) getParent()).onTouchEvent(event);
-    }
-
-    private void showMenu(float rawX, float rawY) {
-
-        PopupMenu popupMenu = new PopupMenu(getContext(), this);
-        popupMenu.inflate(R.menu.nodes);
-
-
     }
 
     public void addWire(Connector connector, Connector pin) {

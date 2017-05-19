@@ -5,7 +5,6 @@ import android.os.Parcelable;
 
 import com.annimon.stream.Stream;
 import com.littleinferno.flowchart.DataType;
-import com.littleinferno.flowchart.project.FlowchartProject;
 import com.littleinferno.flowchart.project.ProjectModule;
 import com.littleinferno.flowchart.util.DestroyListener;
 import com.littleinferno.flowchart.util.NameChangedListener;
@@ -145,6 +144,10 @@ public class AndroidVariable extends ProjectModule implements Parcelable {
                 !arrayChangedListeners.isEmpty();
     }
 
+    public SimpleObject getSaveInfo() {
+        return new SimpleObject(dataType, name, isArray);
+    }
+
     @Override
     public int describeContents() {
         return 0;
@@ -157,5 +160,17 @@ public class AndroidVariable extends ProjectModule implements Parcelable {
         dest.writeString(name);
         dest.writeByte((byte) (isArray ? 1 : 0));
         dest.writeString(dataType.toString());
+    }
+
+    public static class SimpleObject {
+        final DataType dataType;
+        final String name;
+        final boolean isArray;
+
+        public SimpleObject(DataType dataType, String name, boolean isArray) {
+            this.dataType = dataType;
+            this.name = name;
+            this.isArray = isArray;
+        }
     }
 }

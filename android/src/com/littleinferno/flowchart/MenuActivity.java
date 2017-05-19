@@ -5,20 +5,27 @@ import android.databinding.DataBindingUtil;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.DefaultItemAnimator;
-import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.LinearLayout;
 
-import com.annimon.stream.Stream;
 import com.littleinferno.flowchart.databinding.ActivityMenuBinding;
+import com.littleinferno.flowchart.plugin.gui.PluginActivity;
+import com.littleinferno.flowchart.project.FlowchartProject;
 import com.littleinferno.flowchart.project.gui.CreateNewProjectDialog;
+
+import net.idik.lib.slimadapter.SlimAdapter;
+
+import java.io.File;
+
+import io.reactivex.Observable;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.schedulers.Schedulers;
 
 public class MenuActivity extends AppCompatActivity {
 
     private ActivityMenuBinding layout;
+    private SlimAdapter adapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -28,27 +35,41 @@ public class MenuActivity extends AppCompatActivity {
 
         setSupportActionBar(layout.mainMenuToolbar);
 
-//        findViewById(R.id.start).setOnClickListener(v -> {
-////
-////            ProjectFragment fragment = new ProjectFragment();
-////            getSupportFragmentManager()
-////                    .beginTransaction()
-////                    .add(R.id.project, fragment, "project")
-////                    .commit();
-//        });
-
-        ProjectsAdaptor adapter = new ProjectsAdaptor(Stream.of(Files.getProjects()).map(ProjectItem::new).toList(), getFragmentManager());
-
         LinearLayoutManager layoutManager = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
 
-        layout.projectLayout.projectList.addItemDecoration(new DividerItemDecoration(this, LinearLayout.VERTICAL));
-        layout.projectLayout.projectList.setLayoutManager(layoutManager);
-        layout.projectLayout.projectList.setItemAnimator(new DefaultItemAnimator());
-        layout.projectLayout.projectList.setAdapter(adapter);
+        layout.projects.items.setLayoutManager(layoutManager);
 
+        adapter = SlimAdapter.create().registerDefault(R.layout.item_project,
+                (o, injector) -> {
+                    injector.text(R.id.project_name, (String) o)
+                            .clicked(R.id.project_name, v -> {
+                                Intent intent = new Intent(v.getContext(), ProjectActivity.class);
+                                intent.putExtra(FlowchartProject.TAG, (String) o);
+                                v.getContext().startActivity(intent);
+                            });
+                })
+                .attachTo(layout.projects.items);
 
         layout.addNewProject
-                .setOnClickListener(v -> startActivity(new Intent(MenuActivity.this, CreateNewProjectDialog.class)));
+                .setOnClickListener(v -> {
+                    Intent intent = new Intent(MenuActivity.this, CreateNewProjectDialog.class);
+                    intent.setFlags(intent.getFlags() | Intent.FLAG_ACTIVITY_NO_HISTORY);
+                    startActivity(intent);
+                });
+
+        initProjects();
+    }
+
+    private void initProjects() {
+        Observable.just(Files.getSavesLocation())
+                .map(File::new)
+                .map(File::list)
+                .flatMap(Observable::fromArray)
+                .map(Files::saveNameToProjectName)
+                .toList()
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(strings -> adapter.updateData(strings));
     }
 
     @Override
@@ -59,7 +80,6 @@ public class MenuActivity extends AppCompatActivity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.main_menu, menu);
-
         return true;
     }
 
