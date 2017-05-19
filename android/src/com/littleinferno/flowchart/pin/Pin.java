@@ -20,7 +20,7 @@ import java.util.List;
 import java.util.Set;
 
 @SuppressLint("ViewConstructor")
-public class Connector extends android.support.v7.widget.AppCompatTextView implements Generator {
+public class Pin extends android.support.v7.widget.AppCompatTextView implements Generator {
 
     private final Connection connection;
     private DataType type;
@@ -28,17 +28,17 @@ public class Connector extends android.support.v7.widget.AppCompatTextView imple
 
     public final AndroidNode node;
 
-    private Optional<Connector> connectedPin;
-    private Optional<List<Connector>> connectedPins;
+    private Optional<Pin> connectedPin;
+    private Optional<List<Pin>> connectedPins;
 
     private float sceneX;
     private float sceneY;
 
     private final Optional<Set<DataType>> possibleConvert;
 
-    private static Optional<Connector> connector = Optional.empty();
+    private static Optional<Pin> connector = Optional.empty();
 
-    public Connector(AndroidNode node, LinearLayout.LayoutParams params, Connection connection, String name, boolean isArray, Optional<Set<DataType>> possibleConvert, DataType type) {
+    public Pin(AndroidNode node, LinearLayout.LayoutParams params, Connection connection, String name, boolean isArray, Optional<Set<DataType>> possibleConvert, DataType type) {
         super(node.getContext());
 
         this.connection = connection;
@@ -137,11 +137,11 @@ public class Connector extends android.support.v7.widget.AppCompatTextView imple
             if (dataTypes.contains(type) || type == DataType.UNIVERSAL) {
                 this.type = type;
                 setColor(type);
-                connectedPin.ifPresent(connector -> connector.setType(type));
+                connectedPin.ifPresent(pin -> pin.setType(type));
 
                 connectedPins.ifPresent(connectors -> Stream
                         .of(connectors)
-                        .forEach(connector -> connector.setType(type)));
+                        .forEach(pin -> pin.setType(type)));
 
                 Stream.of(node.getPins())
                         .filter(pin -> pin.getType() == DataType.UNIVERSAL)
@@ -168,7 +168,7 @@ public class Connector extends android.support.v7.widget.AppCompatTextView imple
         return connectedPins.isPresent() && connectedPins.get().size() > 0;
     }
 
-    public boolean connect(final Connector pin) {
+    public boolean connect(final Pin pin) {
         connector = Optional.empty();
 
         if (!possibleConnect(pin))
@@ -200,7 +200,7 @@ public class Connector extends android.support.v7.widget.AppCompatTextView imple
         return true;
     }
 
-    private void connectPin(final Connector pin) {
+    private void connectPin(final Pin pin) {
 
         connectedPin.ifPresent(c -> c.disconnect(this));
 
@@ -214,7 +214,7 @@ public class Connector extends android.support.v7.widget.AppCompatTextView imple
         node.getScene().addWire(this, pin);
     }
 
-    private void connectPins(final Connector pin) {
+    private void connectPins(final Pin pin) {
         pin.connectPin(this);
     }
 
@@ -228,7 +228,7 @@ public class Connector extends android.support.v7.widget.AppCompatTextView imple
         }
     }
 
-    public void disconnect(final Connector pin) {
+    public void disconnect(final Pin pin) {
         if (isSingle()) {
             disconnectPin();
         } else {
@@ -247,11 +247,11 @@ public class Connector extends android.support.v7.widget.AppCompatTextView imple
         setImage();
     }
 
-    private void disconnectPins(final Connector pin) {
+    private void disconnectPins(final Pin pin) {
         pin.disconnectPin();
     }
 
-    private boolean possibleConnect(Connector pin) {
+    private boolean possibleConnect(Pin pin) {
         return !(pin.getConnection() == getConnection()
                 || pin.node == node
                 || pin.isArray() != isArray());
@@ -285,11 +285,6 @@ public class Connector extends android.support.v7.widget.AppCompatTextView imple
         }
 
     }
-
-//    public float ceneter(){
-////        getImage().
-//    }
-
 
     private void set(int id) {
         getImage().clearColorFilter();

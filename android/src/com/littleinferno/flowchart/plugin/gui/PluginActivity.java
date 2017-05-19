@@ -15,7 +15,7 @@ import com.google.gson.Gson;
 import com.littleinferno.flowchart.util.Files;
 import com.littleinferno.flowchart.R;
 import com.littleinferno.flowchart.databinding.ActivityPluginBinding;
-import com.littleinferno.flowchart.plugin.AndroidBasePluginHandle;
+import com.littleinferno.flowchart.plugin.BasePluginHandle;
 import com.littleinferno.flowchart.plugin.PluginHelper;
 import com.littleinferno.flowchart.util.Swiper;
 
@@ -34,7 +34,7 @@ public class PluginActivity extends AppCompatActivity {
 
     ActivityPluginBinding layout;
     private Disposable plugins;
-    private List<AndroidBasePluginHandle.PluginParams> pluginParams;
+    private List<BasePluginHandle.PluginParams> pluginParams;
     private SlimAdapter adapter;
 
     @Override
@@ -53,7 +53,7 @@ public class PluginActivity extends AppCompatActivity {
         adapter = SlimAdapter
                 .create()
                 .registerDefault(R.layout.layout_plugin_params, (o, injector) -> {
-                    AndroidBasePluginHandle.PluginParams data = (AndroidBasePluginHandle.PluginParams) o;
+                    BasePluginHandle.PluginParams data = (BasePluginHandle.PluginParams) o;
                     injector.text(R.id.name, data.getPluginName())
                             .text(R.id.version, data.getPluginVersion())
                             .text(R.id.description, data.getPluginDescription());
@@ -122,9 +122,9 @@ public class PluginActivity extends AppCompatActivity {
                 .map(File::listFiles)
                 .flatMap(Observable::fromArray)
                 .map(ZipFile::new)
-                .map(file -> file.getInputStream(file.getEntry(PluginHelper.indexFile)))
+                .map(file -> file.getInputStream(file.getEntry(PluginHelper.INDEX_FILE)))
                 .map(Files::inputStreamToString)
-                .map(json -> gson.fromJson(json, AndroidBasePluginHandle.PluginParams.class))
+                .map(json -> gson.fromJson(json, BasePluginHandle.PluginParams.class))
                 .toList()
                 .map(pluginParamses -> {
                     pluginParamses.add(PluginHelper.getStandartPluginParams(getAssets()));

@@ -18,13 +18,12 @@ import com.github.angads25.filepicker.view.FilePickerDialog;
 import com.google.gson.Gson;
 import com.jakewharton.rxbinding2.widget.RxAdapterView;
 import com.jakewharton.rxbinding2.widget.RxTextView;
-import com.littleinferno.flowchart.util.Files;
-import com.littleinferno.flowchart.ProjectActivity;
 import com.littleinferno.flowchart.R;
 import com.littleinferno.flowchart.databinding.LayoutNewProjectBinding;
-import com.littleinferno.flowchart.plugin.AndroidBasePluginHandle;
+import com.littleinferno.flowchart.plugin.BasePluginHandle;
 import com.littleinferno.flowchart.plugin.PluginHelper;
 import com.littleinferno.flowchart.project.Project;
+import com.littleinferno.flowchart.util.Files;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -42,7 +41,7 @@ public class CreateNewProjectDialog extends AppCompatActivity {
 
     LayoutNewProjectBinding layout;
     String projectName;
-    private List<AndroidBasePluginHandle.PluginParams> pluginParams;
+    private List<BasePluginHandle.PluginParams> pluginParams;
     private Disposable name;
     private Disposable items;
     private Disposable plugins;
@@ -132,9 +131,9 @@ public class CreateNewProjectDialog extends AppCompatActivity {
                 .map(File::listFiles)
                 .flatMap(Observable::fromArray)
                 .map(ZipFile::new)
-                .map(file -> file.getInputStream(file.getEntry(PluginHelper.indexFile)))
+                .map(file -> file.getInputStream(file.getEntry(PluginHelper.INDEX_FILE)))
                 .map(Files::inputStreamToString)
-                .map(json -> gson.fromJson(json, AndroidBasePluginHandle.PluginParams.class))
+                .map(json -> gson.fromJson(json, BasePluginHandle.PluginParams.class))
                 .toList()
                 .map(pluginParamses -> {
                     pluginParamses.add(PluginHelper.getStandartPluginParams(getAssets()));
@@ -148,7 +147,7 @@ public class CreateNewProjectDialog extends AppCompatActivity {
                     ArrayAdapter<String> adapter =
                             new ArrayAdapter<>(this, android.R.layout.simple_spinner_item,
                                     Stream.of(params)
-                                            .map(AndroidBasePluginHandle.PluginParams::getPluginName)
+                                            .map(BasePluginHandle.PluginParams::getPluginName)
                                             .toList()
                             );
 
@@ -174,7 +173,7 @@ public class CreateNewProjectDialog extends AppCompatActivity {
             case R.id.bt_create_project:
                 Intent intent = new Intent(this, ProjectActivity.class);
                 intent.putExtra(Project.PROJECT_NAME, projectName);
-                intent.putExtra("PLUGIN", pluginParams.get(layout.plugins.getSelectedItemPosition()).getPluginName());
+                intent.putExtra(Project.PLUGIN, pluginParams.get(layout.plugins.getSelectedItemPosition()).getPluginName());
 
                 startActivity(intent);
                 return true;

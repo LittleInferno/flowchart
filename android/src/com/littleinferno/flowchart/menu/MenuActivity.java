@@ -1,4 +1,4 @@
-package com.littleinferno.flowchart;
+package com.littleinferno.flowchart.menu;
 
 import android.content.Intent;
 import android.databinding.DataBindingUtil;
@@ -9,10 +9,12 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import com.littleinferno.flowchart.R;
 import com.littleinferno.flowchart.databinding.ActivityMenuBinding;
 import com.littleinferno.flowchart.plugin.gui.PluginActivity;
 import com.littleinferno.flowchart.project.Project;
 import com.littleinferno.flowchart.project.gui.CreateNewProjectDialog;
+import com.littleinferno.flowchart.project.gui.ProjectActivity;
 import com.littleinferno.flowchart.util.Files;
 
 import net.idik.lib.slimadapter.SlimAdapter;

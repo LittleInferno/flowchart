@@ -7,11 +7,10 @@ import android.os.Parcelable;
 
 import com.annimon.stream.Stream;
 import com.google.gson.reflect.TypeToken;
-import com.littleinferno.flowchart.util.Files;
 import com.littleinferno.flowchart.function.Function;
 import com.littleinferno.flowchart.function.FunctionManager;
-import com.littleinferno.flowchart.plugin.AndroidPluginHandle;
-import com.littleinferno.flowchart.plugin.PluginHelper;
+import com.littleinferno.flowchart.plugin.PluginHandle;
+import com.littleinferno.flowchart.util.Files;
 import com.littleinferno.flowchart.variable.Variable;
 import com.littleinferno.flowchart.variable.VariableManager;
 
@@ -22,10 +21,11 @@ public class Project implements Parcelable {
 
     public static final String TAG = "FLOWCHART_PROJECT";
     public static final String PROJECT_NAME = "NAME";
+    public static final String PLUGIN = "PLUGIN";
     private Function currentScene;
     private Context context;
     private String name;
-    private static AndroidPluginHandle pluginHandle;
+    private static PluginHandle pluginHandle;
 
     private FragmentManager fragmentManager;
     private VariableManager variableManager;
@@ -59,11 +59,19 @@ public class Project implements Parcelable {
         }
     };
 
-    public static Project create(String name) {
-        return new Project(name);
+    public static Project create(Context context, String name) {
+        Project project = new Project(name);
+        project.setContext(context);
+        return project;
     }
 
-    public void setPlugin(AndroidPluginHandle plugin) {
+    public static Project load(Context context, String name) throws Exception {
+        Project project = create(context, name);
+        project.init(Files.loadProjectSave(name));
+        return project;
+    }
+
+    public void setPlugin(PluginHandle plugin) {
         pluginHandle = plugin;
     }
 
@@ -72,18 +80,18 @@ public class Project implements Parcelable {
         pluginHandle = null;
     }
 
-    public AndroidPluginHandle.NodeHandle getNodeHandle(final String nodeName) {
+    public PluginHandle.NodeHandle getNodeHandle(final String nodeName) {
         return Stream.of(pluginHandle.getNodes())
                 .filter(value -> value.getName().equals(nodeName))
                 .findFirst()
                 .orElseThrow(() -> new RuntimeException("cannot find node: " + nodeName));
     }
 
-    public List<AndroidPluginHandle.NodeHandle> getNodeHandles() {
+    public List<PluginHandle.NodeHandle> getNodeHandles() {
         return pluginHandle.getNodes();
     }
 
-    public AndroidPluginHandle.RuleHandle getRules() {
+    public PluginHandle.RuleHandle getRules() {
         return pluginHandle.getRules();
     }
 
@@ -166,16 +174,11 @@ public class Project implements Parcelable {
         return new SimpleObject(pluginHandle.getPluginParams().getPluginName(), functions, variables);
     }
 
-    public void init(SimpleObject s) throws Exception {
+    public void init(SimpleObject saveInfo) throws Exception {
 
-        if (s.plugin.equals("standart plugin")) {
-            setPlugin(new AndroidPluginHandle(PluginHelper.getStandartPluginParams(context.getAssets()),
-                    PluginHelper.getStandartPluginContent(context.getAssets())));
-        } else {
-            setPlugin(Files.loadPlugin(s.plugin));
-        }
-        Stream.of(s.functions).forEach(functionManager::createFunction);
-        Stream.of(s.variables).forEach(variableManager::createVariable);
+        setPlugin(Files.loadPlugin(context, saveInfo.plugin));
+        Stream.of(saveInfo.functions).forEach(functionManager::createFunction);
+        Stream.of(saveInfo.variables).forEach(variableManager::createVariable);
     }
 
     public static class SimpleObject {

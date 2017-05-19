@@ -5,16 +5,14 @@ import org.mozilla.javascript.ContextFactory;
 import org.mozilla.javascript.Function;
 import org.mozilla.javascript.Scriptable;
 
-public abstract class AndroidBasePluginHandle {
+public abstract class BasePluginHandle {
 
     private PluginParams pluginParams;
     private Context rhino;
     private Scriptable scope;
-    private String plugin;
 
-    AndroidBasePluginHandle(PluginParams params, String plugin) {
+    BasePluginHandle(PluginParams params, String plugin) {
         this.pluginParams = params;
-        this.plugin = plugin;
         rhino = ContextFactory.getGlobal().enterContext();
         rhino.setOptimizationLevel(-1);
 

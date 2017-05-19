@@ -15,12 +15,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
 
-public class AndroidPluginHandle extends AndroidBasePluginHandle {
+public class PluginHandle extends BasePluginHandle {
 
     private List<NodeHandle> handles;
     private RuleHandle ruleHandle;
 
-    public AndroidPluginHandle(PluginParams pluginParams, String plugin) throws Exception {
+    public PluginHandle(PluginParams pluginParams, String plugin) throws Exception {
         super(pluginParams, plugin);
 
         handles = new ArrayList<>();
@@ -29,7 +29,7 @@ public class AndroidPluginHandle extends AndroidBasePluginHandle {
         registerNodes((NativeArray) createScriptFun("exportNodes").call());
     }
 //        if (params.getApiVersion() != getApiVersion())
-//            throw new RuntimeException("pluginFile api version(" + params.getApiVersion() + ") != api version" + getApiVersion());
+//            throw new RuntimeException("PLUGIN_FILE api version(" + params.getApiVersion() + ") != api version" + getApiVersion());
 
     private RuleHandle readRules(ScriptableObject exportRules) throws Exception {
         final String words[] = (String[]) Context.jsToJava(exportRules.get("keyWords"), String[].class);
@@ -138,11 +138,11 @@ public class AndroidPluginHandle extends AndroidBasePluginHandle {
         final String category;
         final ScriptFun codegen;
         final ScriptFun init;
-        final AndroidPluginHandle nodePluginHandle;
+        final PluginHandle nodePluginHandle;
         private Map<String, Object> attributes;
 
 
-        NodeHandle(AndroidPluginHandle nodePluginHandle, final String name, final String title,
+        NodeHandle(PluginHandle nodePluginHandle, final String name, final String title,
                    final String category, final ScriptFun codegen, final ScriptFun init) {
             this.nodePluginHandle = nodePluginHandle;
             this.name = name;
@@ -186,7 +186,7 @@ public class AndroidPluginHandle extends AndroidBasePluginHandle {
             return init;
         }
 
-        public AndroidPluginHandle getPluginHandle() {
+        public PluginHandle getPluginHandle() {
             return nodePluginHandle;
         }
     }

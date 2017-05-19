@@ -14,7 +14,7 @@ import android.widget.RelativeLayout;
 
 import com.annimon.stream.Stream;
 import com.littleinferno.flowchart.node.AndroidNode;
-import com.littleinferno.flowchart.pin.Connector;
+import com.littleinferno.flowchart.pin.Pin;
 
 import java.util.ArrayList;
 
@@ -26,9 +26,9 @@ public class AndroidSceneLayout extends RelativeLayout {
     boolean touch = false;
 
     private static class Wire {
-        final Connector begin, end;
+        final Pin begin, end;
 
-        private Wire(Connector begin, Connector end) {
+        private Wire(Pin begin, Pin end) {
             this.begin = begin;
             this.end = end;
         }
@@ -80,7 +80,7 @@ public class AndroidSceneLayout extends RelativeLayout {
         return ((CardView) getParent()).onTouchEvent(event);
     }
 
-    public void addWire(Connector connector, Connector pin) {
+    public void addWire(Pin connector, Pin pin) {
         wires.add(new Wire(connector, pin));
         invalidate();
     }

@@ -8,8 +8,8 @@ import android.support.annotation.NonNull;
 import com.annimon.stream.Stream;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.littleinferno.flowchart.plugin.AndroidBasePluginHandle;
-import com.littleinferno.flowchart.plugin.AndroidPluginHandle;
+import com.littleinferno.flowchart.plugin.BasePluginHandle;
+import com.littleinferno.flowchart.plugin.PluginHandle;
 import com.littleinferno.flowchart.plugin.PluginHelper;
 import com.littleinferno.flowchart.project.Project;
 
@@ -129,15 +129,9 @@ public class Files {
                 });
     }
 
-    public static void loadProject(Project project) {
-        String string = readToString(new File(getSaveLocation(project.getName())));
-
-        Project.SimpleObject s = gson.fromJson(string, Project.SimpleObject.class);
-        try {
-            project.init(s);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+    public static Project.SimpleObject loadProjectSave(String name) {
+        String string = readToString(new File(getSaveLocation(name)));
+        return gson.fromJson(string, Project.SimpleObject.class);
     }
 
     public static void delete(Context context, String pluginName) {
@@ -157,12 +151,15 @@ public class Files {
                 });
     }
 
-    public static AndroidPluginHandle loadPlugin(String plugin) throws Exception {
-        ZipFile zip = new ZipFile(Files.getPLuginsLocation() + "/" + plugin);
-        String index = Files.inputStreamToString(zip.getInputStream(zip.getEntry(PluginHelper.indexFile)));
-        String pl = Files.inputStreamToString(zip.getInputStream(zip.getEntry(PluginHelper.pluginFile)));
+    public static PluginHandle loadPlugin(Context context, String plugin) throws Exception {
+        if (plugin.equals(PluginHelper.STANDART_PLUGIN))
+            return PluginHelper.getStandartPlugin(context);
 
-        return new AndroidPluginHandle(new Gson().fromJson(index, AndroidBasePluginHandle.PluginParams.class), pl);
+        ZipFile zip = new ZipFile(Files.getPLuginsLocation() + "/" + plugin);
+        String index = Files.inputStreamToString(zip.getInputStream(zip.getEntry(PluginHelper.INDEX_FILE)));
+        String pl = Files.inputStreamToString(zip.getInputStream(zip.getEntry(PluginHelper.PLUGIN_FILE)));
+
+        return new PluginHandle(new Gson().fromJson(index, BasePluginHandle.PluginParams.class), pl);
     }
 
 }

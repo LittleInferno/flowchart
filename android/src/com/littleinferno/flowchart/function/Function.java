@@ -9,7 +9,7 @@ import com.littleinferno.flowchart.util.Connection;
 import com.littleinferno.flowchart.util.DataType;
 import com.littleinferno.flowchart.generator.Generator;
 import com.littleinferno.flowchart.node.AndroidNode;
-import com.littleinferno.flowchart.node.AndroidNodeManager;
+import com.littleinferno.flowchart.node.NodeManager;
 import com.littleinferno.flowchart.project.ProjectModule;
 import com.littleinferno.flowchart.scene.AndroidSceneLayout;
 import com.littleinferno.flowchart.util.DestroyListener;
@@ -36,7 +36,7 @@ public class Function extends ProjectModule implements Generator, Parcelable {
     private List<NameChangedListener> nameChangedListeners;
     private List<DestroyListener> destroyListeners;
 
-    private final AndroidNodeManager nodeManager;
+    private final NodeManager nodeManager;
     private AndroidSceneLayout androidScene;
     private List<FunctionParameter.CallbackPair> parameterListeners = new ArrayList<>();
     private final List<Link> parameterAddListeners = new ArrayList<>();
@@ -53,7 +53,7 @@ public class Function extends ProjectModule implements Generator, Parcelable {
         nameChangedListeners = new ArrayList<>();
         destroyListeners = new ArrayList<>();
 
-        nodeManager = new AndroidNodeManager(this);
+        nodeManager = new NodeManager(this);
         nodeManager.createNode("function begin node", 10, 400);
     }
 
@@ -64,7 +64,7 @@ public class Function extends ProjectModule implements Generator, Parcelable {
         this.functionManager = functionManager;
         this.name = saveInfo.name;
 
-        nodeManager = new AndroidNodeManager(this);
+        nodeManager = new NodeManager(this);
         parameters = new ArrayList<>();
 
         Stream.of(saveInfo.nodes).forEach(nodeManager::createNode);
@@ -77,7 +77,7 @@ public class Function extends ProjectModule implements Generator, Parcelable {
         functionManager = parent.remove(getId());
 
         name = in.readString();
-        nodeManager = in.readParcelable(AndroidNodeManager.class.getClassLoader());
+        nodeManager = in.readParcelable(NodeManager.class.getClassLoader());
 
         parameters = new ArrayList<>();
         in.readList(parameters, FunctionParameter.class.getClassLoader());
@@ -236,7 +236,7 @@ public class Function extends ProjectModule implements Generator, Parcelable {
         dest.writeParcelable(nodeManager, flags);
     }
 
-    public AndroidNodeManager getNodeManager() {
+    public NodeManager getNodeManager() {
         return nodeManager;
     }
 

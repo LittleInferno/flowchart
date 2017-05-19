@@ -21,8 +21,8 @@ import com.littleinferno.flowchart.util.Connection;
 import com.littleinferno.flowchart.util.DataType;
 import com.littleinferno.flowchart.databinding.NodeLayoutBinding;
 import com.littleinferno.flowchart.function.Function;
-import com.littleinferno.flowchart.pin.Connector;
-import com.littleinferno.flowchart.plugin.AndroidPluginHandle;
+import com.littleinferno.flowchart.pin.Pin;
+import com.littleinferno.flowchart.plugin.PluginHandle;
 import com.littleinferno.flowchart.plugin.bridge.ViewName;
 import com.littleinferno.flowchart.scene.AndroidSceneLayout;
 
@@ -53,9 +53,9 @@ public class AndroidNode extends CardView {
     NodeLayoutBinding layout;
     private Function function;
     private PointF point;
-    private final AndroidPluginHandle.NodeHandle nodeHandle;
+    private final PluginHandle.NodeHandle nodeHandle;
 
-    public AndroidNode(final Function function, final AndroidPluginHandle.NodeHandle nodeHandle) {
+    public AndroidNode(final Function function, final PluginHandle.NodeHandle nodeHandle) {
         super(function.getProject().getContext());
         layout = NodeLayoutBinding.inflate((LayoutInflater) function.getProject().getContext()
                 .getSystemService(Context.LAYOUT_INFLATER_SERVICE), this, true);
@@ -81,55 +81,47 @@ public class AndroidNode extends CardView {
     }
 
     @Override
-    public Parcelable onSaveInstanceState() {
-        return super.onSaveInstanceState();
-    }
-
-    @Override
     protected void onRestoreInstanceState(Parcelable state) {
         super.onRestoreInstanceState(state);
     }
 
-    private void init(Context context) {
-    }
-
     @SuppressWarnings("unused")
-    public Connector addDataInputPin(final String name, final boolean isArray, final DataType... possibleConvert) {
+    public Pin addDataInputPin(final String name, final boolean isArray, final DataType... possibleConvert) {
         return buildPin(Connection.INPUT, name, isArray, possibleConvert);
     }
 
     @SuppressWarnings("unused")
-    public Connector addDataOutputPin(final String name, final boolean isArray, final DataType... possibleConvert) {
+    public Pin addDataOutputPin(final String name, final boolean isArray, final DataType... possibleConvert) {
         return buildPin(Connection.OUTPUT, name, isArray, possibleConvert);
     }
 
     @SuppressWarnings("unused")
-    public Connector addExecutionInputPin(final String name) {
+    public Pin addExecutionInputPin(final String name) {
         return buildPin(Connection.INPUT, name, false, DataType.EXECUTION);
     }
 
     @SuppressWarnings("unused")
-    public Connector addExecutionOutputPin(final String name) {
+    public Pin addExecutionOutputPin(final String name) {
         return buildPin(Connection.OUTPUT, name, false, DataType.EXECUTION);
     }
 
-    Connector buildPin(final Connection connection, final String name, final boolean isArray, final DataType type) {
-        return new Connector(this, createLayoutParams(),
+    Pin buildPin(final Connection connection, final String name, final boolean isArray, final DataType type) {
+        return new Pin(this, createLayoutParams(),
                 connection, name, isArray, Optional.empty(), type);
     }
 
-    Connector buildPin(final Connection connection, final String name, final boolean isArray, final DataType... possibleConverts) {
+    Pin buildPin(final Connection connection, final String name, final boolean isArray, final DataType... possibleConverts) {
         if (possibleConverts.length == 1)
             return buildPin(connection, name, isArray, possibleConverts[0]);
 
-        return new Connector(this, createLayoutParams(),
+        return new Pin(this, createLayoutParams(),
                 connection, name, isArray,
                 Optional.of(new HashSet<>(Arrays.asList(possibleConverts))),
                 DataType.UNIVERSAL);
     }
 
     @SuppressWarnings("unused")
-    public void removePin(final Connector pin) {
+    public void removePin(final Pin pin) {
         pin.disconnectAll();
         layout.nodeLeft.removeView(pin);
         layout.nodeRight.removeView(pin);
@@ -140,33 +132,33 @@ public class AndroidNode extends CardView {
     public void removePin(final String pin) {
         Stream.range(0, layout.nodeLeft.getChildCount())
                 .map(layout.nodeLeft::getChildAt)
-                .filter(value -> value instanceof Connector)
-                .map(Connector.class::cast)
+                .filter(value -> value instanceof Pin)
+                .map(Pin.class::cast)
                 .filter(connector -> connector.getName().equals(pin))
                 .findFirst().ifPresent(p -> layout.nodeLeft.removeView(p));
 
         Stream.range(0, layout.nodeRight.getChildCount())
                 .map(layout.nodeRight::getChildAt)
-                .filter(value -> value instanceof Connector)
-                .map(Connector.class::cast)
+                .filter(value -> value instanceof Pin)
+                .map(Pin.class::cast)
                 .filter(connector -> connector.getName().equals(pin))
                 .findFirst().ifPresent(p -> layout.nodeRight.removeView(p));
     }
 
-    public Connector[] getPins() {
+    public Pin[] getPins() {
         return Stream.concat(
                 Stream.range(0, layout.nodeLeft.getChildCount())
                         .map(layout.nodeLeft::getChildAt)
-                        .filter(value -> value instanceof Connector)
-                        .map(Connector.class::cast),
+                        .filter(value -> value instanceof Pin)
+                        .map(Pin.class::cast),
                 Stream.range(0, layout.nodeRight.getChildCount())
                         .map(layout.nodeRight::getChildAt)
-                        .filter(value -> value instanceof Connector)
-                        .map(Connector.class::cast)).toArray(Connector[]::new);
+                        .filter(value -> value instanceof Pin)
+                        .map(Pin.class::cast)).toArray(Pin[]::new);
     }
 
     @SuppressWarnings("unused")
-    public Connector getPin(String name) {
+    public Pin getPin(String name) {
         return Stream.of(getPins())
                 .filter(p -> p.getName().equals(name))
                 .findFirst()
@@ -274,7 +266,7 @@ public class AndroidNode extends CardView {
         return (AndroidSceneLayout) getParent();
     }
 
-    public AndroidPluginHandle.NodeHandle getNodeHandle() {
+    public PluginHandle.NodeHandle getNodeHandle() {
         return nodeHandle;
     }
 
@@ -338,7 +330,7 @@ public class AndroidNode extends CardView {
         final float y;
         final String[] attributes;
 
-        public SimpleObject(String name, float x, float y, String... attributes) {
+        SimpleObject(String name, float x, float y, String... attributes) {
             this.name = name;
             this.x = x;
             this.y = y;

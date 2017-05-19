@@ -7,7 +7,7 @@ import android.view.View;
 
 import com.annimon.stream.Stream;
 import com.littleinferno.flowchart.function.Function;
-import com.littleinferno.flowchart.plugin.AndroidPluginHandle;
+import com.littleinferno.flowchart.plugin.PluginHandle;
 import com.littleinferno.flowchart.scene.AndroidSceneLayout;
 
 import java.util.ArrayList;
@@ -15,7 +15,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.UUID;
 
-public class AndroidNodeManager implements Parcelable {
+public class NodeManager implements Parcelable {
     private final HashMap<UUID, Function> parent = new HashMap<>();
 
     public static final String TAG = "NODE_MANAGER";
@@ -24,30 +24,30 @@ public class AndroidNodeManager implements Parcelable {
     private final Function function;
     private final UUID id;
 
-    public AndroidNodeManager(Function function) {
+    public NodeManager(Function function) {
         id = UUID.randomUUID();
         this.function = function;
     }
 
-    private AndroidNodeManager(Parcel in) {
+    private NodeManager(Parcel in) {
         id = UUID.fromString(in.readString());
         function = parent.remove(id);
     }
 
-    public static final Creator<AndroidNodeManager> CREATOR = new Creator<AndroidNodeManager>() {
+    public static final Creator<NodeManager> CREATOR = new Creator<NodeManager>() {
         @Override
-        public AndroidNodeManager createFromParcel(Parcel in) {
-            return new AndroidNodeManager(in);
+        public NodeManager createFromParcel(Parcel in) {
+            return new NodeManager(in);
         }
 
         @Override
-        public AndroidNodeManager[] newArray(int size) {
-            return new AndroidNodeManager[size];
+        public NodeManager[] newArray(int size) {
+            return new NodeManager[size];
         }
     };
 
     public AndroidNode createNode(@NonNull String nodeName, float x, float y) {
-        AndroidPluginHandle.NodeHandle nodeHandle = function
+        PluginHandle.NodeHandle nodeHandle = function
                 .getProject()
                 .getNodeHandle(nodeName);
 
@@ -83,7 +83,8 @@ public class AndroidNodeManager implements Parcelable {
         AndroidNode node = createNode(savedInfo.name, savedInfo.x, savedInfo.y);
 
         node.getNodeHandle().getAttribute("load")
-                .ifPresent(o -> node.getNodeHandle()
+                .ifPresent(o ->
+                        node.getNodeHandle()
                         .getPluginHandle()
                         .createScriptFun((org.mozilla.javascript.Function) o)
                         .call(node, savedInfo.attributes));

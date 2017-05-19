@@ -1,4 +1,4 @@
-package com.littleinferno.flowchart;
+package com.littleinferno.flowchart.project.gui;
 
 import android.content.Intent;
 import android.databinding.DataBindingUtil;
@@ -12,15 +12,13 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 
 import com.annimon.stream.Stream;
+import com.littleinferno.flowchart.R;
 import com.littleinferno.flowchart.databinding.ActivityProjectBinding;
 import com.littleinferno.flowchart.function.Function;
 import com.littleinferno.flowchart.function.gui.FunctionListFragment;
 import com.littleinferno.flowchart.node.gui.Section;
-import com.littleinferno.flowchart.plugin.AndroidPluginHandle;
-import com.littleinferno.flowchart.plugin.PluginHelper;
+import com.littleinferno.flowchart.plugin.PluginHandle;
 import com.littleinferno.flowchart.project.Project;
-import com.littleinferno.flowchart.project.gui.CreateNewProjectDialog;
-import com.littleinferno.flowchart.project.gui.ViewCodeFragment;
 import com.littleinferno.flowchart.scene.gui.SceneFragment;
 import com.littleinferno.flowchart.util.Files;
 import com.littleinferno.flowchart.variable.gui.VariableListFragment;
@@ -55,40 +53,21 @@ public class ProjectActivity extends AppCompatActivity implements NavigationView
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
-        String name;
-
-        if (savedInstanceState != null && savedInstanceState.containsKey(Project.TAG)) {
-            project = savedInstanceState.getParcelable(Project.TAG);
-            project.setContext(this);
-        } else if ((name = getIntent().getStringExtra(Project.TAG)) != null) {
-            project = Project.create(name);
-            project.setContext(this);
-            Files.loadProject(project);
-        } else {
-            project = Project.create(getIntent().getStringExtra(Project.PROJECT_NAME));
-            project.setContext(this);
-            try {
-                String plugin = getIntent().getStringExtra("PLUGIN");
-                if (plugin.equals("standart plugin")) {
-                    project.setPlugin
-                            (new AndroidPluginHandle(PluginHelper.getStandartPluginParams(getAssets()),
-                                    PluginHelper.getStandartPluginContent(getAssets())));
-                } else
-                    project.setPlugin(Files.loadPlugin(plugin));
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
+        try {
+            initProject(savedInstanceState);
+        } catch (Exception e) {
+            e.printStackTrace();
         }
 
-        List<AndroidPluginHandle.NodeHandle> handles = project.getNodeHandles();
+        List<PluginHandle.NodeHandle> handles = project.getNodeHandles();
 
         layout.projectMain.projectLayout.nodes.init(project, Stream.of(handles)
-                .map(AndroidPluginHandle.NodeHandle::getCategory)
+                .map(PluginHandle.NodeHandle::getCategory)
                 .distinct()
                 .filter(v -> !v.equals("system"))
                 .map(s -> new Section(s, Stream.of(handles)
                         .filter(h -> h.getCategory().equals(s))
-                        .map(AndroidPluginHandle.NodeHandle::getName)
+                        .map(PluginHandle.NodeHandle::getName)
                         .toList())).toList());
 
         project.setFragmentManager(getFragmentManager());
@@ -103,12 +82,25 @@ public class ProjectActivity extends AppCompatActivity implements NavigationView
 
     }
 
+    private void initProject(Bundle savedInstanceState) throws Exception {
+        String name;
+
+        if (savedInstanceState != null && savedInstanceState.containsKey(Project.TAG)) {
+            project = savedInstanceState.getParcelable(Project.TAG);
+            project.setContext(this);
+        } else if ((name = getIntent().getStringExtra(Project.TAG)) != null) {
+            project = Project.load(this, name);
+        } else {
+            project = Project.create(this, getIntent().getStringExtra(Project.PROJECT_NAME));
+            String plugin = getIntent().getStringExtra(Project.PLUGIN);
+            project.setPlugin(Files.loadPlugin(this, plugin));
+        }
+    }
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.project_actions, menu);
-
-
         return true;
     }
 

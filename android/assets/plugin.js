@@ -1,22 +1,13 @@
 var NativeNode = com.littleinferno.flowchart.node.AndroidNode;
 
-var NativeType = com.littleinferno.flowchart.DataType;
-var Connection = com.littleinferno.flowchart.Connection;
-
-var NativeConnection = com.littleinferno.flowchart.Connection;
-var PluginParams = com.littleinferno.flowchart.plugin.AndroidBasePluginHandle.PluginParams;
+var NativeType = com.littleinferno.flowchart.util.DataType;
+var Connection = com.littleinferno.flowchart.util.Connection;
 
 var EditText = com.littleinferno.flowchart.plugin.bridge.TextField;
 var FunctionDropDown = com.littleinferno.flowchart.plugin.bridge.FunctionSpinner;
 var VariableSpinner = com.littleinferno.flowchart.plugin.bridge.VariableSpinner;
 
 var LOG = android.util.Log;
-
-var Project = com.littleinferno.flowchart.project.FlowchartProject;
-
-function pluginParams() {
-    return new PluginParams("basic", "basic plugin for test", "0.0.3", 500);
-}
 
 function exportNodes() {
     return [addNode(), subNode(), mulNode(), divNode(), equalNode(),
@@ -269,17 +260,15 @@ function integerNode() {
         category: "basic java script",
         gen: gen,
         init: init,
-        attributes: [{ "save": save }]
+        attributes: [{ "save": save },{ "load": load }]
     }
 }
 
 function floatNode() {
 
-    var editText;
-
     var init = function (node) {
         node.addDataOutputPin("data", false, NativeType.FLOAT);
-        editText = EditText.make(node, NativeType.FLOAT);
+        var editText = EditText.make("data", node, NativeType.FLOAT);
         node.addView(NativeNode.Align.CENTER, editText);
     }
 
@@ -301,7 +290,7 @@ function floatNode() {
         category: "basic java script",
         gen: gen,
         init: init,
-        attributes: [{ "save": save }]
+        attributes: [{ "save": save },{ "load": load }]
     }
 }
 
@@ -311,7 +300,7 @@ function stringNode() {
 
     var init = function (node) {
         node.addDataOutputPin("result", false, NativeType.STRING);
-        editText = EditText.make(node, NativeType.STRING);
+        var editText = EditText.make("data", node, NativeType.STRING);
         node.addView(NativeNode.Align.CENTER, editText);
     }
 
@@ -333,7 +322,7 @@ function stringNode() {
         category: "basic java script",
         gen: gen,
         init: init,
-        attributes: [{ "save": save }]
+        attributes: [{ "save": save },{ "load": load }]
     }
 }
 

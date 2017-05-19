@@ -10,7 +10,7 @@ import com.bignerdranch.expandablerecyclerview.ParentViewHolder;
 import com.bignerdranch.expandablerecyclerview.model.Parent;
 import com.littleinferno.flowchart.R;
 import com.littleinferno.flowchart.node.AndroidNode;
-import com.littleinferno.flowchart.node.AndroidNodeManager;
+import com.littleinferno.flowchart.node.NodeManager;
 
 import java.util.List;
 
@@ -72,7 +72,7 @@ public class Section implements Parent<String> {
 
         private TextView nodeName;
 
-        NodeViewHolder(AndroidNodeManager nodeManager, View itemView) {
+        NodeViewHolder(NodeManager nodeManager, View itemView) {
             super(itemView);
             nodeName = (TextView) itemView.findViewById(R.id.node_name);
 
