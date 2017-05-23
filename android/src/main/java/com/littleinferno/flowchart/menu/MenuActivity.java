@@ -1,6 +1,7 @@
 package com.littleinferno.flowchart.menu;
 
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -8,6 +9,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.Toast;
 
 import com.littleinferno.flowchart.R;
 import com.littleinferno.flowchart.databinding.ActivityMenuBinding;
@@ -29,6 +31,7 @@ public class MenuActivity extends AppCompatActivity {
 
     private ActivityMenuBinding layout;
     private SlimAdapter adapter;
+    private boolean hasPermision = true;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -60,7 +63,6 @@ public class MenuActivity extends AppCompatActivity {
                     startActivity(intent);
                 });
 
-        initProjects();
     }
 
     private void initProjects() {
@@ -78,6 +80,20 @@ public class MenuActivity extends AppCompatActivity {
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+
+        if (requestCode == 200 && grantResults.length > 0) {
+            boolean readExternalFile = grantResults[0] == PackageManager.PERMISSION_GRANTED;
+
+            if (readExternalFile) {
+                Files.initFolder(this);
+                initProjects();
+                return;
+            }
+        }
+
+
+        Toast.makeText(this, "need permissions", Toast.LENGTH_LONG).show();
+        layout.addNewProject.setEnabled(false);
     }
 
     @Override

@@ -4,17 +4,21 @@ import android.os.Parcel;
 import android.os.Parcelable;
 
 import com.annimon.stream.Stream;
-import com.littleinferno.flowchart.util.DataType;
 import com.littleinferno.flowchart.project.ProjectModule;
+import com.littleinferno.flowchart.util.ArrayChangedListener;
+import com.littleinferno.flowchart.util.DataType;
 import com.littleinferno.flowchart.util.DestroyListener;
+import com.littleinferno.flowchart.util.Generator;
 import com.littleinferno.flowchart.util.NameChangedListener;
 import com.littleinferno.flowchart.util.TypeChangedListener;
-import com.littleinferno.flowchart.util.ArrayChangedListener;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.UUID;
 
-public class Variable extends ProjectModule implements Parcelable {
+public class Variable extends ProjectModule implements Parcelable, Generator {
+    private final HashMap<UUID, VariableManager> parent = new HashMap<>();
 
     public static final String TAG = "VARIABLE";
 
@@ -28,6 +32,7 @@ public class Variable extends ProjectModule implements Parcelable {
     private final List<TypeChangedListener> typeChangedListeners;
     private final List<ArrayChangedListener> arrayChangedListeners;
     private final List<DestroyListener> destroyListeners;
+
 
     public Variable(final VariableManager variableManager, final DataType dataType, final String name, final boolean isArray) {
         super(variableManager.getProject());
@@ -45,7 +50,7 @@ public class Variable extends ProjectModule implements Parcelable {
 
     protected Variable(Parcel in) {
         super(in);
-        variableManager = in.readParcelable(VariableManager.class.getClassLoader());
+        variableManager = parent.remove(getId());
 
         name = in.readString();
         isArray = in.readByte() != 0;
@@ -156,10 +161,16 @@ public class Variable extends ProjectModule implements Parcelable {
     @Override
     public void writeToParcel(Parcel dest, int flags) {
         super.writeToParcel(dest, flags);
-        dest.writeParcelable(variableManager, flags);
+        parent.put(getId(), variableManager);
+
         dest.writeString(name);
         dest.writeByte((byte) (isArray ? 1 : 0));
         dest.writeString(dataType.toString());
+    }
+
+    @Override
+    public String generate() {
+        return getProject().getRules().genVariable(name, dataType, isArray);
     }
 
     public static class SimpleObject {

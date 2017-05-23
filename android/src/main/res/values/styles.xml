@@ -1,14 +1,5 @@
 <resources>
 
-    <style name="AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
-
-    <style name="PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
-
-    <style name="DialogList" parent="android:Theme.Material.Light.Dialog">
-        <item name="android:windowMinWidthMajor">90%</item>
-        <item name="android:windowMinWidthMinor">90%</item>
-    </style>
-
     <style name="DialogDetails" parent="Theme.AppCompat.Light.NoActionBar">
         <item name="android:windowCloseOnTouchOutside">true</item>
         <item name="android:windowMinWidthMajor">90%</item>
@@ -20,6 +11,9 @@
         <item name="android:windowExitAnimation">@anim/fragment_out</item>
     </style>
 
-
+    <style name="Theme.Material.Light.Dialog.NoMinWidth" parent="android:Theme.Material.Light.Dialog">
+        <item name="android:windowMinWidthMinor">0dip</item>
+        <item name="android:windowMinWidthMajor">0dip</item>
+    </style>
 
 </resources>

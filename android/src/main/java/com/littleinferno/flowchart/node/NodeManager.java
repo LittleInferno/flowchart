@@ -81,14 +81,8 @@ public class NodeManager implements Parcelable {
 
     public AndroidNode createNode(AndroidNode.SimpleObject savedInfo) {
         AndroidNode node = createNode(savedInfo.name, savedInfo.x, savedInfo.y);
-
-        node.getNodeHandle().getAttribute("load")
-                .ifPresent(o ->
-                        node.getNodeHandle()
-                        .getPluginHandle()
-                        .createScriptFun((org.mozilla.javascript.Function) o)
-                        .call(node, savedInfo.attributes));
-
+        node.setNodeId(UUID.fromString(savedInfo.id));
+        node.setLoadAttributes(savedInfo.attributes);
         return node;
     }
 
@@ -99,6 +93,13 @@ public class NodeManager implements Parcelable {
     public AndroidNode getNode(String name) {
         return Stream.of(nodes)
                 .filter(n -> n.getNodeHandle().getName().equals(name))
+                .findFirst()
+                .orElseThrow(() -> new RuntimeException("Cannot find node"));
+    }
+
+    public AndroidNode getNode(UUID id) {
+        return Stream.of(nodes)
+                .filter(n -> n.getNodeId().equals(id))
                 .findFirst()
                 .orElseThrow(() -> new RuntimeException("Cannot find node"));
     }

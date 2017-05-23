@@ -3,43 +3,36 @@ package com.littleinferno.flowchart.variable;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import com.annimon.stream.Collectors;
 import com.annimon.stream.Stream;
-import com.littleinferno.flowchart.util.DataType;
 import com.littleinferno.flowchart.project.Project;
 import com.littleinferno.flowchart.project.ProjectModule;
+import com.littleinferno.flowchart.util.DataType;
 import com.littleinferno.flowchart.util.Fun;
+import com.littleinferno.flowchart.util.Generator;
 import com.littleinferno.flowchart.util.Link;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class VariableManager extends ProjectModule implements Parcelable {
+public class VariableManager extends ProjectModule implements Parcelable, Generator {
 
     public static final String TAG = "VARIABLE_MANAGER";
 
     private final List<Variable> variables;
-    private final List<Link> variableAddListeners;
-    private final List<Link> variableRemoveListeners;
+    private final List<Link> variableAddListeners = new ArrayList<>();
+    private final List<Link> variableRemoveListeners = new ArrayList<>();
 
     public VariableManager(Project project) {
         super(project);
 
         variables = new ArrayList<>();
-        variableAddListeners = new ArrayList<>();
-        variableRemoveListeners = new ArrayList<>();
     }
 
     private VariableManager(Parcel in) {
         super(in);
         variables = new ArrayList<>();
         in.readList(variables, Variable.class.getClassLoader());
-
-        variableAddListeners = new ArrayList<>();
-        in.readList(variableAddListeners, Fun.class.getClassLoader());
-
-        variableRemoveListeners = new ArrayList<>();
-        in.readList(variableRemoveListeners, Fun.class.getClassLoader());
-
     }
 
     public static final Creator<VariableManager> CREATOR = new Creator<VariableManager>() {
@@ -112,8 +105,6 @@ public class VariableManager extends ProjectModule implements Parcelable {
     public void writeToParcel(Parcel dest, int flags) {
         super.writeToParcel(dest, flags);
         dest.writeList(variables);
-        dest.writeList(variableAddListeners);
-        dest.writeList(variableRemoveListeners);
     }
 
     public Link onVariableAdd(Fun fun) {
@@ -142,5 +133,10 @@ public class VariableManager extends ProjectModule implements Parcelable {
 
     public Variable createVariable(Variable.SimpleObject s) {
         return createVariable(s.name, s.dataType, s.isArray);
+    }
+
+    @Override
+    public String generate() {
+        return Stream.of(variables).map(Variable::generate).collect(Collectors.joining("\n"));
     }
 }

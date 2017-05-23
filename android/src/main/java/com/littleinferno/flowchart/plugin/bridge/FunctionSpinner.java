@@ -2,7 +2,6 @@ package com.littleinferno.flowchart.plugin.bridge;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
-import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -16,14 +15,41 @@ import com.littleinferno.flowchart.util.Link;
 
 @SuppressWarnings("unused")
 @SuppressLint("ViewConstructor")
-public class FunctionSpinner extends android.support.v7.widget.AppCompatSpinner {
+public class FunctionSpinner extends android.support.v7.widget.AppCompatSpinner implements ViewName {
+
+    public static FunctionSpinner make(String name, AndroidNode node, OnSelected selected) {
+        return new FunctionSpinner(name, node.getFunction().getFunctionManager(),
+                node.getContext(), selected);
+    }
+
+    public static String getSelected(AndroidNode node, String name) {
+        FunctionSpinner view = (FunctionSpinner) node.getView(name);
+        return view != null ? view.functionManager.getFunction(view.getSelectedItemPosition()).getName() : "";
+    }
+
+    public static void setSelected(AndroidNode node, String name, String text) {
+        FunctionSpinner view = (FunctionSpinner) node.getView(name);
+        if (view != null) {
+            int index = Stream.of(view.functionManager.getFunctions())
+                    .filter(variable -> variable.getName().equals(name))
+                    .map(variable -> view.functionManager.getFunctions().indexOf(variable))
+                    .findSingle()
+                    .orElse(0);
+
+            view.setSelection(index);
+        }
+    }
 
     private final Link add;
     private final Link remove;
+    private final String name;
+    private final FunctionManager functionManager;
 
-    private FunctionSpinner(FunctionManager functionManager, Context context, OnSelected onSelected) {
+    private FunctionSpinner(String name, FunctionManager functionManager, Context context, OnSelected onSelected) {
         super(context);
-        Log.e("EROR", "E");
+        this.name = name;
+        this.functionManager = functionManager;
+
         ArrayAdapter<String> adapter =
                 new ArrayAdapter<>(getContext(), android.R.layout.simple_spinner_item,
                         Stream.of(functionManager.getFunctions())
@@ -67,7 +93,8 @@ public class FunctionSpinner extends android.support.v7.widget.AppCompatSpinner 
         void select(Function object);
     }
 
-    public static FunctionSpinner make(AndroidNode node, OnSelected selected) {
-        return new FunctionSpinner(node.getFunction().getFunctionManager(), node.getContext(), selected);
+    @Override
+    public String getName() {
+        return name;
     }
 }

@@ -7,16 +7,21 @@ import android.support.annotation.Nullable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
+import android.view.WindowManager;
 
 import com.github.angads25.filepicker.model.DialogConfigs;
 import com.github.angads25.filepicker.model.DialogProperties;
 import com.github.angads25.filepicker.view.FilePickerDialog;
-import com.littleinferno.flowchart.util.Files;
 import com.littleinferno.flowchart.databinding.LayoutCodeViewBinding;
+import com.littleinferno.flowchart.util.Files;
+import com.littleinferno.flowchart.util.Generator;
 
 import java.io.File;
 
-public class ViewCodeFragment extends DialogFragment {
+import thereisnospon.codeview.CodeViewTheme;
+
+public class CodeViewDialog extends DialogFragment {
 
     LayoutCodeViewBinding layout;
     private String code;
@@ -25,10 +30,22 @@ public class ViewCodeFragment extends DialogFragment {
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
         layout = LayoutCodeViewBinding.inflate(inflater, container, false);
-
         return layout.getRoot();
     }
 
+    @Override
+    public void onActivityCreated(Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+
+        WindowManager.LayoutParams lp = new WindowManager.LayoutParams();
+        Window window = getDialog().getWindow();
+        lp.copyFrom(window.getAttributes());
+
+        lp.width = WindowManager.LayoutParams.MATCH_PARENT;
+        lp.height = WindowManager.LayoutParams.MATCH_PARENT;
+
+        window.setAttributes(lp);
+    }
 
     @Override
     public void onStart() {
@@ -37,14 +54,14 @@ public class ViewCodeFragment extends DialogFragment {
         Bundle arguments = getArguments();
 
         if (arguments != null) {
-            code = arguments.getString("CODE");
-            layout.codeView.setText(code);
+            code = arguments.getString(Generator.CODE);
+            layout.codeview.setTheme(CodeViewTheme.GITHUB);
+            layout.codeview.showCode(code);
+
         }
 
-        layout.save.setOnClickListener(v -> {
-            showFilePicker();
-        });
-
+        layout.back.setOnClickListener(v -> dismiss());
+        layout.save.setOnClickListener(v -> showFilePicker());
     }
 
     private void showFilePicker() {
@@ -54,7 +71,6 @@ public class ViewCodeFragment extends DialogFragment {
         properties.root = new File(DialogConfigs.DEFAULT_DIR);
         properties.error_dir = new File(DialogConfigs.DEFAULT_DIR);
         properties.offset = new File(DialogConfigs.DEFAULT_DIR);
-        properties.extensions = new String[]{"fcp"};
 
         FilePickerDialog dialog = new FilePickerDialog(getContext(), properties);
 
@@ -65,14 +81,13 @@ public class ViewCodeFragment extends DialogFragment {
         dialog.show();
     }
 
-
     public static void show(String code, FragmentManager fragmentManager) {
         Bundle bundle = new Bundle();
-        bundle.putString("CODE", code);
+        bundle.putString(Generator.CODE, code);
 
-        ViewCodeFragment viewCodeFragment = new ViewCodeFragment();
+        CodeViewDialog codeViewDialog = new CodeViewDialog();
 
-        viewCodeFragment.setArguments(bundle);
-        viewCodeFragment.show(fragmentManager, "CODE_VIEW");
+        codeViewDialog.setArguments(bundle);
+        codeViewDialog.show(fragmentManager, "CODE_VIEW");
     }
 }

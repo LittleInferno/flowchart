@@ -8,7 +8,6 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.LinearLayoutManager;
-import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -40,15 +39,16 @@ public class FunctionListFragment extends DialogFragment {
     }
 
     @Override
-    public void onActivityCreated(Bundle bundle) {
-        super.onActivityCreated(bundle);
+    public void onActivityCreated(Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
 
+        WindowManager.LayoutParams lp = new WindowManager.LayoutParams();
         Window window = getDialog().getWindow();
-        if (window != null) {
-            WindowManager.LayoutParams layoutParams = window.getAttributes();
-            layoutParams.gravity = Gravity.FILL_HORIZONTAL;
-            layoutParams.windowAnimations = R.style.FragmentAnim;
-        }
+        lp.copyFrom(window.getAttributes());
+
+        lp.width = WindowManager.LayoutParams.MATCH_PARENT;
+        lp.height = WindowManager.LayoutParams.MATCH_PARENT;
+        window.setAttributes(lp);
     }
 
     @Override
@@ -94,11 +94,8 @@ public class FunctionListFragment extends DialogFragment {
                     adapter.notifyItemRemoved(position);
                     adapter.notifyItemRangeChanged(position, functionManager.getFunctions().size());
 
-                    if (position > functionManager.getFunctions().size())
-                        position--;
-
                     FunctionDetailsFragment.show(functionManager, getChildFragmentManager(),
-                            functionManager.getFunctions().get(position), R.id.function_details_layout);
+                            functionManager.getFunctions().get(--position), R.id.function_details_layout);
 
                     layout.addFunction.show();
                 })

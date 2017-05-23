@@ -2,7 +2,6 @@ package com.littleinferno.flowchart.plugin.bridge;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
-import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -16,14 +15,40 @@ import com.littleinferno.flowchart.variable.VariableManager;
 
 @SuppressWarnings("unused")
 @SuppressLint("ViewConstructor")
-public class VariableSpinner extends android.support.v7.widget.AppCompatSpinner {
+public class VariableSpinner extends android.support.v7.widget.AppCompatSpinner implements ViewName {
+
+    public static VariableSpinner make(String name, AndroidNode node, OnSelected selected) {
+        return new VariableSpinner(name, node.getFunction().getProject().getVariableManager(),
+                node.getContext(), selected);
+    }
+
+    public static String getSelected(AndroidNode node, String name) {
+        VariableSpinner view = (VariableSpinner) node.getView(name);
+        return view != null ? view.variableManager.getVariable(view.getSelectedItemPosition()).getName() : "";
+    }
+
+    public static void setSelected(AndroidNode node, String name, String text) {
+        VariableSpinner view = (VariableSpinner) node.getView(name);
+        if (view != null) {
+            int index = Stream.of(view.variableManager.getVariables())
+                    .filter(variable -> variable.getName().equals(name))
+                    .map(variable -> view.variableManager.getVariables().indexOf(variable))
+                    .findSingle()
+                    .orElse(0);
+
+            view.setSelection(index);
+        }
+    }
 
     private final Link add;
     private final Link remove;
+    private final String name;
+    private final VariableManager variableManager;
 
-    private VariableSpinner(VariableManager variableManager, Context context, OnSelected onSelected) {
+    private VariableSpinner(String name, VariableManager variableManager, Context context, OnSelected onSelected) {
         super(context);
-        Log.e("EROR", "S");
+        this.name = name;
+        this.variableManager = variableManager;
 
         ArrayAdapter<String> adapter =
                 new ArrayAdapter<>(getContext(), android.R.layout.simple_spinner_item,
@@ -63,12 +88,13 @@ public class VariableSpinner extends android.support.v7.widget.AppCompatSpinner 
         remove.disconnect();
     }
 
+    @Override
+    public String getName() {
+        return name;
+    }
+
     @SuppressWarnings("WeakerAccess")
     public interface OnSelected {
         void select(Variable object);
-    }
-
-    public static VariableSpinner make(AndroidNode node, OnSelected selected) {
-        return new VariableSpinner(node.getFunction().getProject().getVariableManager(), node.getContext(), selected);
     }
 }

@@ -128,19 +128,13 @@ public class ProjectActivity extends AppCompatActivity implements NavigationView
                 break;
             }
             case R.id.start: {
-                String generate = project.getFunctionManager().generate();
-                project.setGen(generate);
-                Files.saveGen(project, generate);
+                project.generate();
                 break;
             }
             case R.id.code: {
-                String generate = project.getFunctionManager().generate();
-                project.setGen(generate);
-                Files.saveGen(project, generate);
-                ViewCodeFragment.show(generate, getFragmentManager());
+                CodeViewDialog.show(project.generate(), getFragmentManager());
                 break;
             }
-
         }
         return true;
     }

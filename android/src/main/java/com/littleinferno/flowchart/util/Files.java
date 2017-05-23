@@ -5,7 +5,6 @@ import android.media.MediaScannerConnection;
 import android.os.Environment;
 import android.support.annotation.NonNull;
 
-import com.annimon.stream.Stream;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.littleinferno.flowchart.plugin.BasePluginHandle;
@@ -21,7 +20,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintWriter;
 import java.nio.channels.FileChannel;
-import java.util.List;
 import java.util.Scanner;
 import java.util.zip.ZipFile;
 
@@ -30,25 +28,11 @@ import io.reactivex.schedulers.Schedulers;
 
 public class Files {
 
-    public static String projectLocation = "/flowchart_projects/projects";
+    public static String flowchrtLocation = "/flowchart_projects";
 
     private static Gson gson = new GsonBuilder()
             .setPrettyPrinting()
             .create();
-
-    static List<String> getProjects() {
-        File file = new File(Environment.getExternalStorageDirectory().toString() + projectLocation);
-
-        File[] listOfFiles = file.listFiles();
-
-        return Stream.of(listOfFiles).filter(File::isDirectory).map(File::getName).toList();
-    }
-
-    public static File newProjectFolder(String name) {
-        File file = new File(Environment.getExternalStorageDirectory().toString() + projectLocation + "/" + name);
-        file.mkdir();
-        return file;
-    }
 
     public static String inputStreamToString(final InputStream inputStream) {
         Scanner scanner = new java.util.Scanner(inputStream).useDelimiter("\\A");
@@ -85,7 +69,7 @@ public class Files {
 
 
     public static String getSavesLocation() {
-        return Environment.getExternalStorageDirectory().toString() + "/flowchart_projects/saves/";
+        return Environment.getExternalStorageDirectory().toString() + flowchrtLocation + "/saves/";
     }
 
     public static String getSaveLocation(String projectName) {
@@ -93,11 +77,11 @@ public class Files {
     }
 
     public static String getPLuginsLocation() {
-        return Environment.getExternalStorageDirectory().toString() + "/flowchart_projects/plugins/";
+        return Environment.getExternalStorageDirectory().toString() + flowchrtLocation + "/plugins/";
     }
 
     public static String getGenerateLocation() {
-        return Environment.getExternalStorageDirectory().toString() + "/flowchart_projects/plugins/";
+        return Environment.getExternalStorageDirectory().toString() + flowchrtLocation + "/generation/";
     }
 
     public static void copyFile(Context context, File source, File dest) {
@@ -160,6 +144,22 @@ public class Files {
         String pl = Files.inputStreamToString(zip.getInputStream(zip.getEntry(PluginHelper.PLUGIN_FILE)));
 
         return new PluginHandle(new Gson().fromJson(index, BasePluginHandle.PluginParams.class), pl);
+    }
+
+    public static void initFolder(Context context) {
+        File file = new File(flowchrtLocation);
+
+        if (!file.exists()) {
+            File f1 = new File(getSavesLocation());
+            File f2 = new File(getPLuginsLocation());
+            File f3 = new File(getGenerateLocation());
+
+            f1.mkdirs();
+            f2.mkdirs();
+            f3.mkdirs();
+
+            updateAndroidFS(context, f1.toString(), f2.toString(), f3.toString());
+        }
     }
 
 }

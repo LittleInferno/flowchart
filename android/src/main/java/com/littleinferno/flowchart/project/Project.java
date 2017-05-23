@@ -11,13 +11,14 @@ import com.littleinferno.flowchart.function.Function;
 import com.littleinferno.flowchart.function.FunctionManager;
 import com.littleinferno.flowchart.plugin.PluginHandle;
 import com.littleinferno.flowchart.util.Files;
+import com.littleinferno.flowchart.util.Generator;
 import com.littleinferno.flowchart.variable.Variable;
 import com.littleinferno.flowchart.variable.VariableManager;
 
 import java.lang.reflect.Type;
 import java.util.List;
 
-public class Project implements Parcelable {
+public class Project implements Parcelable, Generator {
 
     public static final String TAG = "FLOWCHART_PROJECT";
     public static final String PROJECT_NAME = "NAME";
@@ -161,6 +162,7 @@ public class Project implements Parcelable {
 
     public void setGen(String gen) {
         this.gen = gen;
+        Files.saveGen(this, gen);
     }
 
     public SimpleObject getSaveInfo() {
@@ -174,11 +176,25 @@ public class Project implements Parcelable {
         return new SimpleObject(pluginHandle.getPluginParams().getPluginName(), functions, variables);
     }
 
-    public void init(SimpleObject saveInfo) throws Exception {
+    private void init(SimpleObject saveInfo) throws Exception {
 
         setPlugin(Files.loadPlugin(context, saveInfo.plugin));
-        Stream.of(saveInfo.functions).forEach(functionManager::createFunction);
         Stream.of(saveInfo.variables).forEach(variableManager::createVariable);
+        Stream.of(saveInfo.functions)
+                .map(functionManager::createFunction)
+                .forEach(Function::loadNodes);
+    }
+
+    @Override
+    public String generate() {
+        String variables = variableManager.generate();
+        String functions = functionManager.generate();
+        setGen(variables + "\n" + functions);
+        return getGen();
+    }
+
+    public String getGen() {
+        return gen;
     }
 
     public static class SimpleObject {

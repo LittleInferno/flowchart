@@ -6,10 +6,10 @@ import android.os.Parcelable;
 import com.annimon.stream.Collectors;
 import com.annimon.stream.Optional;
 import com.annimon.stream.Stream;
-import com.littleinferno.flowchart.generator.Generator;
 import com.littleinferno.flowchart.project.Project;
 import com.littleinferno.flowchart.project.ProjectModule;
 import com.littleinferno.flowchart.util.Fun;
+import com.littleinferno.flowchart.util.Generator;
 import com.littleinferno.flowchart.util.Link;
 
 import java.util.ArrayList;
@@ -21,16 +21,13 @@ public class FunctionManager extends ProjectModule implements Generator, Parcela
 
     private List<Function> functions;
     private int counter;
-    private final List<Link> functionRemoveListeners;
-    private final List<Link> functionAddListeners;
+    private final List<Link> functionRemoveListeners = new ArrayList<>();
+    private final List<Link> functionAddListeners = new ArrayList<>();
 
     public FunctionManager(final Project project) {
         super(project);
         functions = new ArrayList<>();
         counter = 0;
-
-        functionRemoveListeners = new ArrayList<>();
-        functionAddListeners = new ArrayList<>();
     }
 
     private FunctionManager(Parcel in) {
@@ -39,12 +36,6 @@ public class FunctionManager extends ProjectModule implements Generator, Parcela
 
         functions = new ArrayList<>();
         in.readList(functions, Function.class.getClassLoader());
-
-        functionAddListeners = new ArrayList<>();
-        in.readList(functionAddListeners, Fun.class.getClassLoader());
-
-        functionRemoveListeners = new ArrayList<>();
-        in.readList(functionRemoveListeners, Fun.class.getClassLoader());
     }
 
     public static final Creator<FunctionManager> CREATOR = new Creator<FunctionManager>() {
@@ -80,13 +71,6 @@ public class FunctionManager extends ProjectModule implements Generator, Parcela
         functions.add(0, function);
 
         notifyFunctionAdd();
-        return function;
-    }
-
-    public Function createFunction() {
-        Function function = new Function(this, "newFun" + counter++);
-
-        functions.add(function);
         return function;
     }
 
@@ -140,8 +124,6 @@ public class FunctionManager extends ProjectModule implements Generator, Parcela
         super.writeToParcel(dest, flags);
         dest.writeInt(counter);
         dest.writeList(functions);
-        dest.writeList(functionAddListeners);
-        dest.writeList(functionRemoveListeners);
     }
 
     public Link onFunctionAdd(Fun fun) {
@@ -167,5 +149,9 @@ public class FunctionManager extends ProjectModule implements Generator, Parcela
     @Override
     public String generate() {
         return Stream.of(functions).map(Function::generate).collect(Collectors.joining("\n"));
+    }
+
+    public Function getFunction(int pos) {
+        return functions.get(pos);
     }
 }

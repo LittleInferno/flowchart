@@ -8,7 +8,6 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.LinearLayoutManager;
-import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -41,20 +40,23 @@ public class VariableListFragment extends DialogFragment {
     }
 
     @Override
-    public void onActivityCreated(Bundle bundle) {
-        super.onActivityCreated(bundle);
+    public void onActivityCreated(Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
 
+        WindowManager.LayoutParams lp = new WindowManager.LayoutParams();
         Window window = getDialog().getWindow();
-        if (window != null) {
-            WindowManager.LayoutParams params = window.getAttributes();
-            params.gravity = Gravity.FILL_HORIZONTAL;
-            params.windowAnimations = R.style.FragmentAnim;
-        }
+        lp.copyFrom(window.getAttributes());
+
+        lp.width = WindowManager.LayoutParams.MATCH_PARENT;
+        lp.height = WindowManager.LayoutParams.MATCH_PARENT;
+        window.setAttributes(lp);
     }
 
     @Override
     public void onStart() {
         super.onStart();
+
+        layout.back.setOnClickListener(v -> dismiss());
 
         Bundle bundle = getArguments();
 

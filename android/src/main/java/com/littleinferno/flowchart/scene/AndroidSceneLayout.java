@@ -15,8 +15,10 @@ import android.widget.RelativeLayout;
 import com.annimon.stream.Stream;
 import com.littleinferno.flowchart.node.AndroidNode;
 import com.littleinferno.flowchart.pin.Pin;
+import com.littleinferno.flowchart.util.ResUtil;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class AndroidSceneLayout extends RelativeLayout {
     private final Paint paint;
@@ -25,12 +27,32 @@ public class AndroidSceneLayout extends RelativeLayout {
     private int y = 0;
     boolean touch = false;
 
-    private static class Wire {
+    public static class Wire {
         final Pin begin, end;
 
         private Wire(Pin begin, Pin end) {
             this.begin = begin;
             this.end = end;
+        }
+
+        public SimpleObject getSaveInfo() {
+            return new SimpleObject(begin.getNode().getNodeId().toString(), begin.getName(),
+                    end.getNode().getNodeId().toString(), end.getName());
+        }
+
+        public class SimpleObject {
+
+            public final String begNode;
+            public final String begPin;
+            public final String endNode;
+            public final String endPin;
+
+            public SimpleObject(String begNode, String begPin, String endNode, String endPin) {
+                this.begNode = begNode;
+                this.begPin = begPin;
+                this.endNode = endNode;
+                this.endPin = endPin;
+            }
         }
     }
 
@@ -80,8 +102,15 @@ public class AndroidSceneLayout extends RelativeLayout {
         return ((CardView) getParent()).onTouchEvent(event);
     }
 
-    public void addWire(Pin connector, Pin pin) {
+    public Wire addWire(Pin connector, Pin pin) {
         wires.add(new Wire(connector, pin));
+        invalidate();
+
+        return wires.get(wires.size() - 1);
+    }
+
+    public void removeWire(Wire wire) {
+        wires.remove(wire);
         invalidate();
     }
 
@@ -102,20 +131,22 @@ public class AndroidSceneLayout extends RelativeLayout {
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
 
-        Stream.of(wires).forEach(wire -> {
+        Stream.of(wires)
+                .filter(wire ->
+                        wire.begin.getVisibility() == View.VISIBLE &&
+                                wire.end.getVisibility() == View.VISIBLE)
+                .forEach(wire -> {
+                    float bx = wire.begin.getSceneX();
+                    float by = wire.begin.getSceneY();
 
-            float bx = wire.begin.getSceneX();
-            float by = wire.begin.getSceneY();
+                    float ex = wire.end.getSceneX();
+                    float ey = wire.end.getSceneY();
 
-            float ex = wire.end.getSceneX();
-            float ey = wire.end.getSceneY();
+                    paint.setStrokeWidth(10);
+                    paint.setColor(ResUtil.getDataTypeColor(getContext(), wire.begin.getType()));
 
-            paint.setStrokeWidth(10);
-
-//            paint.setColor(ResUtil.getDataTypeColor(getContext(), wire.begin.getType()));
-
-            canvas.drawLine(bx, by, ex, ey, paint);
-        });
+                    canvas.drawLine(bx, by, ex, ey, paint);
+                });
     }
 
     @Override
@@ -139,6 +170,10 @@ public class AndroidSceneLayout extends RelativeLayout {
         }
 
         return true;
+    }
+
+    public List<Wire.SimpleObject> getSaveInfo() {
+        return Stream.of(wires).map(Wire::getSaveInfo).toList();
     }
 }
 

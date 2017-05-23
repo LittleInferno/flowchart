@@ -1,5 +1,7 @@
 package com.littleinferno.flowchart.plugin.gui;
 
+import android.Manifest;
+import android.content.pm.PackageManager;
 import android.databinding.DataBindingUtil;
 import android.graphics.Color;
 import android.os.Bundle;
@@ -12,16 +14,18 @@ import com.github.angads25.filepicker.model.DialogConfigs;
 import com.github.angads25.filepicker.model.DialogProperties;
 import com.github.angads25.filepicker.view.FilePickerDialog;
 import com.google.gson.Gson;
-import com.littleinferno.flowchart.util.Files;
 import com.littleinferno.flowchart.R;
 import com.littleinferno.flowchart.databinding.ActivityPluginBinding;
 import com.littleinferno.flowchart.plugin.BasePluginHandle;
 import com.littleinferno.flowchart.plugin.PluginHelper;
+import com.littleinferno.flowchart.util.Files;
 import com.littleinferno.flowchart.util.Swiper;
 
 import net.idik.lib.slimadapter.SlimAdapter;
 
 import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.zip.ZipFile;
 
@@ -115,6 +119,20 @@ public class PluginActivity extends AppCompatActivity {
         layout.progress.setEnabled(true);
         layout.progress.setVisibility(View.VISIBLE);
 
+        if (checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+            pluginParams = new ArrayList<>();
+            try {
+                pluginParams.add(PluginHelper.getStandartPluginParams(getAssets()));
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+            layout.progress.setVisibility(View.INVISIBLE);
+            layout.progress.setEnabled(false);
+            layout.plugins.items.setVisibility(View.VISIBLE);
+            layout.addPlugin.setEnabled(false);
+            return;
+        }
         Gson gson = new Gson();
 
         plugins = Observable.just(Files.getPLuginsLocation())
@@ -141,4 +159,12 @@ public class PluginActivity extends AppCompatActivity {
                 });
     }
 
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+
+        if (plugins != null)
+            plugins.dispose();
+
+    }
 }

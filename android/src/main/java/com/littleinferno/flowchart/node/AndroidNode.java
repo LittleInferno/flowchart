@@ -17,26 +17,29 @@ import android.widget.RelativeLayout;
 
 import com.annimon.stream.Optional;
 import com.annimon.stream.Stream;
-import com.littleinferno.flowchart.util.Connection;
-import com.littleinferno.flowchart.util.DataType;
 import com.littleinferno.flowchart.databinding.NodeLayoutBinding;
 import com.littleinferno.flowchart.function.Function;
 import com.littleinferno.flowchart.pin.Pin;
 import com.littleinferno.flowchart.plugin.PluginHandle;
 import com.littleinferno.flowchart.plugin.bridge.ViewName;
 import com.littleinferno.flowchart.scene.AndroidSceneLayout;
+import com.littleinferno.flowchart.util.Connection;
+import com.littleinferno.flowchart.util.DataType;
 
 import org.mozilla.javascript.NativeArray;
 
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.UUID;
 
 @SuppressLint("ViewConstructor")
 public class AndroidNode extends CardView {
 
+    HashMap<String, String> nodeAttributes = new HashMap<>();
 
-    private final UUID id;
+    private UUID id;
+    private String[] attributes;
 
     public float getHeaderHeight() {
         return layout.header.getBottom();
@@ -44,6 +47,14 @@ public class AndroidNode extends CardView {
 
     public void setClosable(Integer closable) {
         layout.close.setVisibility(closable);
+    }
+
+    public UUID getNodeId() {
+        return id;
+    }
+
+    public void setNodeId(UUID id) {
+        this.id = id;
     }
 
     public enum Align {
@@ -221,6 +232,16 @@ public class AndroidNode extends CardView {
         return viewName;
     }
 
+    @SuppressWarnings("unused")
+    public void putAttribute(String key, String value) {
+        nodeAttributes.put(key, value);
+    }
+
+    @SuppressWarnings("unused")
+    public String getAttribute(String key) {
+        return nodeAttributes.get(key);
+    }
+
     public void drag() {
         ClipData data = ClipData.newPlainText("", "");
         ShadowBuilder shadowBuilder = new ShadowBuilder(this);
@@ -282,14 +303,28 @@ public class AndroidNode extends CardView {
 
             for (int i = 0; i < call.size(); i++) attributes[i] = (String) call.get(i);
 
-            return new SimpleObject(getNodeHandle().getName(), getX(), getY(), attributes);
+            return new SimpleObject(getNodeHandle().getName(), getX(), getY(), id.toString(), attributes);
         }
 
-        return new SimpleObject(getNodeHandle().getName(), getX(), getY());
+        return new SimpleObject(getNodeHandle().getName(), getX(), getY(), id.toString());
     }
 
-    public UUID getNodeId() {
-        return id;
+    public void setLoadAttributes(String[] attributes) {
+        this.attributes = attributes;
+    }
+
+    @SuppressWarnings("unused")
+    public void removeDataPin() {
+        Stream.of(getPins()).filter(pin -> pin.getType() != DataType.EXECUTION).forEach(this::removePin);
+    }
+
+    public void load() {
+        nodeHandle.getAttribute("load")
+                .ifPresent(o ->
+                        nodeHandle
+                                .getPluginHandle()
+                                .createScriptFun((org.mozilla.javascript.Function) o)
+                                .call(this, attributes));
     }
 
     private static class ShadowBuilder extends View.DragShadowBuilder {
@@ -328,12 +363,14 @@ public class AndroidNode extends CardView {
         final String name;
         final float x;
         final float y;
+        final String id;
         final String[] attributes;
 
-        SimpleObject(String name, float x, float y, String... attributes) {
+        SimpleObject(String name, float x, float y, String id, String... attributes) {
             this.name = name;
             this.x = x;
             this.y = y;
+            this.id = id;
             this.attributes = attributes;
         }
     }

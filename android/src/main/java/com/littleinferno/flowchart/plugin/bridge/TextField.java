@@ -15,9 +15,6 @@ import com.littleinferno.flowchart.node.AndroidNode;
 @SuppressLint("ViewConstructor")
 public class TextField extends TextInputLayout implements ViewName {
 
-    private EditText editText;
-    private String name;
-
     public static TextField make(String name, AndroidNode node, DataType dataType) {
         return new TextField(name, node.getContext(), dataType);
     }
@@ -32,6 +29,9 @@ public class TextField extends TextInputLayout implements ViewName {
         if (view != null)
             view.setText(text);
     }
+
+    private EditText editText;
+    private String name;
 
     private void setText(String text) {
         editText.setText(text);

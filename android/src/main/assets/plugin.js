@@ -37,14 +37,23 @@ function exportRules() {
             "volatile", "while", "with", "yield"],
 
         variableIsAvailable: true,
+        variableGen: function (name, type, isArray) {
+            return ("var " + name + " = " + (isArray ? "[]" : type.getDefaultValue()) + ";");
+        },
         functionIsAvailable: true,
         pattern: "[$a-zA-Z_][0-9a-zA-Z_$]*",
         entryPoint: "main"
+
     };
 }
 
 function makeVariable(name, value) {
     return "var " + name + " = " + value + ";";
+}
+
+var __Counter = 0;
+function makeNamedValue(name) {
+    return name + __Counter++;
 }
 
 function addNode() {
@@ -260,7 +269,7 @@ function integerNode() {
         category: "basic java script",
         gen: gen,
         init: init,
-        attributes: [{ "save": save },{ "load": load }]
+        attributes: [{ "save": save }, { "load": load }]
     }
 }
 
@@ -290,7 +299,7 @@ function floatNode() {
         category: "basic java script",
         gen: gen,
         init: init,
-        attributes: [{ "save": save },{ "load": load }]
+        attributes: [{ "save": save }, { "load": load }]
     }
 }
 
@@ -322,7 +331,7 @@ function stringNode() {
         category: "basic java script",
         gen: gen,
         init: init,
-        attributes: [{ "save": save },{ "load": load }]
+        attributes: [{ "save": save }, { "load": load }]
     }
 }
 
@@ -446,31 +455,75 @@ function functionCallNode() {
         node.addExecutionInputPin("in");
         var next = node.addExecutionOutputPin("out");
 
-        var hash = -1;
-        var drop = FunctionDropDown.make(node, function (fun) {
-            if (hash != -1)
-                fun.removeParameterListener(hash);
+        var m_fun = null;
+        var m_listener = null;
 
-            hash = fun.addParameterListener(function (parameter) {
+        var drop = FunctionDropDown.make("data", node, function (fun) {
+            if (m_fun) {
+                m_fun.removeParameterListener(m_listener);
+                node.removeDataPin();
+            }
+
+            var n = function (change) { pin.setName(change) }
+            var t = function (change) { pin.setType(change) }
+            var a = function (change) { pin.setArray(change) }
+            m_fun = fun;
+            m_listener = m_fun.addParameterListener(function (parameter) {
+                var pin;
                 if (parameter.getConnection() == Connection.INPUT)
                     pin = node.addDataInputPin(parameter.getName(), parameter.isArray(), parameter.getDataType());
                 else
                     pin = node.addDataOutputPin(parameter.getName(), parameter.isArray(), parameter.getDataType());
 
-                parameter.onNameChange(function (change) { pin.setName(change) });
-                parameter.onTypeChange(function (change) { pin.setType(change) });
-                parameter.onArrayChange(function (change) { pin.setArray(change) });
+                parameter.onNameChange(n);
+                parameter.onTypeChange(t);
+                parameter.onArrayChange(a);
             }, function (parameter) {
+                parameter.removeNameChange(n);
+                parameter.removeTypeChange(t);
+                parameter.removeArrayChange(a);
                 node.removePin(parameter.getName());
             }
             );
             fun.applyParameters();
         });
-        // node.addView(NativeNode.Align.CENTER, drop);
+        node.addView(NativeNode.Align.CENTER, drop);
     }
 
-    var gen = function (node) {
-        return "";
+    var gen = function (node, pin) {
+        var res = "";
+
+        if (pin.getType() == NativeType.EXECUTION) {
+            var parameters = node.getFunction().getOutputParameters().length;
+            var call = makeNamedValue("tmpcall");
+            node.putAttribute("call", call);
+
+            var next = node.getPin("out").generate();
+
+            var params = "";
+            parameters = node.getFunction().getInputParameters();
+
+            for (var i = 0; i < parameters.length; i++) {
+                params += node.getPin(parameters[i].getName());
+                if (i != parameters.length - 1)
+                    params += ',';
+            }
+
+            return (call + " =  " + FunctionDropDown.getSelected(node, "data") + "(" + params + ");\n" + next);
+        }
+
+        if (node.getFunction().getOutputParameters().length == 1)
+            return node.getAttribute("call");
+
+        return (node.getAttribute("call") + '.' + pin.getName());
+    }
+
+    var load = function (node, attributes) {
+        FunctionDropDown.setSelected(node, "data", attributes[0])
+    }
+
+    var save = function (node) {
+        return [FunctionDropDown.getSelected(node, "data")];
     }
 
     return {
@@ -479,6 +532,7 @@ function functionCallNode() {
         category: "function",
         gen: gen,
         init: init,
+        attributes: [{ "save": save }, { "load": load }]
     }
 }
 
@@ -520,7 +574,7 @@ function variableSetNode() {
         var m_n = function (change) { pin.setType(change) };
         var m_t = function (change) { pin.setArray(change) };
 
-        var drop = VariableSpinner.make(node, function (variable) {
+        var drop = VariableSpinner.make("Spinner", node, function (variable) {
             if (m_var) {
                 pin.disconnectAll();
                 m_var.removeTypeChangeListener(m_n);
@@ -535,11 +589,19 @@ function variableSetNode() {
                 pin.setType(m_var.getDataType())
             }
         });
-        //   node.addView(NativeNode.Align.CENTER, drop);
+        node.addView(NativeNode.Align.CENTER, drop);
     }
 
     var gen = function (node) {
-        return "";
+        return (VariableSpinner.getSelected(node, "Spinner") + " =  " + node.getPin("data").generate());
+    }
+
+    var load = function (node, attributes) {
+        VariableSpinner.setSelected(node, "Spinner", attributes[0])
+    }
+
+    var save = function (node) {
+        return [VariableSpinner.getSelected(node, "Spinner")];
     }
 
     return {
@@ -548,6 +610,7 @@ function variableSetNode() {
         category: "variable",
         gen: gen,
         init: init,
+        attributes: [{ "save": save }, { "load": load }]
     }
 }
 
@@ -560,7 +623,7 @@ function variableGetNode() {
         var m_n = function (change) { pin.setType(change) };
         var m_t = function (change) { pin.setArray(change) };
 
-        var drop = VariableSpinner.make(node, function (variable) {
+        var drop = VariableSpinner.make("Spinner", node, function (variable) {
             if (m_var) {
                 m_var.removeTypeChangeListener(m_n);
                 m_var.removeArrayChangeListener(m_t);
@@ -574,11 +637,19 @@ function variableGetNode() {
                 pin.setType(m_var.getDataType())
             }
         });
-        //node.addView(NativeNode.Align.CENTER, drop);
+        node.addView(NativeNode.Align.CENTER, drop);
     }
 
     var gen = function (node) {
-        return "";
+        return VariableSpinner.getSelected(node, "Spinner");
+    }
+
+    var load = function (node, attributes) {
+        VariableSpinner.setSelected(node, "Spinner", attributes[0])
+    }
+
+    var save = function (node) {
+        return [VariableSpinner.getSelected(node, "Spinner")];
     }
 
     return {

@@ -2,6 +2,7 @@ package com.littleinferno.flowchart.plugin;
 
 import com.annimon.stream.Optional;
 import com.annimon.stream.Stream;
+import com.littleinferno.flowchart.util.DataType;
 
 import org.mozilla.javascript.Context;
 import org.mozilla.javascript.Function;
@@ -39,9 +40,17 @@ public class PluginHandle extends BasePluginHandle {
         final String pattern = (String) exportRules.get("pattern");
 
         final String entryPoint = (String) exportRules.get("entryPoint");
-
         checkRule(words, variableAvailable, functionAvailable, pattern, entryPoint);
-        return new RuleHandle(words, variableAvailable, functionAvailable, Pattern.compile(pattern), entryPoint);
+
+        Function variableGen = null;
+        if (variableAvailable) {
+            variableGen = (Function) exportRules.get("variableGen");
+            if (variableGen == null)
+                throw new RuntimeException("variableGen must be defined");
+        }
+
+        return new RuleHandle(this, words, variableAvailable, functionAvailable,
+                Pattern.compile(pattern), entryPoint, variableGen);
     }
 
     private void checkRule(String[] words, Boolean variableAvailable, Boolean functionAvailable, String pattern, String entryPoint) throws Exception {
@@ -192,18 +201,23 @@ public class PluginHandle extends BasePluginHandle {
     }
 
     public static class RuleHandle {
+        private BasePluginHandle pluginHandle;
         final String[] keyWords;
         final boolean variableIsAvailable;
         final boolean functionIsAvailable;
         final Pattern pattern;
         final String entryPoint;
+        final Function variableGen;
 
-        RuleHandle(String[] keyWords, boolean variableIsAvailable, boolean functionIsAvailable, Pattern pattern, String entryPoint) {
+        RuleHandle(BasePluginHandle pluginHandle, String[] keyWords, boolean variableIsAvailable,
+                   boolean functionIsAvailable, Pattern pattern, String entryPoint, Function variableGen) {
+            this.pluginHandle = pluginHandle;
             this.keyWords = keyWords;
             this.variableIsAvailable = variableIsAvailable;
             this.functionIsAvailable = functionIsAvailable;
             this.pattern = pattern;
             this.entryPoint = entryPoint;
+            this.variableGen = variableGen;
         }
 
         public boolean containsWord(final String word) {
@@ -216,6 +230,10 @@ public class PluginHandle extends BasePluginHandle {
 
         public String getEntryPoint() {
             return entryPoint;
+        }
+
+        public String genVariable(String name, DataType dataType, boolean isArray) {
+            return pluginHandle.createScriptFun(variableGen).call(String.class, name, dataType, isArray);
         }
     }
 }

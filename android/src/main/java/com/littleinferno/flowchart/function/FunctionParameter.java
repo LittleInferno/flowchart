@@ -4,11 +4,11 @@ import android.os.Parcel;
 import android.os.Parcelable;
 
 import com.annimon.stream.Stream;
+import com.littleinferno.flowchart.util.ArrayChangedListener;
 import com.littleinferno.flowchart.util.Connection;
 import com.littleinferno.flowchart.util.DataType;
 import com.littleinferno.flowchart.util.NameChangedListener;
 import com.littleinferno.flowchart.util.TypeChangedListener;
-import com.littleinferno.flowchart.util.ArrayChangedListener;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -119,6 +119,21 @@ public class FunctionParameter implements Parcelable {
     @SuppressWarnings("unused")
     public void onArrayChange(ArrayChangedListener listener) {
         arrayChangedListeners.add(listener);
+    }
+
+    @SuppressWarnings("unused")
+    public void removeNameChange(NameChangedListener listener) {
+        nameChangedListeners.remove(listener);
+    }
+
+    @SuppressWarnings("unused")
+    public void removeTypeChange(TypeChangedListener listener) {
+        typeChangedListeners.remove(listener);
+    }
+
+    @SuppressWarnings("unused")
+    public void removeArrayChange(ArrayChangedListener listener) {
+        arrayChangedListeners.remove(listener);
     }
 
     private void notifyListenersNameChanged(String newName) {

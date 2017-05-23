@@ -31,6 +31,10 @@ public final class ResUtil {
                 return ContextCompat.getColor(context, R.color.Float);
             case STRING:
                 return ContextCompat.getColor(context, R.color.String);
+            case UNIVERSAL:
+                return ContextCompat.getColor(context, R.color.Universal);
+            case EXECUTION:
+                return ContextCompat.getColor(context, R.color.Execution);
         }
         return 0;
     }

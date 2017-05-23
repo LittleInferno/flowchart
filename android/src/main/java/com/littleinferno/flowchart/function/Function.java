@@ -5,19 +5,21 @@ import android.os.Parcelable;
 import android.util.Log;
 
 import com.annimon.stream.Stream;
-import com.littleinferno.flowchart.util.Connection;
-import com.littleinferno.flowchart.util.DataType;
-import com.littleinferno.flowchart.generator.Generator;
 import com.littleinferno.flowchart.node.AndroidNode;
 import com.littleinferno.flowchart.node.NodeManager;
+import com.littleinferno.flowchart.pin.Pin;
 import com.littleinferno.flowchart.project.ProjectModule;
 import com.littleinferno.flowchart.scene.AndroidSceneLayout;
+import com.littleinferno.flowchart.util.Connection;
+import com.littleinferno.flowchart.util.DataType;
 import com.littleinferno.flowchart.util.DestroyListener;
 import com.littleinferno.flowchart.util.Fun;
+import com.littleinferno.flowchart.util.Generator;
 import com.littleinferno.flowchart.util.Link;
 import com.littleinferno.flowchart.util.NameChangedListener;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -37,10 +39,11 @@ public class Function extends ProjectModule implements Generator, Parcelable {
     private List<DestroyListener> destroyListeners;
 
     private final NodeManager nodeManager;
-    private AndroidSceneLayout androidScene;
+    private AndroidSceneLayout scene;
     private List<FunctionParameter.CallbackPair> parameterListeners = new ArrayList<>();
     private final List<Link> parameterAddListeners = new ArrayList<>();
     private final List<Link> parameterRemoveListeners = new ArrayList<>();
+    private List<AndroidSceneLayout.Wire.SimpleObject> wires = Collections.emptyList();
 
     Function(FunctionManager functionManager, String name) {
         super(functionManager.getProject());
@@ -69,6 +72,8 @@ public class Function extends ProjectModule implements Generator, Parcelable {
 
         Stream.of(saveInfo.nodes).forEach(nodeManager::createNode);
         Stream.of(saveInfo.parameters).forEach(this::addParameter);
+
+        wires = saveInfo.wires;
     }
 
     private Function(Parcel in) {
@@ -170,14 +175,14 @@ public class Function extends ProjectModule implements Generator, Parcelable {
     }
 
     @SuppressWarnings("unused")
-    public int addParameterListener(FunctionParameter.Add add, FunctionParameter.Remove remove) {
+    public FunctionParameter.CallbackPair addParameterListener(FunctionParameter.Add add, FunctionParameter.Remove remove) {
         parameterListeners.add(new FunctionParameter.CallbackPair(add, remove));
-        return parameterListeners.get(parameterListeners.size() - 1).hashCode();
+        return parameterListeners.get(parameterListeners.size() - 1);
     }
 
     @SuppressWarnings("unused")
-    public void removeParameterListener(int i) {
-        parameterListeners = Stream.of(parameterListeners).filter(v -> v.hashCode() != i).toList();
+    public void removeParameterListener(FunctionParameter.CallbackPair i) {
+        parameterListeners = Stream.of(parameterListeners).filter(i::equals).toList();
     }
 
     private void notifyListenersNameChanged(String newName) {
@@ -221,6 +226,10 @@ public class Function extends ProjectModule implements Generator, Parcelable {
         return result;
     }
 
+    public void loadNodes() {
+        Stream.of(nodeManager.getNodes()).forEach(AndroidNode::load);
+    }
+
     @Override
     public int describeContents() {
         return 0;
@@ -241,7 +250,7 @@ public class Function extends ProjectModule implements Generator, Parcelable {
     }
 
     public void bindScene(AndroidSceneLayout androidScene) {
-        this.androidScene = androidScene;
+        this.scene = androidScene;
 
         Stream.of(nodeManager.getNodes())
                 .forEach(androidNode -> {
@@ -251,6 +260,20 @@ public class Function extends ProjectModule implements Generator, Parcelable {
 
                     androidScene.addView(androidNode);
                 });
+
+        Stream.of(wires).forEach(simpleObject -> {
+
+            Pin begin = nodeManager
+                    .getNode(UUID.fromString(simpleObject.begNode))
+                    .getPin(simpleObject.begPin);
+
+            Pin end = nodeManager
+                    .getNode(UUID.fromString(simpleObject.endNode))
+                    .getPin(simpleObject.endPin);
+
+            begin.connect(end);
+        });
+
     }
 
     public FunctionManager getFunctionManager() {
@@ -258,8 +281,8 @@ public class Function extends ProjectModule implements Generator, Parcelable {
     }
 
     public void nodeAdded(AndroidNode node) {
-        if (androidScene != null)
-            androidScene.addView(node);
+        if (scene != null)
+            scene.addView(node);
     }
 
     public Link onParameterAdd(Fun fun) {
@@ -293,7 +316,8 @@ public class Function extends ProjectModule implements Generator, Parcelable {
     public SimpleObject getSaveInfo() {
         return new SimpleObject(name,
                 Stream.of(parameters).map(FunctionParameter::getSaveInfo).toList(),
-                Stream.of(nodeManager.getNodes()).map(AndroidNode::getSaveInfo).toList());
+                Stream.of(nodeManager.getNodes()).map(AndroidNode::getSaveInfo).toList(),
+                scene.getSaveInfo());
     }
 
     @Override
@@ -315,11 +339,16 @@ public class Function extends ProjectModule implements Generator, Parcelable {
         final String name;
         final List<FunctionParameter.SimpleObject> parameters;
         final List<AndroidNode.SimpleObject> nodes;
+        final List<AndroidSceneLayout.Wire.SimpleObject> wires;
 
-        public SimpleObject(String name, List<FunctionParameter.SimpleObject> parameters, List<AndroidNode.SimpleObject> nodes) {
+        public SimpleObject(String name,
+                            List<FunctionParameter.SimpleObject> parameters,
+                            List<AndroidNode.SimpleObject> nodes,
+                            List<AndroidSceneLayout.Wire.SimpleObject> wires) {
             this.name = name;
             this.parameters = parameters;
             this.nodes = nodes;
+            this.wires = wires;
         }
     }
 }

@@ -9,11 +9,12 @@ import android.widget.LinearLayout;
 
 import com.annimon.stream.Optional;
 import com.annimon.stream.Stream;
+import com.littleinferno.flowchart.R;
+import com.littleinferno.flowchart.node.AndroidNode;
+import com.littleinferno.flowchart.scene.AndroidSceneLayout;
 import com.littleinferno.flowchart.util.Connection;
 import com.littleinferno.flowchart.util.DataType;
-import com.littleinferno.flowchart.R;
-import com.littleinferno.flowchart.generator.Generator;
-import com.littleinferno.flowchart.node.AndroidNode;
+import com.littleinferno.flowchart.util.Generator;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -37,6 +38,7 @@ public class Pin extends android.support.v7.widget.AppCompatTextView implements 
     private final Optional<Set<DataType>> possibleConvert;
 
     private static Optional<Pin> connector = Optional.empty();
+    private AndroidSceneLayout.Wire wire;
 
     public Pin(AndroidNode node, LinearLayout.LayoutParams params, Connection connection, String name, boolean isArray, Optional<Set<DataType>> possibleConvert, DataType type) {
         super(node.getContext());
@@ -211,7 +213,7 @@ public class Pin extends android.support.v7.widget.AppCompatTextView implements 
         setImage();
         pin.setImage();
 
-        node.getScene().addWire(this, pin);
+        wire = node.getScene().addWire(this, pin);
     }
 
     private void connectPins(final Pin pin) {
@@ -245,6 +247,7 @@ public class Pin extends android.support.v7.widget.AppCompatTextView implements 
 
         connectedPin = Optional.empty();
         setImage();
+        node.getScene().removeWire(wire);
     }
 
     private void disconnectPins(final Pin pin) {
@@ -304,6 +307,10 @@ public class Pin extends android.support.v7.widget.AppCompatTextView implements 
 
     public float getSceneY() {
         return sceneY;
+    }
+
+    public AndroidNode getNode() {
+        return node;
     }
 
     @Override
