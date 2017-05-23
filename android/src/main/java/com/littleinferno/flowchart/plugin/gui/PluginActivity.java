@@ -49,7 +49,7 @@ public class PluginActivity extends AppCompatActivity {
 
         setSupportActionBar(layout.toolbar);
         layout.toolbar.setNavigationIcon(R.drawable.ic_arrow_back_black_24dp);
-        layout.toolbar.setTitle("create new project");
+        getSupportActionBar().setTitle("plugins");
         layout.toolbar.setNavigationOnClickListener(v -> this.finish());
 
         layout.plugins.items.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
@@ -126,7 +126,7 @@ public class PluginActivity extends AppCompatActivity {
             } catch (IOException e) {
                 e.printStackTrace();
             }
-
+            adapter.updateData(pluginParams);
             layout.progress.setVisibility(View.INVISIBLE);
             layout.progress.setEnabled(false);
             layout.plugins.items.setVisibility(View.VISIBLE);
