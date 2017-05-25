@@ -73,7 +73,7 @@ public class Files {
     }
 
     public static String getSaveLocation(String projectName) {
-        return getSavesLocation() + "/" + projectNameToSaveName(projectName);
+        return getSavesLocation() + projectNameToSaveName(projectName);
     }
 
     public static String getPLuginsLocation() {
@@ -118,9 +118,9 @@ public class Files {
         return gson.fromJson(string, Project.SimpleObject.class);
     }
 
-    public static void delete(Context context, String pluginName) {
-        new File(pluginName).delete();
-        updateAndroidFS(context, pluginName);
+    public static void delete(Context context, String name) {
+        new File(name).delete();
+        updateAndroidFS(context, name);
     }
 
     public static void saveGen(Project project, String generate) {
@@ -139,11 +139,25 @@ public class Files {
         if (plugin.equals(PluginHelper.STANDART_PLUGIN))
             return PluginHelper.getStandartPlugin(context);
 
-        ZipFile zip = new ZipFile(Files.getPLuginsLocation() + "/" + plugin);
+        ZipFile zip = new ZipFile(getPLuginLocation(plugin));
         String index = Files.inputStreamToString(zip.getInputStream(zip.getEntry(PluginHelper.INDEX_FILE)));
         String pl = Files.inputStreamToString(zip.getInputStream(zip.getEntry(PluginHelper.PLUGIN_FILE)));
 
         return new PluginHandle(new Gson().fromJson(index, BasePluginHandle.PluginParams.class), pl);
+    }
+
+    public static BasePluginHandle.PluginParams loadPluginParams(Context context, String plugin) throws IOException {
+        if (plugin.equals(PluginHelper.STANDART_PLUGIN))
+            return PluginHelper.getStandartPluginParams(context.getAssets());
+
+        ZipFile zipFile = new ZipFile(getPLuginLocation(plugin));
+        InputStream inputStream = zipFile.getInputStream(zipFile.getEntry(PluginHelper.INDEX_FILE));
+
+        return gson.fromJson(inputStreamToString(inputStream), BasePluginHandle.PluginParams.class);
+    }
+
+    public static String getPLuginLocation(String plugin) {
+        return getPLuginsLocation() + "/" + plugin;
     }
 
     public static void initFolder(Context context) {

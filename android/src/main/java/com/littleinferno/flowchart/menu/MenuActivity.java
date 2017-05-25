@@ -27,7 +27,7 @@ import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
 
-public class MenuActivity extends AppCompatActivity {
+public class MenuActivity extends AppCompatActivity implements ProjectDel {
 
     private ActivityMenuBinding layout;
     private SlimAdapter adapter;
@@ -47,12 +47,25 @@ public class MenuActivity extends AppCompatActivity {
 
         adapter = SlimAdapter.create().registerDefault(R.layout.item_project,
                 (o, injector) -> {
-                    injector.text(R.id.project_name, (String) o)
-                            .clicked(R.id.project_name, v -> {
-                                Intent intent = new Intent(v.getContext(), ProjectActivity.class);
-                                intent.putExtra(Project.TAG, (String) o);
-                                v.getContext().startActivity(intent);
-                            });
+                    injector.text(R.id.project_name, (String) o);
+
+                    injector.clicked(R.id.project_root, v -> {
+                        Intent intent = new Intent(v.getContext(), ProjectActivity.class);
+                        intent.putExtra(Project.TAG, (String) o);
+                        v.getContext().startActivity(intent);
+                    });
+
+                    injector.longClicked(R.id.project_root, v -> {
+                        Bundle bundle = new Bundle();
+                        bundle.putString(Project.PROJECT_NAME, (String) o);
+                        ProjectDetailsDialog dialog = new ProjectDetailsDialog();
+                        dialog.setDelListener(this);
+                        dialog.setArguments(bundle);
+                        dialog.show(getFragmentManager(), "DIALOG");
+
+                        return true;
+                    });
+
                 })
                 .attachTo(layout.projects.items);
 
@@ -91,7 +104,6 @@ public class MenuActivity extends AppCompatActivity {
             }
         }
 
-
         Toast.makeText(this, "need permissions", Toast.LENGTH_LONG).show();
         layout.addNewProject.setEnabled(false);
     }
@@ -111,5 +123,10 @@ public class MenuActivity extends AppCompatActivity {
             default:
                 return super.onOptionsItemSelected(item);
         }
+    }
+
+    @Override
+    public void del() {
+        adapter.notifyDataSetChanged();
     }
 }

@@ -127,10 +127,10 @@ public class ProjectActivity extends AppCompatActivity implements NavigationView
                 FunctionListFragment.show(project.getFunctionManager(), getFragmentManager());
                 break;
             }
-            case R.id.start: {
-                project.generate();
-                break;
-            }
+//            case R.id.start: {
+//                project.generate();
+//                break;
+//            }
             case R.id.code: {
                 CodeViewDialog.show(project.generate(), getFragmentManager());
                 break;

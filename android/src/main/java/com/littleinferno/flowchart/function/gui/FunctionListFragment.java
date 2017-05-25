@@ -116,6 +116,9 @@ public class FunctionListFragment extends DialogFragment {
 
         add = functionManager.onFunctionAdd(adapter::notifyDataSetChanged);
         remove = functionManager.onFunctionRemove(adapter::notifyDataSetChanged);
+
+
+        layout.back.setOnClickListener(v -> dismiss());
     }
 
     @Override

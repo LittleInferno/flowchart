@@ -7,7 +7,6 @@ var EditText = com.littleinferno.flowchart.plugin.bridge.TextField;
 var FunctionDropDown = com.littleinferno.flowchart.plugin.bridge.FunctionSpinner;
 var VariableSpinner = com.littleinferno.flowchart.plugin.bridge.VariableSpinner;
 
-var LOG = android.util.Log;
 
 function exportNodes() {
     return [addNode(), subNode(), mulNode(), divNode(), equalNode(),
@@ -43,7 +42,6 @@ function exportRules() {
         functionIsAvailable: true,
         pattern: "[$a-zA-Z_][0-9a-zA-Z_$]*",
         entryPoint: "main"
-
     };
 }
 
@@ -549,7 +547,7 @@ function printNode() {
         var dataStr = node.getPin("data").generate();
         var outStr = node.getPin("out").generate();
 
-        var format = "LOG.i(\"\"," + dataStr + ");\n" + outStr;
+        var format = "Console.log(" + dataStr + ");\n" + outStr;
 
         return format;
     }

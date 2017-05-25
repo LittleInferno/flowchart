@@ -86,7 +86,10 @@ public class AndroidNode extends CardView {
                 .map(o -> o ? VISIBLE : INVISIBLE)
                 .ifPresent(this::setClosable);
 
-        layout.close.setOnClickListener(v -> function.getNodeManager().removeNode(this));
+        layout.close.setOnClickListener(v -> {
+            Stream.of(getPins()).forEach(Pin::disconnectAll);
+            function.getNodeManager().removeNode(this);
+        });
 
         id = UUID.randomUUID();
     }

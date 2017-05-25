@@ -208,5 +208,9 @@ public class Project implements Parcelable, Generator {
             this.functions = functions;
             this.variables = variables;
         }
+
+        public String getPlugin() {
+            return plugin;
+        }
     }
 }

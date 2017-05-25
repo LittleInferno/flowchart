@@ -1,5 +1,6 @@
 package com.littleinferno.flowchart.function.gui;
 
+import android.annotation.SuppressLint;
 import android.app.DialogFragment;
 import android.app.FragmentManager;
 import android.content.Context;

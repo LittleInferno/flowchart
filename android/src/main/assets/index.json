@@ -1,6 +1,6 @@
 {
     "pluginName": "standart plugin",
-    "pluginDescription": "basic java script plugin",
+    "pluginDescription": "basic js plugin",
     "pluginVersion": "1.0.5",
     "apiVersion": "0.1.0"
 }
