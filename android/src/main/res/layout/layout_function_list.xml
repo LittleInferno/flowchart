@@ -32,7 +32,7 @@
                     android:layout_height="match_parent"
                     android:layout_weight="1"
                     android:gravity="center"
-                    android:text="Variables"
+                    android:text="Functions"
                     app:layout_constraintBottom_toTopOf="@+id/coordinatorLayout2"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toEndOf="@+id/back"

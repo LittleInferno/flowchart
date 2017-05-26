@@ -108,12 +108,14 @@ public class CreateNewProjectDialog extends AppCompatActivity {
 
         dialog.setDialogSelectionListener(files -> {
 
-            File source = new File(files[0]);
+            if (files.length > 0) {
+                File source = new File(files[0]);
 
-            String destinationPath = Files.getPLuginsLocation() + source.getName();
-            File destination = new File(destinationPath);
-            Files.copyFile(this, source, destination);
-            initPlugins();
+                String destinationPath = Files.getPLuginsLocation() + "/" + source.getName();
+                File destination = new File(destinationPath);
+                Files.copyFile(this, source, destination);
+                initPlugins();
+            }
         });
 
         dialog.show();

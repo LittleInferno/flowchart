@@ -17,7 +17,8 @@ public class Link {
     }
 
     public void disconnect() {
-        list.remove(this);
+        if (list != null)
+            list.remove(this);
         list = null;
         fun = null;
     }

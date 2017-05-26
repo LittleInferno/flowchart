@@ -28,7 +28,9 @@ import io.reactivex.schedulers.Schedulers;
 
 public class Files {
 
-    public static String flowchrtLocation = "/flowchart_projects";
+    public static String getFlowchrtLocation() {
+        return Environment.getExternalStorageDirectory().toString() + "/flowchart_projects";
+    }
 
     private static Gson gson = new GsonBuilder()
             .setPrettyPrinting()
@@ -69,19 +71,19 @@ public class Files {
 
 
     public static String getSavesLocation() {
-        return Environment.getExternalStorageDirectory().toString() + flowchrtLocation + "/saves/";
+        return getFlowchrtLocation() + "/saves";
     }
 
     public static String getSaveLocation(String projectName) {
-        return getSavesLocation() + projectNameToSaveName(projectName);
+        return getSavesLocation() + "/" + projectNameToSaveName(projectName);
     }
 
     public static String getPLuginsLocation() {
-        return Environment.getExternalStorageDirectory().toString() + flowchrtLocation + "/plugins/";
+        return getFlowchrtLocation() + "/plugins";
     }
 
-    public static String getGenerateLocation() {
-        return Environment.getExternalStorageDirectory().toString() + flowchrtLocation + "/generation/";
+    public static String getGeneratesLocation() {
+        return getFlowchrtLocation() + "/generations";
     }
 
     public static void copyFile(Context context, File source, File dest) {
@@ -127,7 +129,7 @@ public class Files {
         Observable.just(generate)
                 .map(s -> {
                     Files.writeToFile(project.getContext(),
-                            getGenerateLocation() + project.getName(), generate);
+                            getGeneratesLocation() + "/" + project.getName() + ".txt", generate);
                     return 1;
                 })
                 .subscribeOn(Schedulers.io())
@@ -161,19 +163,19 @@ public class Files {
     }
 
     public static void initFolder(Context context) {
-        File file = new File(flowchrtLocation);
+        File file = new File(getFlowchrtLocation());
+
 
         if (!file.exists()) {
+            file.mkdir();
+
             File f1 = new File(getSavesLocation());
             File f2 = new File(getPLuginsLocation());
-            File f3 = new File(getGenerateLocation());
+            File f3 = new File(getGeneratesLocation());
 
             f1.mkdirs();
             f2.mkdirs();
             f3.mkdirs();
-
-            updateAndroidFS(context, f1.toString(), f2.toString(), f3.toString());
         }
     }
-
 }

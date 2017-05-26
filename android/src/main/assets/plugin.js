@@ -10,9 +10,9 @@ var VariableSpinner = com.littleinferno.flowchart.plugin.bridge.VariableSpinner;
 
 function exportNodes() {
     return [addNode(), subNode(), mulNode(), divNode(), equalNode(),
-    lessNode(), greatNode(), integerNode(), floatNode(), stringNode(), variableSetNode(),
+    lessNode(), greatNode(),greatEqNode(), integerNode(), floatNode(), stringNode(), variableSetNode(),
     variableGetNode(), printNode(),
-    functionBeginNode(), functionReturnNode(), functionCallNode()];
+    functionBeginNode(), functionReturnNode(), functionCallNode(), ifNode(), SqrtNode()];
 }
 
 function exportRules() {
@@ -241,6 +241,33 @@ function greatNode() {
     }
 }
 
+function greatEqNode() {
+    var a;
+    var b;
+    var result;
+    var possibleConvert = [NativeType.INT, NativeType.FLOAT, NativeType.STRING];
+
+    var init = function (node) {
+        a = node.addDataInputPin("A", false, possibleConvert);
+        b = node.addDataInputPin("B", false, possibleConvert);
+        result = node.addDataOutputPin("result", false, NativeType.BOOL);
+    }
+
+    var gen = function (node) {
+        var a = node.getPin("A").generate();
+        var b = node.getPin("B").generate();
+        return "( " + a + " >= " + b + " )";
+    }
+
+    return {
+        name: "great eq node",
+        title: "great eq",
+        category: "arithmetic",
+        gen: gen,
+        init: init,
+    }
+}
+
 function integerNode() {
 
     var init = function (node) {
@@ -312,7 +339,7 @@ function stringNode() {
     }
 
     var gen = function (node) {
-        return EditText.getText(node, "data");
+        return ("\"" + EditText.getText(node, "data") + "\"");
     }
 
     var load = function (node, attributes) {
@@ -591,7 +618,8 @@ function variableSetNode() {
     }
 
     var gen = function (node) {
-        return (VariableSpinner.getSelected(node, "Spinner") + " =  " + node.getPin("data").generate());
+        return (VariableSpinner.getSelected(node, "Spinner") + " =  " + node.getPin("data").generate()+"\n"+
+        node.getPin("out").generate());
     }
 
     var load = function (node, attributes) {
@@ -658,3 +686,67 @@ function variableGetNode() {
         init: init,
     }
 }
+
+function ifNode() {
+
+    var init = function (node) {
+        node.addExecutionInputPin("in");
+        node.addDataInputPin("Condition", false, NativeType.BOOL);
+
+        node.addExecutionOutputPin("true");
+        node.addExecutionOutputPin("false");
+    }
+
+    var gen = function (node) {
+
+        var condition = node.getPin("Condition").generate();
+
+        var trueStr = node.getPin("true").generate();
+
+        var faseStr = node.getPin("false").generate();
+
+        var res = "if ( " + condition + ") {\n";
+        res += trueStr;
+        res += "}\n"
+
+        if (faseStr) {
+            res += "else {\n"
+            res += faseStr;
+            res += "}\n";
+        }
+
+
+        return res;
+    }
+
+    return {
+        name: "if  node",
+        title: "if",
+        category: "basic java script",
+        gen: gen,
+        init: init,
+    }
+}
+
+
+function SqrtNode() {
+
+    var init = function (node) {
+        node.addDataInputPin("in", false, NativeType.FLOAT, NativeType.INT);
+        node.addDataOutputPin("out", false, NativeType.FLOAT, NativeType.INT);
+    }
+
+    var gen = function (node) {
+
+        return "Math.sqrt(" + node.getPin("in").generate() +")";
+    }
+
+    return {
+        name: "sqrt  node",
+        title: "sqrt",
+        category: "arithmetic",
+        gen: gen,
+        init: init,
+    }
+}
+

@@ -90,7 +90,7 @@ public class FunctionListFragment extends DialogFragment {
 
         Swiper.create(getContext())
                 .swipeLeft(position -> {
-                    functionManager.getFunctions().remove(position);
+                    functionManager.removeFunction(position);
                     adapter.notifyItemRemoved(position);
                     adapter.notifyItemRangeChanged(position, functionManager.getFunctions().size());
 

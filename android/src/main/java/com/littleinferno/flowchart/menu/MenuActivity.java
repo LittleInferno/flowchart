@@ -37,7 +37,15 @@ public class MenuActivity extends AppCompatActivity implements ProjectDel {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         layout = DataBindingUtil.setContentView(this, R.layout.activity_menu);
-        requestPermissions(new String[]{"android.permission.WRITE_EXTERNAL_STORAGE"}, 200);
+
+        String permission = "android.permission.WRITE_EXTERNAL_STORAGE";
+        int res = checkCallingOrSelfPermission(permission);
+        if (res == PackageManager.PERMISSION_GRANTED) {
+            Files.initFolder(this);
+            initProjects();
+        } else {
+            requestPermissions(new String[]{"android.permission.WRITE_EXTERNAL_STORAGE"}, 200);
+        }
 
         setSupportActionBar(layout.mainMenuToolbar);
 

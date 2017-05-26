@@ -75,7 +75,8 @@ public class CodeViewDialog extends DialogFragment {
         FilePickerDialog dialog = new FilePickerDialog(getContext(), properties);
 
         dialog.setDialogSelectionListener(files -> {
-            Files.writeToFile(getContext(), files[0], code);
+            if (files.length > 0)
+                Files.writeToFile(getContext(), files[0], code);
         });
 
         dialog.show();

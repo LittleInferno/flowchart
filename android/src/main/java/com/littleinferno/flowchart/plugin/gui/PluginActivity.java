@@ -103,7 +103,7 @@ public class PluginActivity extends AppCompatActivity {
 
             Stream.of(files).forEach(s -> {
                 File source = new File(s);
-                String destinationPath = Files.getPLuginsLocation() + source.getName();
+                String destinationPath = Files.getPLuginsLocation() + "/" + source.getName();
                 File destination = new File(destinationPath);
                 Files.copyFile(this, source, destination);
             });

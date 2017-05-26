@@ -114,6 +114,11 @@ public class AndroidSceneLayout extends RelativeLayout {
         invalidate();
     }
 
+    public void removeWires() {
+        wires.clear();
+        invalidate();
+    }
+
     private class GestureListener extends GestureDetector.SimpleOnGestureListener {
         @Override
         public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX, float distanceY) {

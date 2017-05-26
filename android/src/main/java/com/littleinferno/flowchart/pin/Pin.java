@@ -223,11 +223,14 @@ public class Pin extends android.support.v7.widget.AppCompatTextView implements 
     public void disconnectAll() {
         if (isSingle() && isConnect()) {
             disconnectPin();
-        } else {
-            connectedPins
-                    .ifPresent(connectors -> Stream.of(connectors)
-                            .forEach(c -> c.disconnect(this)));
-        }
+        } else connectedPins
+                .ifPresent(connectors ->
+                        {
+                            for (int i = 0; i < connectors.size(); i++) {
+                                connectors.get(i).disconnect(this);
+                            }
+                        }
+                );
     }
 
     public void disconnect(final Pin pin) {

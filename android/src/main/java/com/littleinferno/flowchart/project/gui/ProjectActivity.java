@@ -7,6 +7,7 @@ import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
+import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -146,6 +147,7 @@ public class ProjectActivity extends AppCompatActivity implements NavigationView
         switch (item.getItemId()) {
             case R.id.nav_save:
                 project.save();
+                layout.drawerLayout.closeDrawer(Gravity.LEFT);
                 break;
             case R.id.nav_close:
                 finish();

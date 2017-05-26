@@ -10,6 +10,12 @@ import android.view.ScaleGestureDetector;
 
 public class SceneDrag extends CardView {
 
+    private static float scaleFactor = 1;
+
+    static public float getScaleFactor() {
+        return scaleFactor;
+    }
+
     public SceneDrag(Context context, AttributeSet attrs) {
         super(context, attrs);
         delta = new PointF();
@@ -18,7 +24,7 @@ public class SceneDrag extends CardView {
 //            setX(getWidth() / 2);
 //            setY(getHeight() / 2);
 //        });
-        scaleDetector = new ScaleGestureDetector(context, new  ScaleListener());
+        scaleDetector = new ScaleGestureDetector(context, new ScaleListener());
 
     }
 
@@ -54,7 +60,6 @@ public class SceneDrag extends CardView {
 
     private class ScaleListener extends ScaleGestureDetector.SimpleOnScaleGestureListener {
 
-        private float scaleFactor = 1;
 
         @Override
         public boolean onScale(ScaleGestureDetector detector) {

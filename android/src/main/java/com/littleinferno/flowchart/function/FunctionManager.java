@@ -80,6 +80,10 @@ public class FunctionManager extends ProjectModule implements Generator, Parcela
         functions.remove(function);
     }
 
+    public void removeFunction(int function) {
+        removeFunction(functions.get(function));
+    }
+
     public Function getFunction(String name) {
 
         Optional<Function> function = Stream.of(functions)
