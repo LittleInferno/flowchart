@@ -31,7 +31,7 @@ public class ProjectDetailsDialog extends DialogFragment {
     private Set<String> projectNames;
     private String projectName;
     private String newProjectName;
-    private ProjectDel delListener;
+    private ProjectUpdate delListener;
 
     @Nullable
     @Override
@@ -75,14 +75,15 @@ public class ProjectDetailsDialog extends DialogFragment {
             Files.copyFile(getContext(), new File(Files.getSaveLocation(projectName)),
                     new File(Files.getSaveLocation(newProjectName)));
             Files.delete(getContext(), Files.getSaveLocation(projectName));
+            delListener.update();
             dismiss();
         });
 
         layout.back.setOnClickListener(v -> dismiss());
         layout.delete.setOnClickListener(v -> {
             Files.delete(getContext(), Files.getSaveLocation(projectName));
+            delListener.update();
             dismiss();
-            delListener.del();
         });
 
         loadProject();
@@ -141,7 +142,7 @@ public class ProjectDetailsDialog extends DialogFragment {
         name.dispose();
     }
 
-    public void setDelListener(ProjectDel delListener) {
+    public void setDelListener(ProjectUpdate delListener) {
         this.delListener = delListener;
     }
 }

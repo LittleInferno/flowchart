@@ -27,7 +27,7 @@ import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
 
-public class MenuActivity extends AppCompatActivity implements ProjectDel {
+public class MenuActivity extends AppCompatActivity implements ProjectUpdate {
 
     private ActivityMenuBinding layout;
     private SlimAdapter adapter;
@@ -139,7 +139,7 @@ public class MenuActivity extends AppCompatActivity implements ProjectDel {
     }
 
     @Override
-    public void del() {
+    public void update() {
         initProjects();
     }
 }

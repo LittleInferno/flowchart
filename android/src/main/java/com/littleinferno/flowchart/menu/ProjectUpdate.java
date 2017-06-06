@@ -1,5 +1,5 @@
 package com.littleinferno.flowchart.menu;
 
-interface ProjectDel {
-    void del();
+interface ProjectUpdate {
+    void update();
 }
