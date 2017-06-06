@@ -143,13 +143,13 @@ public class ProjectActivity extends AppCompatActivity implements NavigationView
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
 
-
         switch (item.getItemId()) {
             case R.id.nav_save:
                 project.save();
                 layout.drawerLayout.closeDrawer(Gravity.LEFT);
                 break;
             case R.id.nav_close:
+                project.save();
                 finish();
                 break;
             case R.id.nav_create_new:
@@ -158,7 +158,6 @@ public class ProjectActivity extends AppCompatActivity implements NavigationView
                 startActivity(intent);
                 break;
         }
-        project.save();
         return false;
     }
 

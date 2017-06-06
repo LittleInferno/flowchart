@@ -31,21 +31,11 @@ public class MenuActivity extends AppCompatActivity implements ProjectDel {
 
     private ActivityMenuBinding layout;
     private SlimAdapter adapter;
-    private boolean hasPermision = true;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         layout = DataBindingUtil.setContentView(this, R.layout.activity_menu);
-
-        String permission = "android.permission.WRITE_EXTERNAL_STORAGE";
-        int res = checkCallingOrSelfPermission(permission);
-        if (res == PackageManager.PERMISSION_GRANTED) {
-            Files.initFolder(this);
-            initProjects();
-        } else {
-            requestPermissions(new String[]{"android.permission.WRITE_EXTERNAL_STORAGE"}, 200);
-        }
 
         setSupportActionBar(layout.mainMenuToolbar);
 
@@ -83,6 +73,21 @@ public class MenuActivity extends AppCompatActivity implements ProjectDel {
                     intent.setFlags(intent.getFlags() | Intent.FLAG_ACTIVITY_NO_HISTORY);
                     startActivity(intent);
                 });
+
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        String permission = "android.permission.WRITE_EXTERNAL_STORAGE";
+        int res = checkCallingOrSelfPermission(permission);
+        if (res == PackageManager.PERMISSION_GRANTED) {
+            Files.initFolder(this);
+            initProjects();
+        } else {
+            requestPermissions(new String[]{permission}, 200);
+        }
 
     }
 
@@ -135,6 +140,6 @@ public class MenuActivity extends AppCompatActivity implements ProjectDel {
 
     @Override
     public void del() {
-        adapter.notifyDataSetChanged();
+        initProjects();
     }
 }

@@ -110,7 +110,6 @@ public class Files {
                             getSaveLocation(project.getName()), s);
                     return 1;
                 })
-                .subscribeOn(Schedulers.io())
                 .subscribe(s -> {
                 });
     }
